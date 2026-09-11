@@ -1,11 +1,48 @@
 import { Request, Response } from 'express';
-import { NASHIK_SEED_SITES } from '../seed/seedData.js';
+import { NASHIK_SEED_SITES, ISite } from '../seed/seedData.js';
+import { isDbConnected } from '../config/db.js';
+import { SiteModel } from '../models/Site.js';
 import { ScoringService } from '../services/scoringService.js';
 import { RiskService } from '../services/riskService.js';
 
-export const getAllSites = (req: Request, res: Response) => {
-  const { status, town } = req.query;
-  let sites = [...NASHIK_SEED_SITES];
+const fetchAllSites = async (): Promise<ISite[]> => {
+  if (isDbConnected()) {
+    try {
+      const dbSites = await SiteModel.find().lean();
+      if (dbSites && dbSites.length > 0) {
+        return dbSites.map((s) => ({
+          id: s.id,
+          code: s.code,
+          name: s.name,
+          cityName: s.cityName,
+          wardName: s.wardName,
+          zoneName: s.zoneName,
+          opportunityScore: s.opportunityScore,
+          status: s.status as ISite['status'],
+          latitude: s.latitude,
+          longitude: s.longitude,
+          areaSqm: s.areaSqm,
+          metrics: s.metrics,
+          description: s.description || '',
+          address: s.address || '',
+          tags: s.tags || [],
+        }));
+      }
+    } catch (err) {
+      console.warn('[sitesController] DB query failed, falling back to seed sites:', (err as Error).message);
+    }
+  }
+  return NASHIK_SEED_SITES;
+};
+
+const fetchSiteById = async (siteId: string): Promise<ISite | undefined> => {
+  const sites = await fetchAllSites();
+  return sites.find((s) => s.id === siteId || s.code === siteId);
+};
+
+export const getAllSites = async (req: Request, res: Response) => {
+  const { status } = req.query;
+  let sites = await fetchAllSites();
 
   if (status) {
     sites = sites.filter((s) => s.status.toLowerCase() === (status as string).toLowerCase());
@@ -18,8 +55,9 @@ export const getAllSites = (req: Request, res: Response) => {
   });
 };
 
-export const getRankedSites = (_req: Request, res: Response) => {
-  const ranked = [...NASHIK_SEED_SITES].sort((a, b) => b.opportunityScore - a.opportunityScore);
+export const getRankedSites = async (_req: Request, res: Response) => {
+  const sites = await fetchAllSites();
+  const ranked = [...sites].sort((a, b) => b.opportunityScore - a.opportunityScore);
   res.status(200).json({
     success: true,
     count: ranked.length,
@@ -27,9 +65,9 @@ export const getRankedSites = (_req: Request, res: Response) => {
   });
 };
 
-export const getSiteById = (req: Request, res: Response) => {
+export const getSiteById = async (req: Request, res: Response) => {
   const { siteId } = req.params;
-  const site = NASHIK_SEED_SITES.find((s) => s.id === siteId || s.code === siteId);
+  const site = await fetchSiteById(siteId);
 
   if (!site) {
     return res.status(404).json({
@@ -44,9 +82,9 @@ export const getSiteById = (req: Request, res: Response) => {
   });
 };
 
-export const getSiteScores = (req: Request, res: Response) => {
+export const getSiteScores = async (req: Request, res: Response) => {
   const { siteId } = req.params;
-  const site = NASHIK_SEED_SITES.find((s) => s.id === siteId || s.code === siteId);
+  const site = await fetchSiteById(siteId);
 
   if (!site) {
     return res.status(404).json({
@@ -66,9 +104,9 @@ export const getSiteScores = (req: Request, res: Response) => {
   });
 };
 
-export const getSiteRisk = (req: Request, res: Response) => {
+export const getSiteRisk = async (req: Request, res: Response) => {
   const { siteId } = req.params;
-  const site = NASHIK_SEED_SITES.find((s) => s.id === siteId || s.code === siteId);
+  const site = await fetchSiteById(siteId);
 
   if (!site) {
     return res.status(404).json({

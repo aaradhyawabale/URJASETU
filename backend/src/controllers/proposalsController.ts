@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { ProposalService } from '../services/proposalService.js';
 
-export const getAllProposals = (_req: Request, res: Response) => {
-  const proposals = ProposalService.getAllProposals();
+export const getAllProposals = async (_req: Request, res: Response) => {
+  const proposals = await ProposalService.getAllProposals();
   res.status(200).json({
     success: true,
     count: proposals.length,
@@ -10,9 +10,9 @@ export const getAllProposals = (_req: Request, res: Response) => {
   });
 };
 
-export const getProposalById = (req: Request, res: Response) => {
+export const getProposalById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const proposal = ProposalService.getProposalById(id);
+  const proposal = await ProposalService.getProposalById(id);
 
   if (!proposal) {
     return res.status(404).json({
@@ -27,17 +27,17 @@ export const getProposalById = (req: Request, res: Response) => {
   });
 };
 
-export const createProposal = (req: Request, res: Response) => {
-  const newProposal = ProposalService.createProposal(req.body);
+export const createProposal = async (req: Request, res: Response) => {
+  const newProposal = await ProposalService.createProposal(req.body);
   res.status(201).json({
     success: true,
     data: newProposal,
   });
 };
 
-export const updateProposal = (req: Request, res: Response) => {
+export const updateProposal = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const updated = ProposalService.updateProposal(id, req.body);
+  const updated = await ProposalService.updateProposal(id, req.body);
 
   if (!updated) {
     return res.status(404).json({
@@ -52,9 +52,9 @@ export const updateProposal = (req: Request, res: Response) => {
   });
 };
 
-export const deleteProposal = (req: Request, res: Response) => {
+export const deleteProposal = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const deleted = ProposalService.deleteProposal(id);
+  const deleted = await ProposalService.deleteProposal(id);
 
   if (!deleted) {
     return res.status(404).json({
