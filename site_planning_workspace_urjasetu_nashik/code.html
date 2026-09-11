@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Site Planning Workspace — UrjaSetu Nashik</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "status-recommended-border": "#a7f3d0",
+            "on-primary-fixed": "#002114",
+            "status-screening": "#64748b",
+            "on-tertiary": "#ffffff",
+            "status-review-bg": "#fffbeb",
+            "text-primary": "#0f172a",
+            "outline-variant": "#bccac0",
+            "on-secondary-container": "#00476e",
+            "error-container": "#ffdad6",
+            "secondary-container": "#5bb8fe",
+            "on-error": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-container-highest": "#d3e4fe",
+            "on-surface": "#0b1c30",
+            "status-screening-border": "#e2e8f0",
+            "on-tertiary-fixed": "#2f1500",
+            "outline": "#6d7a72",
+            "surface-tint": "#006c4a",
+            "on-secondary-fixed": "#001d31",
+            "status-review-border": "#fde68a",
+            "on-primary": "#ffffff",
+            "border-subtle": "#e2e8f0",
+            "status-disqualified": "#dc2626",
+            "surface-container-high": "#dce9ff",
+            "on-surface-variant": "#3d4a42",
+            "primary-fixed-dim": "#68dba9",
+            "status-disqualified-bg": "#fef2f2",
+            "status-disqualified-border": "#fecaca",
+            "map-parcel-fill": "#f1f5f9",
+            "map-arterial": "#94a3b8",
+            "secondary-fixed-dim": "#93ccff",
+            "tertiary-fixed": "#ffdcc3",
+            "tertiary-fixed-dim": "#ffb77d",
+            "on-tertiary-container": "#fffbff",
+            "background": "#f8f9ff",
+            "status-recommended-bg": "#ecfdf5",
+            "status-review": "#d97706",
+            "surface-subtle": "#f1f5f9",
+            "map-waterway": "#bae6fd",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed": "#cce5ff",
+            "tertiary-container": "#b15f00",
+            "on-secondary-fixed-variant": "#004b73",
+            "tertiary": "#8d4b00",
+            "on-primary-container": "#f5fff7",
+            "on-background": "#0b1c30",
+            "surface": "#ffffff",
+            "map-parcel-stroke": "#cbd5e1",
+            "surface-dim": "#cbdbf5",
+            "on-primary-fixed-variant": "#005137",
+            "inverse-primary": "#68dba9",
+            "surface-variant": "#d3e4fe",
+            "status-screening-bg": "#f8fafc",
+            "border-strong": "#cbd5e1",
+            "primary": "#006948",
+            "on-secondary": "#ffffff",
+            "surface-bright": "#f8f9ff",
+            "surface-container": "#e5eeff",
+            "inverse-surface": "#213145",
+            "surface-container-low": "#eff4ff",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "primary-container": "#00855d",
+            "app-bg": "#f8fafc",
+            "on-error-container": "#93000a",
+            "secondary": "#006398",
+            "text-secondary": "#475569",
+            "inverse-on-surface": "#eaf1ff",
+            "primary-fixed": "#85f8c4",
+            "status-recommended": "#059669",
+            "text-muted": "#94a3b8"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline-lg": ["Inter"],
+            "label-caps": ["Inter"],
+            "display-hero": ["Inter"],
+            "headline-md": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "metric-tabular": ["Inter"],
+            "headline-sm": ["Inter"],
+            "tag-provenance": ["Inter"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "title-md": ["Inter"],
+            "body-md": ["Inter"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    .gis-grid-pattern {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(203, 213, 225, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(203, 213, 225, 0.4) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-app-bg text-text-primary min-h-screen font-body-md antialiased overflow-x-hidden">
+<!-- SHARED TOP NAV BAR (Brand Anchor: Included verbatim) -->
+<div class="relative flex h-auto w-full flex-col bg-[#f8fcfb] group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7f4f0] px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#0d1c17]">
+<div class="size-4">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-[#0d1c17] text-lg font-bold leading-tight tracking-[-0.015em]">UrjaSetu GIS</h2>
+</div>
+<div class="flex items-center gap-9">
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Dashboard</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Spatial Analytics</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Ranked Sites</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Site Planning</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Grid Interconnect</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Reports</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#489d82] flex border-none bg-[#e7f4f0] items-center justify-center pl-4 rounded-l-lg border-r-0" data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+</svg>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d1c17] focus:outline-0 focus:ring-0 border-none bg-[#e7f4f0] focus:border-none h-full placeholder:text-[#489d82] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search" value=""/>
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#059668] text-[#f8fcfb] text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Session SES-2025-09A</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#e7f4f0] text-[#0d1c17] text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Nashik City (Ward 24)</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e7f4f0] text-[#0d1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<div class="text-[#0d1c17]" data-icon="Bell" data-size="20px" data-weight="regular">
+<svg fill="currentColor" height="20px" viewbox="0 0 256 256" width="20px" xmlns="http://www.w3.org/2000/svg">
+<path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
+</svg>
+</div>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e7f4f0] text-[#0d1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<div class="text-[#0d1c17]" data-icon="Gear" data-size="20px" data-weight="regular">
+<svg fill="currentColor" height="20px" viewbox="0 0 256 256" width="20px" xmlns="http://www.w3.org/2000/svg">
+<path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"></path>
+</svg>
+</div>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Official portrait photograph of a municipal urban GIS analyst wearing smart casual attire against a clean neutral administrative background, sharp clarity and soft natural light." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDsEbo7myyrRH5XYKDAYnBc7ZUqqKJZCWwvv_hYsmsVs697hc85RnpAD8nTtH8R1VKa0NjfPZh7rKxphhYryJdOHCBBCc2h1O8u79r3tfgd9P5HETKB4b-Vh8vAe9hjRdX5qk42Z0mdCtI95PC6NVcW19Yt6H7pMtLwbI8km8zva3O1rjJHT1px86pLnacQdtQ7fQoW_1g7cfpP2mI5R4X3nYDxfzVJREenjUvyy5Wq-ltjPA3bEPKq");'></div>
+</div>
+</header>
+<!-- BREADCRUMBS -->
+<div class="flex flex-wrap gap-2 p-4">
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">UrjaSetu GIS</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">Nashik Urban Agglomeration</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">Ranked Sites</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<span class="text-[#0d1c17] text-base font-medium leading-normal">Site Planning Workspace</span>
+</div>
+<!-- HEADER SECTION -->
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<div class="flex min-w-72 flex-col gap-3">
+<p class="text-[#0d1c17] text-4xl font-black leading-tight tracking-[-0.033em]">Site Planning Workspace — NASHIK-SITE-01 (Ambad Industrial)</p>
+<p class="text-[#489d82] text-base font-normal leading-normal">
+                Define the usable site boundary, verify cadastral setback clearances, and configure the Solar-EV infrastructure footprint.
+              </p>
+</div>
+<div class="flex items-start">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#e7f4f0] text-[#0d1c17] text-sm font-bold leading-normal tracking-[0.015em] border border-[#cee9e0] hover:bg-[#d9ede7] transition-colors">
+<span class="material-symbols-outlined text-[18px] mr-2">download</span>
+<span class="truncate">Export GeoJSON</span>
+</button>
+</div>
+</div>
+<!-- LOCATION BADGES -->
+<div class="flex gap-3 p-3 overflow-x-hidden flex-wrap">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Nashik, Maharashtra</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<span class="material-symbols-outlined text-[16px] text-primary">apartment</span>
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Tier-2 ULB</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<span class="material-symbols-outlined text-[16px] text-primary">grid_4x4</span>
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">EPSG:4326 WGS84</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#ecfdf5] border border-[#a7f3d0] pl-4 pr-4">
+<span class="material-symbols-outlined text-[16px] text-[#059669]">verified</span>
+<p class="text-[#059669] text-sm font-semibold leading-normal">Status: Recommended (Score 84/100)</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">folder_open</span>
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Active Planning: SES-2025-09A</p>
+</div>
+</div>
+<!-- STEPPER NAVIGATION (From Shared Library) -->
+<div class="pb-3">
+<div class="flex border-b border-[#cee9e0] px-4 gap-8">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#489d82] gap-1 pb-[7px] pt-2.5" href="#">
+<div class="text-[#489d82]" data-icon="CheckCircle" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+</svg>
+</div>
+<p class="text-[#489d82] text-sm font-bold leading-normal tracking-[0.015em]">01. Select Site (Score 84/100)</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#059668] text-[#0d1c17] gap-1 pb-[7px] pt-2.5" href="#">
+<div class="text-[#0d1c17]" data-icon="Crop" data-size="24px" data-weight="fill">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM120,80h48a8,8,0,0,1,8,8v48a8,8,0,0,1-16,0V96H120a8,8,0,0,1,0-16Zm72,96H176v16a8,8,0,0,1-16,0V176H88a8,8,0,0,1-8-8V96H64a8,8,0,0,1,0-16H80V64a8,8,0,0,1,16,0v96h96a8,8,0,0,1,0,16Z"></path>
+</svg>
+</div>
+<p class="text-[#0d1c17] text-sm font-bold leading-normal tracking-[0.015em]">02. Define Usable Plot (Active)</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#489d82] gap-1 pb-[7px] pt-2.5" href="#">
+<div class="text-[#489d82]" data-icon="Lightning" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"></path>
+</svg>
+</div>
+<p class="text-[#489d82] text-sm font-bold leading-normal tracking-[0.015em]">03. Select Infrastructure (Configured)</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#489d82] gap-1 pb-[7px] pt-2.5" href="#">
+<div class="text-[#489d82]" data-icon="Cube" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M223.68,66.15,135.68,18h0a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32h0l80.34,44L128,120,47.66,76ZM40,90l80,43.78v85.79L40,175.82Zm96,129.57V133.82L216,90v85.78Z"></path>
+</svg>
+</div>
+<p class="text-[#489d82] text-sm font-bold leading-normal tracking-[0.015em]">04. 3D Visualization &amp; AI Review</p>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- WORKSPACE BODY: SPLIT VIEW INTERFACE -->
+<main class="w-full px-6 lg:px-10 pb-16 pt-2">
+<div class="max-w-[1680px] mx-auto flex flex-col xl:flex-row gap-6 items-start">
+<!-- LEFT WORKSPACE: 2D GIS PLANNING MAP CANVAS (Approx 66% width) -->
+<section class="w-full xl:w-[67%] bg-surface border border-border-subtle rounded-xl overflow-hidden shadow-sm flex flex-col">
+<!-- Sub-header bar for GIS canvas -->
+<div class="bg-surface-subtle px-4 py-2.5 border-b border-border-subtle flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-3">
+<span class="flex h-2.5 w-2.5 rounded-full bg-status-recommended animate-pulse"></span>
+<span class="text-xs font-semibold text-text-primary tracking-tight">Interactive Geodesic Canvas — MahaGIS Ward 24 Vector Tile Service</span>
+<span class="bg-surface border border-border-subtle text-text-secondary text-[11px] font-medium px-2 py-0.5 rounded">MIDC Sector Ambad Zone-A</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[11px] text-text-secondary">Spatial Projection: <strong class="text-text-primary font-medium">EPSG:32643 (UTM 43N)</strong></span>
+</div>
+</div>
+<!-- GIS Canvas Container -->
+<div class="relative w-full h-[760px] bg-[#f5f8f7] overflow-hidden select-none gis-grid-pattern cursor-crosshair">
+<!-- Vector GIS Layers Render (Simulated Vector Basemap with Detailed Municipal Elements) -->
+<svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Patterns for floodway buffer & road hatching -->
+<pattern height="16" id="floodSafePattern" patternunits="userSpaceOnUse" width="16">
+<path d="M0 16 L16 0 M-4 4 L4 -4 M12 20 L20 12" opacity="0.6" stroke="#bae6fd" stroke-width="1.2"></path>
+</pattern>
+<pattern height="20" id="roadStripes" patterntransform="rotate(45)" patternunits="userSpaceOnUse" width="20">
+<line stroke="#cbd5e1" stroke-width="3" x1="0" x2="0" y1="0" y2="20"></line>
+</pattern>
+</defs>
+<!-- Surrounding Industrial Parcel Blocks -->
+<rect fill="#ffffff" height="180" rx="4" stroke="#cbd5e1" stroke-width="1.5" width="240" x="20" y="20"></rect>
+<text fill="#64748b" font-size="11" font-weight="600" letter-spacing="0.05em" x="35" y="45">PLOT A-12: AUTO ANCILLARY MIDC</text>
+<text fill="#94a3b8" font-size="10" x="35" y="62">Built Area: 3,850 m² • Power: 415V 3-Ph</text>
+<rect fill="#ffffff" height="180" rx="4" stroke="#cbd5e1" stroke-width="1.5" width="310" x="280" y="20"></rect>
+<text fill="#64748b" font-size="11" font-weight="600" letter-spacing="0.05em" x="295" y="45">PLOT A-13: MAHINDRA LOGISTICS DEPOT</text>
+<text fill="#94a3b8" font-size="10" x="295" y="62">Cadastral ID: NSK-MIDC-4402 • High Solar Potential</text>
+<rect fill="#ffffff" height="220" rx="4" stroke="#cbd5e1" stroke-width="1.5" width="340" x="610" y="20"></rect>
+<text fill="#64748b" font-size="11" font-weight="600" letter-spacing="0.05em" x="625" y="45">MSEDCL 33/11kV AMBAD SUBSTATION</text>
+<text fill="#0284c7" font-size="10" font-weight="500" x="625" y="62">Distance to Plot Edge: 120m via designated utility easement</text>
+<!-- Substation icon / visual -->
+<circle cx="635" cy="85" fill="#e0f2fe" r="8" stroke="#0284c7" stroke-width="1.5"></circle>
+<path d="M635 80 L632 86 L635 86 L634 90 L638 84 L635 84 Z" fill="#0284c7"></path>
+<!-- Godavari 100-Year Floodway Safety Buffer Area (Noticeably far and safe) -->
+<path d="M 0 680 Q 300 660 600 690 T 1100 670 L 1100 760 L 0 760 Z" fill="url(#floodSafePattern)" opacity="0.4"></path>
+<path d="M 0 680 Q 300 660 600 690 T 1100 670" fill="none" stroke="#38bdf8" stroke-dasharray="6,4" stroke-width="1.5"></path>
+<text fill="#0369a1" font-size="11" font-weight="600" x="30" y="730">GODAVARI 100-YEAR FLOODWAY SAFETY BUFFER (&gt;1.8 KM CLEARANCE · SAFE ZONE)</text>
+<!-- Main Arterial Road: NH-848 Link Corridor (24m Right of Way) -->
+<g id="arterialRoadGroup">
+<!-- Road Base (Width: 80px representing 24m ROW at 1:300 scale) -->
+<rect fill="#e2e8f0" height="96" stroke="#cbd5e1" stroke-width="1" width="1100" x="0" y="240"></rect>
+<!-- Road Centerline -->
+<line stroke="#94a3b8" stroke-dasharray="16,14" stroke-width="2" x1="0" x2="1100" y1="288" y2="288"></line>
+<!-- Road Boundary Marks -->
+<line stroke="#64748b" stroke-width="1.5" x1="0" x2="1100" y1="240" y2="240"></line>
+<line stroke="#64748b" stroke-width="1.5" x1="0" x2="1100" y1="336" y2="336"></line>
+<!-- Road Labels -->
+<text fill="#334155" font-size="12" font-weight="700" letter-spacing="0.04em" x="50" y="275">NH-848 AMBAD INDUSTRIAL CORRIDOR (24.0m MUNICIPAL ROW)</text>
+<text fill="#64748b" font-size="11" x="50" y="315">← Towards CIDCO &amp; City Center | Towards Mumbai-Agra Highway NH-3 →</text>
+</g>
+<!-- 15.0m Building Setback Line from Road ROW -->
+<line stroke="#f59e0b" stroke-dasharray="5,4" stroke-width="1.5" x1="160" x2="880" y1="388" y2="388"></line>
+<text fill="#d97706" font-size="10" font-weight="600" x="220" y="380">CADASRAL SETBACK LINE: 15.0m FROM NH-848 ROAD MARGIN (COMPLIANT)</text>
+<!-- 11kV Feeder Line Overhead Corridor -->
+<path d="M 635 90 L 635 240 L 760 380 L 760 620" fill="none" stroke="#0ea5e9" stroke-dasharray="8,5" stroke-width="2.5"></path>
+<!-- Feeder Transmission Poles -->
+<circle cx="635" cy="160" fill="#0284c7" r="5"></circle>
+<circle cx="760" cy="450" fill="#0284c7" r="5"></circle>
+<circle cx="760" cy="580" fill="#0284c7" r="5"></circle>
+<text fill="#0284c7" font-size="10" font-weight="600" x="775" y="455">11kV MSEDCL Dedicated Feeder (18.5m Safe Offset from Canopy)</text>
+<!-- THE ACTIVE DRAWN USABLE BOUNDARY POLYGON (5 VERTICES) -->
+<!-- Vertices: V1(210, 410), V2(680, 410), V3(720, 570), V4(520, 605), V5(210, 560) -->
+<g id="usablePolygonContainer">
+<!-- Polygon Fill and Boundary -->
+<polygon fill="#10b981" fill-opacity="0.12" points="210,410 680,410 720,570 520,605 210,560" stroke="#059669" stroke-dasharray="8,4" stroke-width="2.5"></polygon>
+<!-- Interior Concept Layout Silhouette (PV Solar Canopy Benches + 6 EV Bays) -->
+<g opacity="0.75">
+<!-- Dual Solar Canopy Footprints -->
+<rect fill="#006948" fill-opacity="0.25" height="90" rx="3" stroke="#006948" stroke-width="1.5" width="220" x="250" y="435"></rect>
+<text fill="#00472e" font-size="10" font-weight="700" x="260" y="455">CANOPY ARRAY 1: 90 kWp</text>
+<rect fill="#006948" fill-opacity="0.25" height="90" rx="3" stroke="#006948" stroke-width="1.5" width="160" x="490" y="435"></rect>
+<text fill="#00472e" font-size="10" font-weight="700" x="500" y="455">CANOPY ARRAY 2: 90 kWp</text>
+<!-- EV Charging Bays (6 spots) -->
+<rect fill="#ffffff" height="40" rx="2" stroke="#059669" stroke-width="1" width="30" x="260" y="475"></rect>
+<text fill="#059669" font-size="9" font-weight="700" x="268" y="500">EV 1</text>
+<rect fill="#ffffff" height="40" rx="2" stroke="#059669" stroke-width="1" width="30" x="296" y="475"></rect>
+<text fill="#059669" font-size="9" font-weight="700" x="304" y="500">EV 2</text>
+<rect fill="#ffffff" height="40" rx="2" stroke="#059669" stroke-width="1" width="30" x="332" y="475"></rect>
+<text fill="#059669" font-size="9" font-weight="700" x="340" y="500">EV 3</text>
+<rect fill="#ffffff" height="40" rx="2" stroke="#059669" stroke-width="1" width="30" x="368" y="475"></rect>
+<text fill="#059669" font-size="9" font-weight="700" x="376" y="500">EV 4</text>
+<rect fill="#ffffff" height="40" rx="2" stroke="#059669" stroke-width="1" width="30" x="505" y="475"></rect>
+<text fill="#059669" font-size="9" font-weight="700" x="513" y="500">EV 5</text>
+<rect fill="#ffffff" height="40" rx="2" stroke="#059669" stroke-width="1" width="30" x="541" y="475"></rect>
+<text fill="#059669" font-size="9" font-weight="700" x="549" y="500">EV 6</text>
+<!-- Transformer & BESS Buffer Enclosure -->
+<rect fill="#cce5ff" height="60" rx="2" stroke="#006398" stroke-width="1.2" width="45" x="660" y="490"></rect>
+<text fill="#00476e" font-size="8" font-weight="700" x="666" y="525">BESS</text>
+</g>
+<!-- Dimension Annotations Along Edges -->
+<!-- Top edge: 70.0m -->
+<g transform="translate(420, 398)">
+<rect fill="#ffffff" height="18" rx="4" stroke="#059669" stroke-width="1" width="84" x="-42" y="-12"></rect>
+<text fill="#065f46" font-size="10" font-weight="700" text-anchor="middle" x="0" y="1">Length: 70.0 m</text>
+</g>
+<!-- Left edge: 35.0m -->
+<g transform="translate(165, 485)">
+<rect fill="#ffffff" height="18" rx="4" stroke="#059669" stroke-width="1" width="80" x="-40" y="-12"></rect>
+<text fill="#065f46" font-size="10" font-weight="700" text-anchor="middle" x="0" y="1">Width: 35.0 m</text>
+</g>
+<!-- Setback Clearance annotation -->
+<g transform="translate(420, 355)">
+<line stroke="#d97706" stroke-dasharray="2,2" stroke-width="1.5" x1="0" x2="0" y1="0" y2="40"></line>
+<rect fill="#fffbeb" height="18" rx="4" stroke="#fde68a" stroke-width="1" width="150" x="-75" y="-12"></rect>
+<text fill="#92400e" font-size="9" font-weight="600" text-anchor="middle" x="0" y="1">Setback from NH-848: 15.0m clear</text>
+</g>
+<!-- 5 Interactive Circular Vertex Edit Handles with Coordinates hover effect -->
+<!-- Vertex 1 -->
+<circle class="cursor-pointer transition-transform hover:scale-125" cx="210" cy="410" fill="#ffffff" r="7" stroke="#059669" stroke-width="3"></circle>
+<circle cx="210" cy="410" fill="#059669" r="3"></circle>
+<!-- Vertex 2 -->
+<circle class="cursor-pointer transition-transform hover:scale-125" cx="680" cy="410" fill="#ffffff" r="7" stroke="#059669" stroke-width="3"></circle>
+<circle cx="680" cy="410" fill="#059669" r="3"></circle>
+<!-- Vertex 3 -->
+<circle class="cursor-pointer transition-transform hover:scale-125" cx="720" cy="570" fill="#ffffff" r="7" stroke="#059669" stroke-width="3"></circle>
+<circle cx="720" cy="570" fill="#059669" r="3"></circle>
+<!-- Vertex 4 -->
+<circle class="cursor-pointer transition-transform hover:scale-125" cx="520" cy="605" fill="#ffffff" r="7" stroke="#059669" stroke-width="3"></circle>
+<circle cx="520" cy="605" fill="#059669" r="3"></circle>
+<!-- Vertex 5 -->
+<circle class="cursor-pointer transition-transform hover:scale-125" cx="210" cy="560" fill="#ffffff" r="7" stroke="#059669" stroke-width="3"></circle>
+<circle cx="210" cy="560" fill="#059669" r="3"></circle>
+<!-- Centroid Pin and Label -->
+<g transform="translate(440, 520)">
+<circle cx="0" cy="0" fill="#dc2626" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<rect fill="#0f172a" fill-opacity="0.9" height="22" rx="4" width="160" x="-80" y="-32"></rect>
+<text fill="#ffffff" font-size="9.5" font-weight="600" text-anchor="middle" x="0" y="-18">Centroid: 19.9975° N, 73.7898° E</text>
+<!-- Small pointer triangle -->
+<polygon fill="#0f172a" fill-opacity="0.9" points="-4,-10 4,-10 0,-4"></polygon>
+</g>
+</g>
+</svg>
+<!-- FLOATING OVERLAY: TOP-LEFT CADASTRE PILL -->
+<div class="absolute top-4 left-4 bg-surface/95 backdrop-blur-sm border border-border-subtle shadow-md px-3.5 py-2 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-primary">navigation</span>
+<div class="text-xs">
+<span class="font-semibold text-text-primary">Cursor: 19.9978° N, 73.7902° E</span>
+<span class="text-text-secondary ml-2">| Zoom: 18x | Tile: MahaGIS Vector Light</span>
+</div>
+</div>
+<!-- FLOATING OVERLAY: TOP-RIGHT DRAWING TOOL MODE -->
+<div class="absolute top-4 right-4 bg-surface/95 backdrop-blur-sm border border-border-subtle shadow-md p-2 rounded-lg flex items-center gap-2">
+<div class="flex items-center gap-2 px-2.5 py-1 bg-status-recommended-bg border border-status-recommended-border rounded text-xs font-semibold text-status-recommended">
+<span class="size-2 rounded-full bg-status-recommended"></span>
+              Mode: Boundary Defined • 5 Vertices
+            </div>
+<button class="px-2.5 py-1.5 bg-surface hover:bg-surface-subtle border border-border-strong rounded text-xs font-medium text-text-primary flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px]">edit</span>
+              Edit Boundary
+            </button>
+<button class="px-2.5 py-1.5 bg-surface hover:bg-status-disqualified-bg border border-border-strong hover:border-status-disqualified-border rounded text-xs font-medium text-text-secondary hover:text-status-disqualified flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px]">restart_alt</span>
+              Redraw
+            </button>
+</div>
+<!-- FLOATING OVERLAY: MAP ZOOM & COMPASS CONTROLS -->
+<div class="absolute right-4 top-20 flex flex-col gap-1.5 bg-surface/95 border border-border-subtle shadow-md p-1 rounded-lg">
+<button class="size-8 flex items-center justify-center hover:bg-surface-subtle text-text-primary rounded text-sm font-bold">+</button>
+<div class="w-full h-px bg-border-subtle"></div>
+<button class="size-8 flex items-center justify-center hover:bg-surface-subtle text-text-primary rounded text-sm font-bold">−</button>
+<div class="w-full h-px bg-border-subtle"></div>
+<button class="size-8 flex items-center justify-center hover:bg-surface-subtle text-text-primary rounded text-xs" title="Reset North">
+<span class="font-bold text-error">N</span>
+</button>
+</div>
+<!-- FLOATING OVERLAY: BOTTOM-LEFT SCALE BAR & LAYER TOGGLES -->
+<div class="absolute bottom-4 left-4 flex flex-col gap-2 max-w-md">
+<!-- GIS Layer Pills -->
+<div class="flex flex-wrap gap-1.5 bg-surface/95 backdrop-blur-sm border border-border-subtle shadow-sm p-1.5 rounded-lg text-xs">
+<button class="px-2 py-1 bg-status-recommended-bg border border-status-recommended-border text-status-recommended rounded font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">power</span>
+                Feeder (11kV) [ON]
+              </button>
+<button class="px-2 py-1 bg-status-recommended-bg border border-status-recommended-border text-status-recommended rounded font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">straighten</span>
+                Road ROW [ON]
+              </button>
+<button class="px-2 py-1 bg-status-recommended-bg border border-status-recommended-border text-status-recommended rounded font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">water_drop</span>
+                Floodway [ON]
+              </button>
+<button class="px-2 py-1 bg-status-recommended-bg border border-status-recommended-border text-status-recommended rounded font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">grid_on</span>
+                Cadastral [ON]
+              </button>
+</div>
+<!-- Scale bar pill -->
+<div class="bg-surface/95 backdrop-blur-sm border border-border-subtle shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-4 w-fit">
+<div class="flex flex-col items-center">
+<div class="flex justify-between w-28 text-[9px] text-text-secondary font-mono">
+<span>0</span>
+<span>50m</span>
+<span>100m</span>
+</div>
+<div class="h-1.5 w-28 border border-text-secondary flex">
+<div class="w-1/2 bg-text-primary"></div>
+<div class="w-1/2 bg-surface"></div>
+</div>
+</div>
+<span class="text-[10px] text-text-secondary font-mono">Scale 1:300 · High Res</span>
+</div>
+</div>
+<!-- FLOATING OVERLAY: BOTTOM-RIGHT GEODESIC ENGINE NOTICE -->
+<div class="absolute bottom-4 right-4 bg-surface/95 backdrop-blur-sm border border-border-subtle shadow-sm px-3 py-2 rounded-lg max-w-xs text-right">
+<p class="text-[11px] font-semibold text-text-primary">Drawing Engine: Turf.js Geodesic Active</p>
+<p class="text-[10px] text-text-secondary leading-tight mt-0.5">Drag any green circular vertex handle to dynamically reshape and recalculate plot footprint in real-time.</p>
+</div>
+</div>
+</section>
+<!-- RIGHT SITE PLANNING CONTROL PANEL (Approx 33% width) -->
+<aside class="w-full xl:w-[33%] flex flex-col gap-5">
+<!-- STEP INDICATOR MODULE -->
+<div class="bg-surface border border-border-subtle rounded-xl p-4 shadow-sm">
+<p class="text-[11px] font-bold text-text-muted tracking-wider uppercase mb-3">Planning Workflow Pipeline</p>
+<div class="grid grid-cols-2 gap-2">
+<!-- Step 1 -->
+<div class="p-2.5 rounded-lg border border-status-recommended-border bg-status-recommended-bg flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-status-recommended">check_circle</span>
+<div class="overflow-hidden">
+<div class="text-[10px] font-bold text-status-recommended">STEP 01</div>
+<div class="text-xs font-semibold text-text-primary truncate">Site 01 Selected</div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="p-2.5 rounded-lg border-2 border-primary bg-primary/5 flex items-center gap-2.5">
+<span class="flex h-2.5 w-2.5 rounded-full bg-primary animate-pulse ml-1"></span>
+<div class="overflow-hidden">
+<div class="text-[10px] font-bold text-primary">STEP 02 (ACTIVE)</div>
+<div class="text-xs font-semibold text-text-primary truncate">Plot Boundary</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="p-2.5 rounded-lg border border-border-subtle bg-surface-subtle flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+<div class="overflow-hidden">
+<div class="text-[10px] font-bold text-text-secondary">STEP 03</div>
+<div class="text-xs font-semibold text-text-primary truncate">Infrastructure Config</div>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="p-2.5 rounded-lg border border-border-subtle bg-surface-subtle/50 opacity-70 flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-text-muted">view_in_ar</span>
+<div class="overflow-hidden">
+<div class="text-[10px] font-bold text-text-muted">STEP 04</div>
+<div class="text-xs font-medium text-text-secondary truncate">3D Digital Twin</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 1: CANDIDATE SITE INTELLIGENCE SNAPSHOT -->
+<div class="bg-surface border border-border-subtle rounded-xl p-4 shadow-sm">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+<div>
+<span class="text-[11px] font-bold text-text-muted uppercase tracking-wider">Candidate Site Intelligence</span>
+<h3 class="text-sm font-bold text-text-primary mt-0.5">NASHIK-SITE-01 · Ambad Link Rd, Phase-2</h3>
+</div>
+<div class="bg-status-recommended-bg border border-status-recommended-border text-status-recommended px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">stars</span>
+              84 / 100
+            </div>
+</div>
+<!-- Metric Chips -->
+<div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+<div class="bg-surface-subtle p-2 rounded border border-border-subtle">
+<span class="text-text-secondary block text-[10px]">Solar GHI Score</span>
+<span class="font-bold text-text-primary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-amber-500">wb_sunny</span>
+                91 / 100 <span class="text-[10px] font-normal text-status-recommended">(High)</span>
+</span>
+</div>
+<div class="bg-surface-subtle p-2 rounded border border-border-subtle">
+<span class="text-text-secondary block text-[10px]">EV Demand Proxy</span>
+<span class="font-bold text-text-primary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-secondary">ev_station</span>
+                82 / 100 <span class="text-[10px] font-normal text-status-recommended">(High)</span>
+</span>
+</div>
+<div class="bg-surface-subtle p-2 rounded border border-border-subtle">
+<span class="text-text-secondary block text-[10px]">Road Access</span>
+<span class="font-bold text-text-primary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-primary">alt_route</span>
+                88 / 100 <span class="text-[10px] font-normal text-text-secondary">(24m ROW)</span>
+</span>
+</div>
+<div class="bg-surface-subtle p-2 rounded border border-border-subtle">
+<span class="text-text-secondary block text-[10px]">Flood Vulnerability</span>
+<span class="font-bold text-text-primary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">verified_user</span>
+                Low <span class="text-[10px] font-normal text-text-secondary">(584m AMSL)</span>
+</span>
+</div>
+</div>
+<div class="mt-2.5 px-2.5 py-1.5 bg-[#f0fdf4] rounded border border-[#bbf7d0] text-[11px] text-[#166534] flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+            Cadastral Clearances: None Detected (Industrial Reservation Free)
+          </div>
+</div>
+<!-- SECTION 2: USABLE PLOT BOUNDARY & AREA MEASUREMENT CARD -->
+<div class="bg-surface border-2 border-primary/20 rounded-xl p-5 shadow-sm">
+<div class="flex items-center justify-between">
+<h3 class="text-sm font-bold text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">polyline</span>
+              Usable Plot Boundary
+            </h3>
+<span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              ESTIMATED · TURF.JS GEODESIC · DEMO
+            </span>
+</div>
+<!-- Highlight Metric Display -->
+<div class="my-4 p-4 bg-surface-subtle border border-border-subtle rounded-lg text-center">
+<span class="text-[11px] font-bold uppercase tracking-wider text-text-secondary block">Estimated Available Plot Area</span>
+<div class="text-4xl font-black text-text-primary tracking-tight mt-1 font-headline-lg">
+              2,450 m²
+            </div>
+<div class="text-xs font-semibold text-text-secondary mt-1">
+              ≈ 0.61 Acres  ·  26,371 sq.ft
+            </div>
+<div class="mt-3 pt-2.5 border-t border-border-subtle/80">
+<p class="text-[11px] font-medium text-text-primary italic">
+                “Estimated available plot area based on the drawn boundary.”
+              </p>
+<p class="text-[10px] text-text-muted mt-1 leading-tight">
+                Not a legal cadastral land survey. Preliminary municipal envelope for conceptual planning.
+              </p>
+</div>
+</div>
+<!-- Plot Geometry Actions -->
+<div class="grid grid-cols-3 gap-2">
+<button class="px-2.5 py-2 bg-surface hover:bg-surface-subtle border border-border-strong rounded text-xs font-semibold text-text-primary flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-primary">edit</span>
+              Edit Boundary
+            </button>
+<button class="px-2.5 py-2 bg-surface hover:bg-status-disqualified-bg border border-border-strong rounded text-xs font-semibold text-text-secondary hover:text-status-disqualified flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[15px]">delete_sweep</span>
+              Reset Plot
+            </button>
+<button class="px-2.5 py-2 bg-surface hover:bg-surface-subtle border border-border-strong rounded text-xs font-semibold text-text-primary flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-secondary">square_foot</span>
+              Recalculate
+            </button>
+</div>
+</div>
+<!-- SECTION 3: INFRASTRUCTURE CONCEPT SELECTION -->
+<div class="bg-surface border border-border-subtle rounded-xl p-5 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-sm font-bold text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">solar_power</span>
+              Infrastructure Type
+            </h3>
+<span class="text-[11px] text-text-secondary">Select 1 Concept</span>
+</div>
+<div class="space-y-3">
+<!-- OPTION 1: SELECTED SOLAR-EV CHARGING HUB -->
+<label class="relative flex flex-col p-3.5 bg-status-recommended-bg/50 border-2 border-status-recommended rounded-xl cursor-pointer transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<input checked="" class="text-primary focus:ring-primary h-4 w-4" name="infra_type" type="radio"/>
+<span class="text-xs font-bold text-text-primary">Solar-EV Charging Hub</span>
+</div>
+<span class="bg-status-recommended text-surface text-[10px] font-bold px-2 py-0.5 rounded-full">Recommended</span>
+</div>
+<p class="text-xs text-text-secondary mt-2 pl-6 leading-relaxed">
+                Dual-canopy 180 kWp bifacial solar PV array integrated with 6 DC fast charging bays (CCS2/CHAdeMO) and battery buffer.
+              </p>
+<div class="mt-2.5 pl-6 flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-surface border border-status-recommended-border text-text-primary text-[10px] font-semibold rounded">
+                  6 DC Bays (120kW)
+                </span>
+<span class="px-2 py-0.5 bg-surface border border-status-recommended-border text-text-primary text-[10px] font-semibold rounded">
+                  180 kWp Solar PV
+                </span>
+<span class="px-2 py-0.5 bg-surface border border-status-recommended-border text-text-primary text-[10px] font-semibold rounded">
+                  Grid-Tied 11kV
+                </span>
+</div>
+</label>
+<!-- OPTION 2: SOLAR CANOPY ONLY -->
+<label class="relative flex flex-col p-3.5 bg-surface hover:bg-surface-subtle border border-border-subtle rounded-xl cursor-pointer transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<input class="text-primary focus:ring-primary h-4 w-4" name="infra_type" type="radio"/>
+<span class="text-xs font-semibold text-text-primary">Solar Canopy Only (Grid Feed)</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted">Feed-in Net</span>
+</div>
+<p class="text-xs text-text-secondary mt-1.5 pl-6 leading-relaxed">
+                High-yield solar photovoltaic parking shelter without high-power EV charging infrastructure.
+              </p>
+</label>
+<!-- OPTION 3: STANDALONE HIGH-POWER EV DEPOT -->
+<label class="relative flex flex-col p-3.5 bg-surface hover:bg-surface-subtle border border-border-subtle rounded-xl cursor-pointer transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<input class="text-primary focus:ring-primary h-4 w-4" name="infra_type" type="radio"/>
+<span class="text-xs font-semibold text-text-primary">Standalone High-Power EV Depot</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted">Bus/Fleet</span>
+</div>
+<p class="text-xs text-text-secondary mt-1.5 pl-6 leading-relaxed">
+                Dedicated municipal EV bus &amp; fleet terminal without rooftop solar generation.
+              </p>
+</label>
+</div>
+</div>
+<!-- SECTION 4: CONSOLIDATED PLANNING SUMMARY CARD -->
+<div class="bg-surface border border-border-subtle rounded-xl p-4 shadow-sm">
+<h4 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">fact_check</span>
+            Consolidated Planning Configuration
+          </h4>
+<div class="space-y-2 text-xs divide-y divide-border-subtle/60">
+<div class="flex justify-between items-center pt-1.5">
+<span class="text-text-secondary">Selected Site:</span>
+<span class="font-semibold text-text-primary">NASHIK-SITE-01 (Ward 24 Ambad)</span>
+</div>
+<div class="flex justify-between items-center pt-1.5">
+<span class="text-text-secondary">Usable Footprint:</span>
+<span class="font-semibold text-text-primary">2,450 m² (Clear of easements)</span>
+</div>
+<div class="flex justify-between items-center pt-1.5">
+<span class="text-text-secondary">Chosen Infra:</span>
+<span class="font-semibold text-primary">Solar-EV Charging Hub (Dual)</span>
+</div>
+<div class="flex justify-between items-center pt-1.5">
+<span class="text-text-secondary">Grid Interconnection:</span>
+<span class="font-semibold text-text-primary">11kV MSEDCL Feeder (120m)</span>
+</div>
+<div class="flex justify-between items-center pt-1.5">
+<span class="text-text-secondary">Topographic Safety:</span>
+<span class="font-semibold text-text-primary">&gt;1.8km from Godavari 100-Yr HFL</span>
+</div>
+</div>
+</div>
+<!-- SECTION 5: PRIMARY ACTION BUTTONS -->
+<div class="bg-surface border border-border-subtle rounded-xl p-5 shadow-sm flex flex-col gap-3">
+<button class="w-full h-12 bg-primary hover:bg-[#005238] active:scale-[0.99] text-on-primary rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-md transition-all">
+<span>Plan in 3D</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+<button class="w-full h-10 bg-surface hover:bg-surface-subtle border border-border-strong text-text-secondary hover:text-text-primary rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Back to Ranked Sites
+          </button>
+<p class="text-[11px] text-center text-text-muted leading-tight mt-1">
+            Next step: Initialize CesiumJS 3D geospatial environment with conceptual Solar-EV Hub model.
+          </p>
+</div>
+</aside>
+</div>
+</main>
+<!-- MUNICIPAL SYSTEM FOOTER -->
+<footer class="w-full bg-surface border-t border-border-subtle py-4 px-10 mt-6">
+<div class="max-w-[1680px] mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-text-secondary gap-3">
+<div class="flex items-center gap-4">
+<span class="font-semibold text-text-primary">UrjaSetu Geospatial Intelligence v2.4</span>
+<span>•</span>
+<span>Nashik Municipal Corporation &amp; MIDC Planning Cell</span>
+<span>•</span>
+<span class="text-status-recommended font-medium">GIS Server: Online (Latency 24ms)</span>
+</div>
+<div class="flex items-center gap-4 text-[11px]">
+<a class="hover:underline" href="#">Cadastral Registry Rules</a>
+<a class="hover:underline" href="#">MSEDCL Interconnect Specs</a>
+<a class="hover:underline" href="#">GDCR Land Clearances</a>
+</div>
+</div>
+</footer>
+<script>
+    // Micro-interaction for plot coordinate feedback and dynamic feedback
+    document.querySelectorAll('#usablePolygonContainer circle').forEach((vertex, index) => {
+      vertex.addEventListener('mouseenter', () => {
+        vertex.setAttribute('stroke', '#00472e');
+      });
+      vertex.addEventListener('mouseleave', () => {
+        vertex.setAttribute('stroke', '#059669');
+      });
+    });
+  </script>
+</body></html>

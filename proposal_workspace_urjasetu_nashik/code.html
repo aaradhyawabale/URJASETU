@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UrjaSetu GIS · Decision Support - Proposal Workspace</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms & Container Queries plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-container": "#00476e",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "map-parcel-stroke": "#cbd5e1",
+            "status-recommended": "#059669",
+            "surface-container": "#e5eeff",
+            "app-bg": "#f8fafc",
+            "status-screening": "#64748b",
+            "surface": "#ffffff",
+            "status-review-bg": "#fffbeb",
+            "on-primary": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-tint": "#006c4a",
+            "primary-fixed": "#85f8c4",
+            "map-arterial": "#94a3b8",
+            "on-primary-fixed-variant": "#005137",
+            "secondary-fixed-dim": "#93ccff",
+            "on-tertiary-fixed": "#2f1500",
+            "surface-bright": "#f8f9ff",
+            "primary-container": "#00855d",
+            "secondary-fixed": "#cce5ff",
+            "status-screening-bg": "#f8fafc",
+            "primary-fixed-dim": "#68dba9",
+            "secondary-container": "#5bb8fe",
+            "tertiary-container": "#b15f00",
+            "text-primary": "#0f172a",
+            "status-disqualified-bg": "#fef2f2",
+            "surface-container-lowest": "#ffffff",
+            "text-secondary": "#475569",
+            "map-parcel-fill": "#f1f5f9",
+            "on-secondary-fixed": "#001d31",
+            "status-review-border": "#fde68a",
+            "on-error": "#ffffff",
+            "tertiary": "#8d4b00",
+            "surface-container-high": "#dce9ff",
+            "status-disqualified": "#dc2626",
+            "tertiary-fixed-dim": "#ffb77d",
+            "map-waterway": "#bae6fd",
+            "on-surface-variant": "#3d4a42",
+            "on-error-container": "#93000a",
+            "status-screening-border": "#e2e8f0",
+            "status-review": "#d97706",
+            "outline-variant": "#bccac0",
+            "tertiary-fixed": "#ffdcc3",
+            "inverse-primary": "#68dba9",
+            "surface-subtle": "#f1f5f9",
+            "on-primary-container": "#f5fff7",
+            "background": "#f8f9ff",
+            "on-tertiary-container": "#fffbff",
+            "on-secondary-fixed-variant": "#004b73",
+            "inverse-on-surface": "#eaf1ff",
+            "status-recommended-border": "#a7f3d0",
+            "on-tertiary": "#ffffff",
+            "surface-dim": "#cbdbf5",
+            "status-recommended-bg": "#ecfdf5",
+            "surface-container-highest": "#d3e4fe",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "primary": "#006948",
+            "border-strong": "#cbd5e1",
+            "status-disqualified-border": "#fecaca",
+            "on-surface": "#0b1c30",
+            "outline": "#6d7a72",
+            "error-container": "#ffdad6",
+            "on-background": "#0b1c30",
+            "text-muted": "#94a3b8",
+            "inverse-surface": "#213145",
+            "surface-variant": "#d3e4fe",
+            "secondary": "#006398",
+            "border-subtle": "#e2e8f0",
+            "on-primary-fixed": "#002114"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1.5rem",
+            "space-lg": "1.25rem",
+            "space-xs": "0.25rem",
+            "gutter-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "margin-mobile": "0.75rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "display-hero": ["Inter"],
+            "headline-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "tag-provenance": ["Inter"],
+            "title-md": ["Inter"],
+            "metric-tabular": ["Inter"],
+            "label-caps": ["Inter"]
+          },
+          "fontSize": {
+            "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-hero": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "tag-provenance": ["10px", { "lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "title-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "metric-tabular": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-caps": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="bg-app-bg text-text-primary antialiased font-body-md">
+<!-- Strict Shared TopNavBar Anchor -->
+<div class="relative flex h-auto w-full flex-col bg-[#f8fcfb] group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7f4f0] px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#0d1c17]">
+<div class="size-4">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-[#0d1c17] text-lg font-bold leading-tight tracking-[-0.015em]">UrjaSetu GIS · Decision Support</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#489d82] flex border-none bg-[#e7f4f0] items-center justify-center pl-4 rounded-l-lg border-r-0" data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+</svg>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d1c17] focus:outline-0 focus:ring-0 border-none bg-[#e7f4f0] focus:border-none h-full placeholder:text-[#489d82] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search" value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Sites Database</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Spatial Screening</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Measurement</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">3D Models</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">AI Advisory</a>
+<a class="text-[#0d1c17] text-sm font-medium leading-normal" href="#">Proposal Workspace</a>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#059668] text-[#f8fcfb] text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Save Proposal</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#e7f4f0] text-[#0d1c17] text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Export GIS</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e7f4f0] text-[#0d1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<div class="text-[#0d1c17]" data-icon="Bell" data-size="20px" data-weight="regular">
+<svg fill="currentColor" height="20px" viewbox="0 0 256 256" width="20px" xmlns="http://www.w3.org/2000/svg">
+<path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
+</svg>
+</div>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e7f4f0] text-[#0d1c17] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<div class="text-[#0d1c17]" data-icon="Scan" data-size="20px" data-weight="regular">
+<svg fill="currentColor" height="20px" viewbox="0 0 256 256" width="20px" xmlns="http://www.w3.org/2000/svg">
+<path d="M224,40V80a8,8,0,0,1-16,0V48H176a8,8,0,0,1,0-16h40A8,8,0,0,1,224,40ZM80,208H48V176a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H80a8,8,0,0,0,0-16Zm136-40a8,8,0,0,0-8,8v32H176a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V176A8,8,0,0,0,216,168ZM40,88a8,8,0,0,0,8-8V48H80a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8V80A8,8,0,0,0,40,88Zm128,96H88a16,16,0,0,1-16-16V88A16,16,0,0,1,88,72h80a16,16,0,0,1,16,16v80A16,16,0,0,1,168,184ZM88,168h80V88H88Z"></path>
+</svg>
+</div>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCG-ySwEFCdaAkjSAXSs6dwaHWxQig7XOaIvkookxt0OZsHC2UFCClKHIcRFlnEJO7c6-J9kODzUuMOdPoq8XoGrpMVI63axDx9Ksr8rJbJwCloi4Dm6UaBIf6JbE1N8CZgE9ZeGwz4xgbUaw9zB7MIDt96-KDn0WXfTUy3E1fcVQH6mFf24iCvSdfN5IeIRE_vQOpM9w3U2SXcmNZe-mAtKUxIg9urY7DeZNBTk5ftVXkMPQ3Kohaa");'></div>
+</div>
+</header>
+<div class="flex flex-wrap gap-2 p-4">
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">01 FIND (✓)</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">02 SCREEN (✓)</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">03 MEASURE (✓)</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">04 VISUALIZE (✓)</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<a class="text-[#489d82] text-base font-medium leading-normal" href="#">05 EXPLAIN (✓)</a>
+<span class="text-[#489d82] text-base font-medium leading-normal">/</span>
+<span class="text-[#0d1c17] text-base font-medium leading-normal">06 DECIDE (Active)</span>
+</div>
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<div class="flex min-w-72 flex-col gap-3">
+<p class="text-[#0d1c17] text-4xl font-black leading-tight tracking-[-0.033em]">Proposal Workspace</p>
+<p class="text-[#489d82] text-base font-normal leading-normal">
+                  Assemble, verify, and package preliminary municipal planning evidence into a statutory decision dossier.
+                </p>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#e7f4f0] text-[#0d1c17] text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Download Dossier PDF</span>
+</button>
+</div>
+<div class="flex gap-3 p-3 overflow-x-hidden">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Site: NASHIK-SITE-01 (Ambad Industrial, Ward 24)</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Nashik, Maharashtra · Tier-2 ULB</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Score: 84 / 100 — RECOMMENDED</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Footprint: 2,450 m² (~0.61 AC)</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Type: Solar-EV Hub (180 kWp + 6 DC Bays)</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#e7f4f0] pl-4 pr-4">
+<p class="text-[#0d1c17] text-sm font-medium leading-normal">Status: DRAFT PROPOSAL — READY FOR REVIEW</p>
+</div>
+</div>
+<h2 class="text-[#0d1c17] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">01. Administrative &amp; Gazette Filing Parameters</h2>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Workspace Body: Two-Column Decision Dossier Layout -->
+<main class="w-full bg-app-bg border-t border-border-subtle py-6">
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Technical & Statutory Sections (~68% width -> lg:col-span-8) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- SECTION 1: Administrative & Gazette Filing Parameters -->
+<section class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center justify-between pb-4 border-b border-border-subtle mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">description</span>
+<h3 class="text-title-md font-headline-sm text-text-primary">01. Administrative &amp; Gazette Filing Parameters</h3>
+</div>
+<span class="text-tag-provenance uppercase bg-surface-subtle border border-border-subtle text-text-secondary px-2.5 py-1 rounded">
+              Form 7-A / Statutory Draft
+            </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-label-caps text-text-secondary uppercase mb-1">Proposal Title</label>
+<input class="w-full rounded border border-border-subtle bg-surface px-3 py-2 text-body-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="Nashik Solar-EV Charging Hub — Site 01 (Ambad MIDC Phase-2)"/>
+</div>
+<div>
+<label class="block text-label-caps text-text-secondary uppercase mb-1">Sponsoring Department</label>
+<input class="w-full rounded border border-border-subtle bg-surface px-3 py-2 text-body-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="Town Planning Department &amp; Smart City Mission Cell, NMC"/>
+</div>
+<div>
+<label class="block text-label-caps text-text-secondary uppercase mb-1">Nodal Jurisdictional Body</label>
+<input class="w-full rounded border border-border-subtle bg-surface px-3 py-2 text-body-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="Nashik Municipal Corporation (NMC) &amp; MIDC Joint Taskforce"/>
+</div>
+<div>
+<label class="block text-label-caps text-text-secondary uppercase mb-1">Target Commissioning Scheme</label>
+<input class="w-full rounded border border-border-subtle bg-surface px-3 py-2 text-body-md text-text-primary focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="PM E-Drive / Maharashtra State RE Policy 2025"/>
+</div>
+<div>
+<label class="block text-label-caps text-text-secondary uppercase mb-1">Usable Plot Footprint (GDCR Clear)</label>
+<div class="relative">
+<input class="w-full rounded border border-border-subtle bg-surface-subtle px-3 py-2 text-body-md text-text-secondary cursor-not-allowed" readonly="" type="text" value="2,450 m² (Clear of GDCR 15m Setback)"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-text-muted text-lg">lock</span>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-text-secondary uppercase mb-1">Statutory Planning Framework</label>
+<div class="relative">
+<input class="w-full rounded border border-border-subtle bg-surface-subtle px-3 py-2 text-body-md text-text-secondary cursor-not-allowed" readonly="" type="text" value="MRTP Act 1966 Sec 37(1) Siting Resolution"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-text-muted text-lg">verified</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: Site Intelligence & Empirical Evidence Matrix -->
+<section class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">analytics</span>
+<h3 class="text-title-md font-headline-sm text-text-primary">02. Site Intelligence &amp; Spatial Evidence Summary</h3>
+</div>
+<span class="text-tag-provenance uppercase bg-status-recommended-bg text-status-recommended border border-status-recommended-border px-2 py-0.5 rounded font-semibold">
+              Derived / Proxy / Screened Heuristics
+            </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+<div class="p-3 rounded border border-border-subtle bg-surface-subtle">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-caps text-text-secondary uppercase">Solar Insolation</span>
+<span class="material-symbols-outlined text-status-recommended text-base">sunny</span>
+</div>
+<div class="text-metric-tabular font-bold text-text-primary">91 <span class="text-body-sm font-normal text-text-secondary">/ 100</span></div>
+<p class="text-body-sm text-text-secondary mt-1">5.42 kWh/m²/day GHI, 0.8% hill shadow proxy (CAMS/NASA POWER)</p>
+</div>
+<div class="p-3 rounded border border-border-subtle bg-surface-subtle">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-caps text-text-secondary uppercase">EV Fleet Demand</span>
+<span class="material-symbols-outlined text-secondary text-base">local_shipping</span>
+</div>
+<div class="text-metric-tabular font-bold text-text-primary">82 <span class="text-body-sm font-normal text-text-secondary">/ 100</span></div>
+<p class="text-body-sm text-text-secondary mt-1">Ambad Freight Hub 350m proximity, 480 vph commercial transit</p>
+</div>
+<div class="p-3 rounded border border-border-subtle bg-surface-subtle">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-caps text-text-secondary uppercase">RoW Connectivity</span>
+<span class="material-symbols-outlined text-primary text-base">conversion_path</span>
+</div>
+<div class="text-metric-tabular font-bold text-text-primary">88 <span class="text-body-sm font-normal text-text-secondary">/ 100</span></div>
+<p class="text-body-sm text-text-secondary mt-1">Dual 24m MIDC carriageway, 420m radial to NH-848 interchange</p>
+</div>
+<div class="p-3 rounded border border-border-subtle bg-surface-subtle">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-caps text-text-secondary uppercase">Flood &amp; Hazard</span>
+<span class="material-symbols-outlined text-status-recommended text-base">shield_with_heart</span>
+</div>
+<div class="text-metric-tabular font-bold text-status-recommended">Safe / Low</div>
+<p class="text-body-sm text-text-secondary mt-1">584m AMSL datum, &gt;1.8 km radial offset from Godavari 100-Yr HFL</p>
+</div>
+</div>
+<!-- Formula display -->
+<div class="p-3 rounded border border-border-subtle bg-surface-subtle text-body-sm text-text-secondary flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-muted text-base">functions</span>
+<span class="font-mono text-[12px] text-text-primary font-medium">
+                (91 × 0.30) + (82 × 0.25) + (88 × 0.25) + (80 × 0.20) - (8 × 1.00) = 84.3
+              </span>
+</div>
+<span class="text-label-caps font-bold text-status-recommended uppercase bg-status-recommended-bg border border-status-recommended-border px-2 py-0.5 rounded">
+              84 / 100 Net Deterministic Index
+            </span>
+</div>
+</section>
+<!-- SECTION 3: Proposed Site Plan & Infrastructure Configuration -->
+<section class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">map</span>
+<h3 class="text-title-md font-headline-sm text-text-primary">03. Proposed Infrastructure &amp; Spatial Layout Preview</h3>
+</div>
+<span class="text-tag-provenance text-text-secondary uppercase font-semibold">Scale 1:500 Geodesic CAD</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+<!-- Left: Visual Cartographic Preview Thumbnail -->
+<div class="md:col-span-6 flex flex-col">
+<div class="relative w-full aspect-[4/3] rounded border border-border-subtle overflow-hidden bg-surface-subtle group">
+<!-- Conceptual Map Mockup -->
+<img class="w-full h-full object-cover" data-alt="Technical municipal satellite GIS basemap view of an industrial parcel in Ambad Nashik Maharashtra with geometric neon-emerald geodesic boundaries, structured solar canopy footprints, and marked electrical feeder pathways. High-resolution orthophoto aesthetic with neutral gray industrial roads and subtle cartographic vector overlays." data-location="Nashik" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEfvAzfoPyTdiRjAwYDmqBNePb2ZSeC8JhzsFpb_Rj108VZHV1X56SGvglGizvc5TSpol_01olPm1aixIChp_hqiahcevH8UJ6GK4GVce3kbhIBNfMeu_3CkE3VmQWSGdy7j9LnLbguBtBAZnLQ85TiMT4yCNCOylvXd_wRaal2iSPQM_h8yt61VB7rYx--kmpTT8Z8zOhOnBu4F8K9gmUo1gMwrdFZ0WDSLDpD-5Yk4e3LjnmJbfd"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0f172a]/70 via-transparent to-transparent flex flex-col justify-end p-3 text-white">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-status-recommended animate-ping"></span>
+<span class="text-label-caps font-bold tracking-wide">PARCEL ID: NASHIK-AMB-01</span>
+</div>
+<p class="text-[11px] text-slate-200">185° S-SW Dual Solar Canopy Orientation · 6 CCS-2 Bays</p>
+</div>
+<span class="absolute top-2 left-2 bg-surface/90 backdrop-blur-sm border border-border-subtle text-text-primary px-2 py-0.5 rounded text-tag-provenance font-semibold">
+                  Turf.js Geodesic Model
+                </span>
+</div>
+<p class="text-[11px] leading-tight text-text-secondary mt-2 italic">
+                Conceptual Siting Preview (Turf.js Geodesic Model) — 2,450 m² usable plot clear of NH-848 15.0m RoW setback. Not legal cadastral survey.
+              </p>
+</div>
+<!-- Right: Technical Specification Matrix -->
+<div class="md:col-span-6 flex flex-col justify-between">
+<div class="space-y-2.5">
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-subtle border border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">solar_power</span>
+<span class="text-body-sm font-medium text-text-primary">Solar Canopy</span>
+</div>
+<span class="text-body-sm font-semibold text-text-primary">180 kWp Bifacial Mono PV</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-subtle border border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-lg">ev_charger</span>
+<span class="text-body-sm font-medium text-text-primary">DC Fast Chargers</span>
+</div>
+<span class="text-body-sm font-semibold text-text-primary">6 × 120 kW Dual-Gun CCS-2</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-subtle border border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-lg">battery_charging_full</span>
+<span class="text-body-sm font-medium text-text-primary">Battery Buffer</span>
+</div>
+<span class="text-body-sm font-semibold text-text-primary">300 kWh LFP BESS Unit</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-subtle border border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary text-lg">domain</span>
+<span class="text-body-sm font-medium text-text-primary">Building Coverage</span>
+</div>
+<span class="text-body-sm font-semibold text-text-primary">32.6% (GDCR Compliant)</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-subtle border border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-recommended text-lg">bolt</span>
+<span class="text-body-sm font-medium text-text-primary">Interconnection</span>
+</div>
+<span class="text-body-sm font-semibold text-text-primary">11kV UG Feeder (120m run)</span>
+</div>
+</div>
+<div class="pt-3">
+<button class="w-full text-center py-2 px-3 rounded border border-border-subtle bg-white hover:bg-surface-subtle text-primary font-medium text-body-sm flex items-center justify-center gap-1 transition">
+<span class="material-symbols-outlined text-base">tune</span>
+                  Adjust Layout Geometry in CAD Tool
+                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: AI Planning Assessment -->
+<section class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">psychology</span>
+<h3 class="text-title-md font-headline-sm text-text-primary">04. AI Planning Assistant Advisory Review</h3>
+</div>
+<span class="text-tag-provenance uppercase bg-surface-subtle text-text-secondary border border-border-subtle px-2 py-0.5 rounded font-semibold">
+              Advisory Decision Support (Non-Binding)
+            </span>
+</div>
+<div class="p-3 rounded-lg bg-status-recommended-bg border border-status-recommended-border mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-status-recommended text-xl">recommend</span>
+<span class="text-body-md font-bold text-status-recommended">
+                RECOMMENDATION: SUITABLE FOR FURTHER STATUTORY EVALUATION
+              </span>
+</div>
+<p class="text-body-sm text-text-secondary leading-relaxed">
+              Based on multi-criteria GIS screening and spatial conflict evaluation, NASHIK-SITE-01 represents an optimal municipal parcel for Solar-EV infrastructure. It successfully reconciles dense heavy-freight transit proximity along the NH-848 industrial corridor with high unshaded horizontal solar yield, while respecting floodway buffers. Proceeding to formal gazette submission and inter-agency utility sanction is recommended.
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Validated Strengths -->
+<div class="p-3 rounded border border-border-subtle bg-surface-subtle">
+<div class="flex items-center gap-1.5 text-status-recommended font-semibold text-body-sm mb-2">
+<span class="material-symbols-outlined text-base">check_circle</span>
+                Validated Planning Strengths
+              </div>
+<ul class="text-body-sm text-text-secondary space-y-1.5 list-disc pl-4">
+<li>High solar GHI yield (5.42 kWh/m²/day) with near-zero hill shade occlusion.</li>
+<li>Direct dual 24m RoW transit access servicing Ambad freight carriers.</li>
+<li>Minimal 120m feeder trenching run along municipal pedestrian right-of-way.</li>
+<li>Clear of 100-yr Godavari riverine floodline and storm inundation buffer.</li>
+</ul>
+</div>
+<!-- Required Verifications -->
+<div class="p-3 rounded border border-status-review-border bg-status-review-bg">
+<div class="flex items-center gap-1.5 text-status-review font-semibold text-body-sm mb-2">
+<span class="material-symbols-outlined text-base">warning</span>
+                Required Statutory Verifications
+              </div>
+<ul class="text-body-sm text-text-secondary space-y-1.5 list-disc pl-4">
+<li>MSEDCL 1.2 MW feeder headroom confirmation and transformer upgrade cost.</li>
+<li>MIDC cadastral title verification and long-term lease reservation deed.</li>
+<li>Swept path turning radius analysis for 12m heavy commercial e-trucks.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- SECTION 5: Statutory & Inter-Agency Verification Audit Checklist -->
+<section class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center justify-between pb-3 border-b border-border-subtle mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">fact_check</span>
+<h3 class="text-title-md font-headline-sm text-text-primary">05. Pre-Implementation Statutory Verification Checklist</h3>
+</div>
+<span class="text-tag-provenance text-text-secondary uppercase">
+              3 of 6 Cleared · 2 Action Required
+            </span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-subtle text-label-caps text-text-secondary uppercase bg-surface-subtle">
+<th class="py-2.5 px-3">Milestone / Statutory Check</th>
+<th class="py-2.5 px-3">Status</th>
+<th class="py-2.5 px-3">Nodal Owner</th>
+<th class="py-2.5 px-3">Verification Notes</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle text-body-sm">
+<!-- Item 1 -->
+<tr class="hover:bg-surface-subtle/50">
+<td class="py-2.5 px-3 font-medium text-text-primary">1. GIS Spatial Multi-Criteria Audit</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-status-recommended bg-status-recommended-bg border border-status-recommended-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">check</span> PASSED (84/100)
+                    </span>
+</td>
+<td class="py-2.5 px-3 text-text-secondary">UrjaSetu GIS Engine</td>
+<td class="py-2.5 px-3 text-text-secondary">Evaluated against Nashik Master Plan 2036</td>
+</tr>
+<!-- Item 2 -->
+<tr class="hover:bg-surface-subtle/50">
+<td class="py-2.5 px-3 font-medium text-text-primary">2. Godavari 100-Yr Floodway Clearance</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-status-recommended bg-status-recommended-bg border border-status-recommended-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">check</span> SAFE (&gt;1.8 KM)
+                    </span>
+</td>
+<td class="py-2.5 px-3 text-text-secondary">Irrigation &amp; Water Resources</td>
+<td class="py-2.5 px-3 text-text-secondary">Copernicus DEM 584m AMSL datum confirmed</td>
+</tr>
+<!-- Item 3 -->
+<tr class="hover:bg-surface-subtle/50 bg-status-review-bg/30">
+<td class="py-2.5 px-3 font-medium text-text-primary">3. 11kV DISCOM Grid Headroom</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-status-review bg-status-review-bg border border-status-review-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">hourglass_top</span> REQUIRED
+                    </span>
+</td>
+<td class="py-2.5 px-3 text-text-secondary">MSEDCL Nashik Circle</td>
+<td class="py-2.5 px-3 text-text-secondary">Formal 1.2 MW injection tap application pending</td>
+</tr>
+<!-- Item 4 -->
+<tr class="hover:bg-surface-subtle/50 bg-status-review-bg/30">
+<td class="py-2.5 px-3 font-medium text-text-primary">4. Cadastral Land Title &amp; Reservation</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-status-review bg-status-review-bg border border-status-review-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">hourglass_top</span> REQUIRED
+                    </span>
+</td>
+<td class="py-2.5 px-3 text-text-secondary">MIDC / NMC Town Planning</td>
+<td class="py-2.5 px-3 text-text-secondary">25-yr lease or municipal reservation deed</td>
+</tr>
+<!-- Item 5 -->
+<tr class="hover:bg-surface-subtle/50">
+<td class="py-2.5 px-3 font-medium text-text-primary">5. GDCR 15.0m RoW Setback Compliance</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-status-recommended bg-status-recommended-bg border border-status-recommended-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">check</span> DRAFT VERIFIED
+                    </span>
+</td>
+<td class="py-2.5 px-3 text-text-secondary">NMC Engineering Works</td>
+<td class="py-2.5 px-3 text-text-secondary">70m frontage pegging aligned with NH-848 link</td>
+</tr>
+<!-- Item 6 -->
+<tr class="hover:bg-surface-subtle/50">
+<td class="py-2.5 px-3 font-medium text-text-primary">6. Geotechnical Core Penetrometer Test</td>
+<td class="py-2.5 px-3">
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-status-screening bg-status-screening-bg border border-status-screening-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">schedule</span> PRE-CONST
+                    </span>
+</td>
+<td class="py-2.5 px-3 text-text-secondary">Empaneled Soil Lab</td>
+<td class="py-2.5 px-3 text-text-secondary">Required for solar canopy piling foundations</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- RIGHT COLUMN: Decision Summary & Statutory Actions (~32% width -> lg:col-span-4) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- 1. Dossier Readiness Tracker Card -->
+<div class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center justify-between mb-3">
+<h4 class="text-title-md font-headline-sm text-text-primary">Dossier Readiness Tracker</h4>
+<span class="inline-flex items-center gap-1 text-[11px] font-bold text-status-recommended bg-status-recommended-bg border border-status-recommended-border px-2.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">check_circle</span> READY FOR REVIEW
+            </span>
+</div>
+<!-- Progress Bar -->
+<div class="mb-4">
+<div class="flex justify-between text-body-sm mb-1">
+<span class="text-text-secondary font-medium">Milestones Finalized</span>
+<span class="font-bold text-text-primary">83% (5 of 6)</span>
+</div>
+<div class="w-full h-2 bg-surface-subtle rounded-full overflow-hidden border border-border-subtle">
+<div class="h-full bg-status-recommended rounded-full" style="width: 83.3%;"></div>
+</div>
+</div>
+<!-- Checkpoints List -->
+<div class="space-y-2 text-body-sm">
+<div class="flex items-start gap-2 text-text-primary">
+<span class="material-symbols-outlined text-status-recommended text-lg shrink-0">check_box</span>
+<span><strong>01. Site Selection &amp; Screening:</strong> Cleared (84/100 Recommended)</span>
+</div>
+<div class="flex items-start gap-2 text-text-primary">
+<span class="material-symbols-outlined text-status-recommended text-lg shrink-0">check_box</span>
+<span><strong>02. Risk &amp; Conflict Exclusions:</strong> Cleared (0 Fatal Flaws)</span>
+</div>
+<div class="flex items-start gap-2 text-text-primary">
+<span class="material-symbols-outlined text-status-recommended text-lg shrink-0">check_box</span>
+<span><strong>03. Geodesic Measurement:</strong> Cleared (2,450 m² Usable)</span>
+</div>
+<div class="flex items-start gap-2 text-text-primary">
+<span class="material-symbols-outlined text-status-recommended text-lg shrink-0">check_box</span>
+<span><strong>04. 3D Model Assembly:</strong> Cleared (Solar-EV Hub)</span>
+</div>
+<div class="flex items-start gap-2 text-text-primary">
+<span class="material-symbols-outlined text-status-recommended text-lg shrink-0">check_box</span>
+<span><strong>05. AI Decision Justification:</strong> Generated (Advisory Prime)</span>
+</div>
+<div class="flex items-start gap-2 text-status-review">
+<span class="material-symbols-outlined text-status-review text-lg shrink-0">pending_actions</span>
+<span><strong>06. Inter-Agency Verifications:</strong> 3 Pending External Reviews</span>
+</div>
+</div>
+</div>
+<!-- 2. Decision Summary Card -->
+<div class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5">
+<div class="flex items-center gap-2 pb-3 border-b border-border-subtle mb-3">
+<span class="material-symbols-outlined text-primary text-xl">gavel</span>
+<h4 class="text-title-md font-headline-sm text-text-primary">Executive Siting Recommendation</h4>
+</div>
+<div class="p-3 bg-surface-subtle border border-border-subtle rounded mb-3">
+<p class="text-body-sm font-semibold text-text-primary">
+              Candidate parcel NASHIK-SITE-01 is prioritized as Rank #1 of 6 municipal candidate locations for the Phase-1 Solar-EV Charging Hub deployment in Nashik Urban Agglomeration.
+            </p>
+</div>
+<h5 class="text-label-caps uppercase text-text-secondary font-bold mb-2">Key Justification Pillars:</h5>
+<ol class="text-body-sm text-text-secondary space-y-2 list-decimal pl-4">
+<li><strong>Top-tier solar yield</strong> (5.42 kWh/m²/day GHI) materially lowers daytime grid demand.</li>
+<li><strong>High-density freight depot proximity</strong> captures 480 commercial vph on MIDC corridor.</li>
+<li><strong>Minimal CapEx interconnection</strong> via short 120m feeder run directly reduces trenching costs.</li>
+<li><strong>Zero environmental encumbrances</strong> with full clearance from Godavari flood zone limits.</li>
+<li><strong>Reversible modular canopy architecture</strong> protects municipal land-use adaptability.</li>
+</ol>
+</div>
+<!-- 3. Workspace Action Buttons & Transitions -->
+<div class="bg-surface rounded-lg border border-border-subtle shadow-sm p-5 space-y-3">
+<button class="w-full h-11 rounded-lg bg-status-recommended hover:bg-primary-container text-white font-bold text-body-lg flex items-center justify-center gap-2 shadow-sm transition">
+<span class="material-symbols-outlined text-xl">save</span>
+            Save Proposal
+          </button>
+<p class="text-[11px] text-center text-text-muted">
+            Saves decision dossier to Saved Proposals workspace.
+          </p>
+<button class="w-full h-10 rounded-lg bg-white border border-border-subtle hover:bg-surface-subtle text-text-primary font-semibold text-body-md flex items-center justify-center gap-2 transition">
+<span class="material-symbols-outlined text-lg">picture_as_pdf</span>
+            Preview Formal Dossier
+          </button>
+<div class="pt-3 border-t border-border-subtle space-y-2">
+<a class="text-body-sm text-primary hover:underline flex items-center gap-1 font-medium" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+              Back to AI Review
+            </a>
+<a class="text-body-sm text-text-secondary hover:text-text-primary flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-base">edit_location</span>
+              Edit Plot Boundary in 2D Map
+            </a>
+<a class="text-body-sm text-text-secondary hover:text-text-primary flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-base">download</span>
+              Export GIS Package (GeoJSON / SHP)
+            </a>
+</div>
+</div>
+<!-- 4. Statutory Municipal Notice Disclaimer -->
+<div class="p-4 rounded-lg border border-border-subtle bg-surface-subtle text-[11px] text-text-secondary leading-normal">
+<div class="flex items-center gap-1.5 font-bold text-text-primary uppercase mb-1">
+<span class="material-symbols-outlined text-sm">balance</span>
+            Statutory Municipal Notice
+          </div>
+          Preliminary dossiers generated via UrjaSetu Spatial Intelligence are advisory decision-support instruments framed under Maharashtra Regional &amp; Town Planning (MRTP) Act guidelines. Final parcel gazetting, land mutation, and grid evacuation permits require statutory NMC Council ratification and formal MSEDCL interconnection studies prior to civil works or capital expenditure tenders.
+        </div>
+</div>
+</div>
+</div>
+</main>
+<footer class="w-full bg-surface border-t border-border-subtle py-4 mt-12">
+<div class="max-w-[1400px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-body-sm text-text-secondary">
+<div>
+      UrjaSetu Geospatial Decision Support System · Urban Local Body Governance Edition
+    </div>
+<div class="flex items-center gap-4 text-tag-provenance text-text-muted">
+<span>EPSG: 4326 / WGS 84</span>
+<span>•</span>
+<span>GDCR Reg. Compliant</span>
+<span>•</span>
+<span>Nashik Municipal Corporation</span>
+</div>
+</div>
+</footer>
+</body></html>
