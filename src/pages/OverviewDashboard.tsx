@@ -1,14 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NASHIK_DEMO_SITES } from '../data/nashikDemoData';
+import { getSites } from '../services/api/sites';
+import { getProposals } from '../services/api/proposals';
+import { CandidateSite, Proposal } from '../types/site';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
 export const OverviewDashboard: React.FC = () => {
   const navigate = useNavigate();
 
+  const [sites, setSites] = useState<CandidateSite[]>([]);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isFallback, setIsFallback] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      const sitesResult = await getSites();
+      const proposalsResult = await getProposals();
+
+      setSites(sitesResult.sites);
+      setProposals(proposalsResult.proposals);
+      setIsFallback(sitesResult.isFallback || proposalsResult.isFallback);
+      setIsLoading(false);
+    }
+    loadData();
+  }, []);
+
+  const recommendedSites = sites.filter((s) => s.status === 'RECOMMENDED');
+  const reviewSites = sites.filter((s) => s.status === 'UNDER_REVIEW');
+  const disqualifiedSites = sites.filter((s) => s.status === 'DISQUALIFIED' || s.status === 'SCREENING');
+
+  const topSite = recommendedSites[0] || sites[0];
+
   return (
     <div className="p-6 xl:p-8 flex flex-col gap-6">
+      {/* Fallback Banner Notice if API is offline */}
+      {isFallback && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-2 font-medium">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span>Live API connection offline — displaying Nashik Municipal seed dataset.</span>
+          </div>
+          <span className="font-mono text-[10px] bg-white border border-amber-200 px-2 py-0.5 rounded text-amber-900 font-semibold">
+            DEMO DATA MODE
+          </span>
+        </div>
+      )}
+
       {/* Executive Strategic Hero Banner */}
       <div className="relative overflow-hidden rounded-xl bg-white p-6 xl:p-8 border border-border-subtle shadow-xs">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -60,7 +100,7 @@ export const OverviewDashboard: React.FC = () => {
           </div>
           <div className="mt-4 flex items-baseline justify-between">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl text-text-primary font-bold">6</span>
+              <span className="text-2xl text-text-primary font-bold">{isLoading ? '...' : sites.length}</span>
               <span className="text-xs text-text-secondary">Sites Evaluated</span>
             </div>
             <span className="text-[10px] px-2 py-0.5 rounded bg-surface-subtle border border-border-subtle text-text-secondary">
@@ -85,7 +125,7 @@ export const OverviewDashboard: React.FC = () => {
           </div>
           <div className="mt-4 flex items-baseline justify-between">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl text-primary font-bold">2</span>
+              <span className="text-2xl text-primary font-bold">{isLoading ? '...' : recommendedSites.length}</span>
               <span className="text-xs text-text-secondary">High Opportunity</span>
             </div>
             <div className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
@@ -95,7 +135,7 @@ export const OverviewDashboard: React.FC = () => {
             </div>
           </div>
           <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-primary h-full w-[33.3%]"></div>
+            <div className="bg-primary h-full w-[50%]"></div>
           </div>
         </div>
 
@@ -112,17 +152,15 @@ export const OverviewDashboard: React.FC = () => {
           </div>
           <div className="mt-4 flex items-baseline justify-between">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl text-amber-700 font-bold">2</span>
+              <span className="text-2xl text-amber-700 font-bold">{isLoading ? '...' : reviewSites.length}</span>
               <span className="text-xs text-text-secondary">Moderate Risk</span>
             </div>
             <div className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
               <span>SITE-03</span>
-              <span>•</span>
-              <span>SITE-06</span>
             </div>
           </div>
           <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-amber-500 h-full w-[33.3%]"></div>
+            <div className="bg-amber-500 h-full w-[25%]"></div>
           </div>
         </div>
 
@@ -139,17 +177,15 @@ export const OverviewDashboard: React.FC = () => {
           </div>
           <div className="mt-4 flex items-baseline justify-between">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl text-red-700 font-bold">2</span>
+              <span className="text-2xl text-red-700 font-bold">{isLoading ? '...' : disqualifiedSites.length}</span>
               <span className="text-xs text-text-secondary">Hydrologic Conflict</span>
             </div>
             <div className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-red-50 text-red-800 border border-red-200 font-semibold">
               <span>SITE-04</span>
-              <span>•</span>
-              <span>SITE-05</span>
             </div>
           </div>
           <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-red-500 h-full w-[33.3%]"></div>
+            <div className="bg-red-500 h-full w-[25%]"></div>
           </div>
         </div>
       </div>
@@ -200,50 +236,44 @@ export const OverviewDashboard: React.FC = () => {
                 <path d="M 50 180 L 750 200" stroke="#cbd5e1" strokeWidth="10" />
                 <path d="M 50 180 L 750 200" stroke="#64748b" strokeWidth="2" />
 
-                {/* Candidate Sites Pins */}
-                {/* NASHIK-SITE-01 */}
-                <g className="cursor-pointer group" onClick={() => navigate('/planning/nashik-site-01')}>
-                  <circle cx="280" cy="160" r="28" fill="#ecfdf5" stroke="#059669" strokeWidth="2" />
-                  <circle cx="280" cy="160" r="10" fill="#059669" />
-                  <text x="280" y="205" textAnchor="middle" fill="#0f172a" fontSize="11" fontWeight="bold">NASHIK-SITE-01</text>
-                  <text x="280" y="220" textAnchor="middle" fill="#059669" fontSize="10" fontWeight="bold">Score: 84/100</text>
-                </g>
+                {/* Candidate Sites Pins from API Data */}
+                {sites.map((site, index) => {
+                  const positions = [
+                    { x: 280, y: 160 },
+                    { x: 520, y: 120 },
+                    { x: 620, y: 280 },
+                    { x: 340, y: 300 },
+                  ];
+                  const pos = positions[index] || { x: 400, y: 200 };
+                  const isRec = site.status === 'RECOMMENDED';
 
-                {/* NASHIK-SITE-02 */}
-                <g className="cursor-pointer group" onClick={() => navigate('/planning/nashik-site-02')}>
-                  <circle cx="520" cy="120" r="22" fill="#ecfdf5" stroke="#059669" strokeWidth="2" />
-                  <circle cx="520" cy="120" r="8" fill="#059669" />
-                  <text x="520" y="155" textAnchor="middle" fill="#0f172a" fontSize="11" fontWeight="bold">NASHIK-SITE-02</text>
-                  <text x="520" y="170" textAnchor="middle" fill="#059669" fontSize="10" fontWeight="bold">Score: 78/100</text>
-                </g>
-
-                {/* NASHIK-SITE-03 */}
-                <g className="cursor-pointer group">
-                  <circle cx="620" cy="280" r="18" fill="#fffbeb" stroke="#d97706" strokeWidth="2" />
-                  <circle cx="620" cy="280" r="6" fill="#d97706" />
-                  <text x="620" y="312" textAnchor="middle" fill="#0f172a" fontSize="11" fontWeight="bold">NASHIK-SITE-03</text>
-                </g>
-
-                {/* NASHIK-SITE-04 */}
-                <g className="cursor-pointer group">
-                  <circle cx="340" cy="300" r="18" fill="#fef2f2" stroke="#dc2626" strokeWidth="2" />
-                  <circle cx="340" cy="300" r="6" fill="#dc2626" />
-                  <text x="340" y="332" textAnchor="middle" fill="#dc2626" fontSize="10" fontWeight="bold">SITE-04 (Flood Risk)</text>
-                </g>
+                  return (
+                    <g key={site.id} className="cursor-pointer group" onClick={() => navigate(`/planning/${site.id}`)}>
+                      <circle cx={pos.x} cy={pos.y} r={isRec ? '26' : '18'} fill={isRec ? '#ecfdf5' : '#fffbeb'} stroke={isRec ? '#059669' : '#d97706'} strokeWidth="2" />
+                      <circle cx={pos.x} cy={pos.y} r="8" fill={isRec ? '#059669' : '#d97706'} />
+                      <text x={pos.x} y={pos.y + 40} textAnchor="middle" fill="#0f172a" fontSize="11" fontWeight="bold">
+                        {site.code}
+                      </text>
+                      <text x={pos.x} y={pos.y + 54} textAnchor="middle" fill={isRec ? '#059669' : '#d97706'} fontSize="10" fontWeight="bold">
+                        Score: {site.opportunityScore}/100
+                      </text>
+                    </g>
+                  );
+                })}
               </svg>
 
               <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-3 py-2 rounded-lg border border-border-subtle text-xs text-text-secondary flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                  <span>Recommended (2)</span>
+                  <span>Recommended ({recommendedSites.length})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                  <span>Under Review (2)</span>
+                  <span>Under Review ({reviewSites.length})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                  <span>Disqualified (2)</span>
+                  <span>Disqualified ({disqualifiedSites.length})</span>
                 </div>
               </div>
             </div>
@@ -252,48 +282,50 @@ export const OverviewDashboard: React.FC = () => {
 
         {/* Right: High-Priority Candidate Site Dossier (lg:col-span-4) */}
         <div className="lg:col-span-4 flex flex-col gap-4">
-          <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-xs flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-primary tracking-wider uppercase">Top Ranked Candidate</span>
-                <span className="text-lg font-bold text-text-primary">NASHIK-SITE-01</span>
+          {topSite && (
+            <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-xs flex flex-col gap-4">
+              <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-primary tracking-wider uppercase">Top Ranked Candidate</span>
+                  <span className="text-lg font-bold text-text-primary">{topSite.code}</span>
+                </div>
+                <ScoreBadge score={topSite.opportunityScore} size="lg" />
               </div>
-              <ScoreBadge score={84} size="lg" />
-            </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-semibold text-text-secondary">Location</span>
-              <p className="text-sm text-text-primary font-medium">Govardhan Bus Depot Substation Parcel</p>
-              <p className="text-xs text-text-muted">Ward 14 - Trimbak Road Axis, Nashik</p>
-            </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-semibold text-text-secondary">Location</span>
+                <p className="text-sm text-text-primary font-medium">{topSite.name}</p>
+                <p className="text-xs text-text-muted">{topSite.ward || topSite.wardName}</p>
+              </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border-subtle">
-              <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
-                <span className="text-[10px] text-text-muted uppercase font-semibold">Solar Suitability</span>
-                <span className="text-sm font-bold text-emerald-700">88 / 100</span>
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border-subtle">
+                <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
+                  <span className="text-[10px] text-text-muted uppercase font-semibold">Solar Suitability</span>
+                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics.solarSuitability} / 100</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
+                  <span className="text-[10px] text-text-muted uppercase font-semibold">EV Demand Proxy</span>
+                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics.evDemandProxy} / 100</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
+                  <span className="text-[10px] text-text-muted uppercase font-semibold">Est. Plot Area</span>
+                  <span className="text-sm font-bold text-text-primary">{(topSite.areaSqm || 2450).toLocaleString()} m²</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
+                  <span className="text-[10px] text-text-muted uppercase font-semibold">Flood Risk</span>
+                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics.floodRisk} Risk</span>
+                </div>
               </div>
-              <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
-                <span className="text-[10px] text-text-muted uppercase font-semibold">EV Demand Proxy</span>
-                <span className="text-sm font-bold text-emerald-700">82 / 100</span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
-                <span className="text-[10px] text-text-muted uppercase font-semibold">Est. Plot Area</span>
-                <span className="text-sm font-bold text-text-primary">2,450 m²</span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
-                <span className="text-[10px] text-text-muted uppercase font-semibold">Flood Risk</span>
-                <span className="text-sm font-bold text-emerald-700">Low Risk</span>
-              </div>
-            </div>
 
-            <button
-              onClick={() => navigate('/planning/nashik-site-01')}
-              className="w-full py-2.5 px-4 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 mt-2 shadow-xs"
-            >
-              <span className="material-symbols-outlined text-[18px]">design_services</span>
-              <span>Open Site Planning Workspace</span>
-            </button>
-          </div>
+              <button
+                onClick={() => navigate(`/planning/${topSite.id}`)}
+                className="w-full py-2.5 px-4 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 mt-2 shadow-xs"
+              >
+                <span className="material-symbols-outlined text-[18px]">design_services</span>
+                <span>Open Site Planning Workspace</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -318,12 +350,12 @@ export const OverviewDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle text-sm">
-              {NASHIK_DEMO_SITES.map((site) => (
+              {sites.map((site) => (
                 <tr key={site.id} className="hover:bg-slate-50 transition-colors">
                   <td className="py-3 px-6 font-mono font-bold text-text-primary">{site.code}</td>
                   <td className="py-3 px-6">
                     <div className="font-semibold text-text-primary">{site.name}</div>
-                    <div className="text-xs text-text-muted">{site.ward}</div>
+                    <div className="text-xs text-text-muted">{site.ward || site.wardName}</div>
                   </td>
                   <td className="py-3 px-6">
                     <ScoreBadge score={site.opportunityScore} size="sm" />
@@ -331,7 +363,7 @@ export const OverviewDashboard: React.FC = () => {
                   <td className="py-3 px-6">
                     <StatusBadge status={site.status} />
                   </td>
-                  <td className="py-3 px-6 font-medium text-text-secondary">{site.areaSqm.toLocaleString()} m²</td>
+                  <td className="py-3 px-6 font-medium text-text-secondary">{(site.areaSqm || 2450).toLocaleString()} m²</td>
                   <td className="py-3 px-6 text-right">
                     <button
                       onClick={() => navigate(`/planning/${site.id}`)}

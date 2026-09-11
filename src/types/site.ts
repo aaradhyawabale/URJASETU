@@ -19,12 +19,17 @@ export interface CandidateSite {
   name: string;
   code: string; // e.g. NASHIK-SITE-01
   city: string; // Nashik
+  cityName?: string;
   ward: string;
-  zone: string;
+  wardName?: string;
+  zone?: string;
+  zoneName?: string;
   opportunityScore: number; // 0 - 100
   status: SiteStatus;
   lat: number;
+  latitude?: number;
   lng: number;
+  longitude?: number;
   areaSqm: number;
   metrics: SiteMetrics;
   description: string;
