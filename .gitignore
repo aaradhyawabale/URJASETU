@@ -1,4 +1,18 @@
+# Dependencies
 node_modules
+backend/node_modules
+
+# Build outputs
 dist
-.DS_Store
+build
+backend/dist
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+URJASETU_TEAM_SECRETS.md
+
+# Logs & OS Files
 *.log
+.DS_Store

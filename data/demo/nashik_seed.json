@@ -1,0 +1,47 @@
+{
+  "town": {
+    "name": "Nashik",
+    "state": "Maharashtra",
+    "country": "India",
+    "srid": 4326,
+    "center": { "lat": 19.9975, "lng": 73.7898 }
+  },
+  "candidateSites": [
+    {
+      "id": "nashik-site-01",
+      "code": "NASHIK-SITE-01",
+      "name": "Govardhan Bus Depot Substation Parcel",
+      "ward": "Ward 14 - Trimbak Road Axis",
+      "opportunityScore": 84,
+      "status": "RECOMMENDED",
+      "lat": 19.9975,
+      "lng": 73.7898,
+      "areaSqm": 2450,
+      "metrics": {
+        "solarSuitability": 88,
+        "evDemandProxy": 82,
+        "roadAccessibility": 91,
+        "floodRisk": "LOW",
+        "landConflict": "NONE"
+      }
+    },
+    {
+      "id": "nashik-site-02",
+      "code": "NASHIK-SITE-02",
+      "name": "Satpur Industrial Area Cluster B",
+      "ward": "Ward 8 - MIDC Satpur",
+      "opportunityScore": 78,
+      "status": "RECOMMENDED",
+      "lat": 19.9882,
+      "lng": 73.7421,
+      "areaSqm": 3100,
+      "metrics": {
+        "solarSuitability": 85,
+        "evDemandProxy": 79,
+        "roadAccessibility": 86,
+        "floodRisk": "LOW",
+        "landConflict": "NONE"
+      }
+    }
+  ]
+}
