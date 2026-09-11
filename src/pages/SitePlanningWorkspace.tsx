@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getSiteById } from '../services/api/sites';
 import { createProposal } from '../services/api/proposals';
 import { CandidateSite, InfrastructureType } from '../types/site';
+import { InteractivePlotDrawer } from '../gis/components/InteractivePlotDrawer';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
 export const SitePlanningWorkspace: React.FC = () => {
@@ -12,7 +13,6 @@ export const SitePlanningWorkspace: React.FC = () => {
   const [site, setSite] = useState<CandidateSite | null>(null);
   const [plotAreaSqm, setPlotAreaSqm] = useState<number>(2450);
   const [selectedInfra, setSelectedInfra] = useState<InfrastructureType>('SOLAR_EV_CHARGING_HUB');
-  const [isDrawing, setIsDrawing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -26,18 +26,10 @@ export const SitePlanningWorkspace: React.FC = () => {
     loadSite();
   }, [siteId]);
 
-  const handleDrawSimulate = () => {
-    setIsDrawing(true);
-    setTimeout(() => {
-      setPlotAreaSqm(2480);
-      setIsDrawing(false);
-    }, 600);
-  };
-
   const handleCreateProposalAndProceed = async () => {
     if (!site) return;
     setIsSaving(true);
-    const res = await createProposal({
+    await createProposal({
       siteId: site.id,
       siteCode: site.code,
       title: `${site.code} ${selectedInfra.replace(/_/g, ' ')} Proposal`,
@@ -53,72 +45,12 @@ export const SitePlanningWorkspace: React.FC = () => {
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
-      {/* Interactive Plot Drawing Canvas (70% width) */}
+      {/* Interactive Turf.js Plot Drawing Canvas (70% width) */}
       <div className="flex-1 relative bg-slate-100 h-full flex flex-col">
-        {/* Drawing Control Bar */}
-        <div className="absolute top-4 left-4 z-20 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-border-subtle shadow-md flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary text-[20px]">gesture</span>
-          <span className="text-xs font-bold text-text-primary uppercase tracking-wider">Boundary Controls:</span>
-
-          <button
-            onClick={handleDrawSimulate}
-            disabled={isDrawing}
-            className="text-xs px-3 py-1.5 rounded-lg bg-primary text-white font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-1.5 shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[16px]">edit</span>
-            <span>{isDrawing ? 'Calculating Area...' : 'Draw Custom Plot Boundary'}</span>
-          </button>
-
-          <span className="text-xs text-text-muted">|</span>
-
-          <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-surface-subtle border border-border-subtle px-2.5 py-1 rounded-lg">
-            <span>Turf.js Live Area:</span>
-            <span className="font-bold text-text-primary font-mono">{plotAreaSqm.toLocaleString()} m²</span>
-          </div>
-        </div>
-
-        {/* Map Canvas */}
-        <div className="w-full h-full relative select-none">
-          <svg className="w-full h-full" viewBox="0 0 1000 650" fill="none">
-            <rect width="1000" height="650" fill="#f8fafc" />
-
-            {/* Grid */}
-            <path d="M0 100 H1000 M0 200 H1000 M0 300 H1000 M0 400 H1000 M0 500 H1000" stroke="#e2e8f0" strokeDasharray="3 3" />
-            <path d="M150 0 V650 M300 0 V650 M450 0 V650 M600 0 V650 M750 0 V650 M900 0 V650" stroke="#e2e8f0" strokeDasharray="3 3" />
-
-            {/* Cadastral Parcel Outline */}
-            <rect x="250" y="150" width="450" height="350" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4 4" />
-
-            {/* Drawn Usable Plot Polygon (Turf.js calculated area) */}
-            <polygon
-              points="300,180 650,180 620,450 320,420"
-              fill="#059669"
-              fillOpacity="0.2"
-              stroke="#059669"
-              strokeWidth="3"
-            />
-
-            {/* Drawing Nodes */}
-            <circle cx="300" cy="180" r="5" fill="#059669" stroke="#ffffff" strokeWidth="2" />
-            <circle cx="650" cy="180" r="5" fill="#059669" stroke="#ffffff" strokeWidth="2" />
-            <circle cx="620" cy="450" r="5" fill="#059669" stroke="#ffffff" strokeWidth="2" />
-            <circle cx="320" cy="420" r="5" fill="#059669" stroke="#ffffff" strokeWidth="2" />
-
-            {/* Substation Line & Feeder Connection Point */}
-            <path d="M 120 180 L 300 180" stroke="#f59e0b" strokeWidth="3" strokeDasharray="4 4" />
-            <circle cx="120" cy="180" r="8" fill="#f59e0b" />
-            <text x="120" y="205" textAnchor="middle" fill="#d97706" fontSize="10" fontWeight="bold">33kV Substation Line</text>
-
-            <text x="470" y="300" textAnchor="middle" fill="#059669" fontSize="16" fontWeight="bold">
-              ESTIMATED PLOT AREA: {plotAreaSqm.toLocaleString()} m²
-            </text>
-          </svg>
-
-          {/* Canvas Disclaimer */}
-          <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md px-3 py-2 rounded-lg border border-border-subtle text-xs text-text-secondary">
-            <span className="font-semibold text-text-primary">Estimated available plot area based on the drawn boundary</span>
-          </div>
-        </div>
+        <InteractivePlotDrawer
+          initialAreaSqm={plotAreaSqm}
+          onAreaChange={(newArea) => setPlotAreaSqm(newArea)}
+        />
       </div>
 
       {/* Right Side Panel: Infrastructure Selection & Parameters (30% width) */}

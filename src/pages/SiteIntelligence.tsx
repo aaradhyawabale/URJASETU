@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSites, getSiteScores, getSiteRisk } from '../services/api/sites';
 import { CandidateSite } from '../types/site';
+import { LeafletMap } from '../gis/components/LeafletMap';
+import { CENTRAL_GIS_LAYERS_REGISTRY } from '../gis/data/layersRegistry';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
@@ -113,104 +115,14 @@ export const SiteIntelligence: React.FC = () => {
           </div>
         )}
 
-        {/* GIS Map Visualization Canvas */}
+        {/* Interactive Leaflet 2D GIS Map Component */}
         <div className="w-full h-full relative select-none">
-          <svg className="w-full h-full" viewBox="0 0 1000 650" fill="none">
-            <rect width="1000" height="650" fill="#f1f5f9" />
-
-            {/* Map Grid */}
-            <path d="M0 100 H1000 M0 200 H1000 M0 300 H1000 M0 400 H1000 M0 500 H1000 M0 600 H1000" stroke="#cbd5e1" strokeDasharray="3 3" />
-            <path d="M150 0 V650 M300 0 V650 M450 0 V650 M600 0 V650 M750 0 V650 M900 0 V650" stroke="#cbd5e1" strokeDasharray="3 3" />
-
-            {/* Solar Irradiance Heatmap Layer */}
-            {layers.solarIrradiance && (
-              <g opacity="0.25">
-                <circle cx="350" cy="220" r="180" fill="#fef08a" />
-                <circle cx="350" cy="220" r="110" fill="#fde047" />
-                <circle cx="650" cy="180" r="160" fill="#fef08a" />
-              </g>
-            )}
-
-            {/* EV Demand Heatmap Layer */}
-            {layers.evDemandProxy && (
-              <g opacity="0.2">
-                <circle cx="350" cy="240" r="120" fill="#0284c7" />
-                <circle cx="700" cy="350" r="150" fill="#0284c7" />
-              </g>
-            )}
-
-            {/* Flood Risk Overlay */}
-            {layers.floodways && (
-              <path d="M 0 450 Q 300 380, 550 440 T 1000 380" stroke="#7dd3fc" strokeWidth="36" fill="none" opacity="0.6" />
-            )}
-
-            {/* 33kV Substation Feeders */}
-            {layers.substationFeeders && (
-              <path d="M 120 50 L 350 220 L 700 200 M 350 220 L 350 480" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="6 4" />
-            )}
-
-            {/* Arterial Roads */}
-            <path d="M 150 0 L 450 650" stroke="#94a3b8" strokeWidth="10" />
-            <path d="M 50 220 L 950 250" stroke="#94a3b8" strokeWidth="8" />
-
-            {/* Candidate Sites Pins */}
-            {sites.map((site, index) => {
-              const positions = [
-                { x: 350, y: 220 },
-                { x: 650, y: 180 },
-                { x: 720, y: 380 },
-                { x: 420, y: 420 },
-              ];
-              const pos = positions[index] || { x: 400, y: 300 };
-              const isSelected = selectedSite?.id === site.id;
-
-              return (
-                <g
-                  key={site.id}
-                  className="cursor-pointer transition-transform hover:scale-110"
-                  onClick={() => handleSelectSite(site)}
-                >
-                  {isSelected && (
-                    <circle cx={pos.x} cy={pos.y} r="32" fill="none" stroke="#059669" strokeWidth="3" className="animate-ping" />
-                  )}
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r={isSelected ? '24' : '18'}
-                    fill={site.status === 'RECOMMENDED' ? '#ecfdf5' : site.status === 'UNDER_REVIEW' ? '#fffbeb' : '#fef2f2'}
-                    stroke={site.status === 'RECOMMENDED' ? '#059669' : site.status === 'UNDER_REVIEW' ? '#d97706' : '#dc2626'}
-                    strokeWidth="2.5"
-                  />
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r="8"
-                    fill={site.status === 'RECOMMENDED' ? '#059669' : site.status === 'UNDER_REVIEW' ? '#d97706' : '#dc2626'}
-                  />
-                  <text x={pos.x} y={pos.y + 36} textAnchor="middle" fill="#0f172a" fontSize="12" fontWeight="bold">
-                    {site.code}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-
-          {/* Map Footer Legend */}
-          <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-border-subtle text-xs flex items-center gap-4 shadow-sm">
-            <span className="font-bold text-text-primary uppercase tracking-wider text-[11px]">GIS Legend:</span>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span>Recommended (80+ Score)</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span>Review Needed</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-              <span>Risk Disqualified</span>
-            </div>
-          </div>
+          <LeafletMap
+            sites={sites}
+            selectedSite={selectedSite}
+            onSelectSite={handleSelectSite}
+            layers={layers}
+          />
         </div>
       </div>
 
