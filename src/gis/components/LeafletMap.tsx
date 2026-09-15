@@ -3,17 +3,24 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { CandidateSite } from '../../types/site';
 import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
+import { fetchOsmLayer } from '../services/osmService';
+
+export interface LayerVisibilityState {
+  osmRoads?: boolean;
+  osmBuildings?: boolean;
+  osmPois?: boolean;
+  osmParking?: boolean;
+  osmEvCharging?: boolean;
+  osmLanduse?: boolean;
+  substationFeeders?: boolean;
+  floodways?: boolean;
+}
 
 interface LeafletMapProps {
   sites: CandidateSite[];
   selectedSite: CandidateSite | null;
   onSelectSite: (site: CandidateSite) => void;
-  layers: {
-    solarIrradiance: boolean;
-    evDemandProxy: boolean;
-    substationFeeders: boolean;
-    floodways: boolean;
-  };
+  layers: LayerVisibilityState;
 }
 
 export const LeafletMap: React.FC<LeafletMapProps> = ({
@@ -25,23 +32,24 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
-  const geojsonLayersRef = useRef<L.LayerGroup | null>(null);
+  const geojsonLayersRef = useRef<Record<string, L.LayerGroup>>({});
 
   // Initialize Leaflet Map Instance
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
-      // Center on Nashik: 19.9975, 73.7898
+      // Center on Nashik extent: 19.9975, 73.7898
       const map = L.map(mapContainerRef.current, {
         center: [19.9975, 73.7898],
         zoom: 13,
         zoomControl: false,
+        preferCanvas: true, // Use canvas renderer for high feature counts
       });
 
-      // Add Cartographic Light Tile Layer
+      // Add Cartographic Light Tile Layer with explicit OSM attribution
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19,
       }).addTo(map);
@@ -49,7 +57,6 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       // Add Zoom Control to bottom-right
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      geojsonLayersRef.current = L.layerGroup().addTo(map);
       mapInstanceRef.current = map;
     }
 
@@ -61,60 +68,303 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     };
   }, []);
 
-  // Update Dynamic GeoJSON Overlays
+  // Sync OSM and Demo GeoJSON Layers asynchronously
   useEffect(() => {
     const map = mapInstanceRef.current;
-    const group = geojsonLayersRef.current;
-    if (!map || !group) return;
+    if (!map) return;
 
-    group.clearLayers();
+    let isSubscribed = true;
 
-    // 1. Godavari Riverway Ribbon
-    if (layers.floodways) {
-      const riverLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.riverways as any, {
-        style: {
-          color: '#0284c7',
-          weight: 12,
-          opacity: 0.6,
-        },
+    async function syncLayers() {
+      // 1. Clear or initialize Layer Groups
+      const groupMap = geojsonLayersRef.current;
+
+      const layerKeys = [
+        'osmLanduse',
+        'osmRoads',
+        'osmBuildings',
+        'osmPois',
+        'osmParking',
+        'osmEvCharging',
+        'floodways',
+        'substationFeeders',
+      ];
+
+      layerKeys.forEach((key) => {
+        if (!groupMap[key]) {
+          groupMap[key] = L.layerGroup().addTo(map!);
+        } else {
+          groupMap[key].clearLayers();
+        }
       });
-      group.addLayer(riverLayer);
 
-      // Flood Risk Polygon
-      const floodZoneLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.floodZones as any, {
-        style: {
-          color: '#dc2626',
-          fillColor: '#fef2f2',
-          fillOpacity: 0.4,
-          weight: 2,
-          dashArray: '4 4',
-        },
-      });
-      group.addLayer(floodZoneLayer);
+      // 2. Render Demo Floodways & Feeders if toggled
+      if (layers.floodways) {
+        const riverLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.riverways as any, {
+          style: { color: '#0284c7', weight: 10, opacity: 0.5 },
+        });
+        const floodZoneLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.floodZones as any, {
+          style: { color: '#dc2626', fillColor: '#fef2f2', fillOpacity: 0.35, weight: 2, dashArray: '4 4' },
+        });
+        groupMap.floodways.addLayer(riverLayer);
+        groupMap.floodways.addLayer(floodZoneLayer);
+      }
+
+      if (layers.substationFeeders) {
+        const feederLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.feeders as any, {
+          style: { color: '#f59e0b', weight: 3, dashArray: '6 6', opacity: 0.9 },
+        });
+        groupMap.substationFeeders.addLayer(feederLayer);
+      }
+
+      // 3. Render OSM Land Use Layer
+      if (layers.osmLanduse) {
+        const data = await fetchOsmLayer('landuse');
+        if (data && isSubscribed) {
+          const landuseLayer = L.geoJSON(data as any, {
+            style: (feature) => {
+              const landuseType = feature?.properties?.landuse || '';
+              let fillColor = '#e2e8f0';
+              if (landuseType === 'industrial') fillColor = '#cbd5e1';
+              if (landuseType === 'commercial') fillColor = '#fed7aa';
+              if (landuseType === 'residential') fillColor = '#fef08a';
+              if (landuseType === 'farmland' || landuseType === 'grass') fillColor = '#bbf7d0';
+              return {
+                fillColor,
+                fillOpacity: 0.4,
+                weight: 1,
+                color: '#94a3b8',
+              };
+            },
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const name = props.name || props.landuse || 'Zoned Parcel';
+              const type = props.landuse || props.type || 'General Zone';
+              const osmId = props['@id'] || 'Not available';
+
+              layer.bindPopup(`
+                <div style="font-family: Inter, sans-serif; padding: 4px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase;">OSM Land Use Zone</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${name}</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                    <div>Category: <strong>${type}</strong></div>
+                    <div>OSM ID: <code>${osmId}</code></div>
+                  </div>
+                </div>
+              `);
+            },
+          });
+          groupMap.osmLanduse.addLayer(landuseLayer);
+        }
+      }
+
+      // 4. Render OSM Roads Network Layer
+      if (layers.osmRoads) {
+        const data = await fetchOsmLayer('roads');
+        if (data && isSubscribed) {
+          const currentZoom = map!.getZoom();
+          const roadLayer = L.geoJSON(data as any, {
+            style: (feature) => {
+              const highway = feature?.properties?.highway || '';
+              let color = '#64748b';
+              let weight = 2;
+              let opacity = 0.7;
+
+              if (highway === 'motorway' || highway === 'trunk') {
+                color = '#dc2626';
+                weight = currentZoom > 13 ? 5 : 3;
+                opacity = 0.9;
+              } else if (highway === 'primary' || highway === 'secondary') {
+                color = '#0284c7';
+                weight = currentZoom > 13 ? 4 : 2.5;
+                opacity = 0.85;
+              } else if (highway === 'tertiary') {
+                color = '#475569';
+                weight = 2;
+              } else if (currentZoom < 13) {
+                // Hide or fade minor residential roads at macro zoom to preserve performance
+                opacity = 0.2;
+                weight = 1;
+              }
+
+              return { color, weight, opacity };
+            },
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const name = props.name || props.ref || 'Unassigned Highway/Road';
+              const highway = props.highway || 'local';
+              const osmId = props['@id'] || 'Not available';
+
+              layer.bindPopup(`
+                <div style="font-family: Inter, sans-serif; padding: 4px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase;">OSM Road Corridor</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${name}</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                    <div>Highway Classification: <strong>${highway}</strong></div>
+                    <div>Ref / Old Code: ${props.ref || 'None'}</div>
+                    <div>OSM ID: <code>${osmId}</code></div>
+                  </div>
+                </div>
+              `);
+            },
+          });
+          groupMap.osmRoads.addLayer(roadLayer);
+        }
+      }
+
+      // 5. Render OSM Buildings Layer (High-density 49k features)
+      if (layers.osmBuildings) {
+        const data = await fetchOsmLayer('buildings');
+        if (data && isSubscribed) {
+          const buildingLayer = L.geoJSON(data as any, {
+            style: {
+              fillColor: '#64748b',
+              fillOpacity: 0.3,
+              weight: 1,
+              color: '#475569',
+            },
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const name = props.name || props.building || 'Building Footprint';
+              const type = props.building || props.type || 'Structure';
+              const osmId = props['@id'] || 'Not available';
+
+              layer.bindPopup(`
+                <div style="font-family: Inter, sans-serif; padding: 4px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase;">OSM Building Footprint</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${name}</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                    <div>Building Type: <strong>${type}</strong></div>
+                    <div>OSM ID: <code>${osmId}</code></div>
+                  </div>
+                </div>
+              `);
+            },
+          });
+          groupMap.osmBuildings.addLayer(buildingLayer);
+        }
+      }
+
+      // 6. Render OSM POIs Layer
+      if (layers.osmPois) {
+        const data = await fetchOsmLayer('pois');
+        if (data && isSubscribed) {
+          const poiLayer = L.geoJSON(data as any, {
+            pointToLayer: (feature, latlng) => {
+              return L.circleMarker(latlng, {
+                radius: 4,
+                fillColor: '#8b5cf6',
+                color: '#ffffff',
+                weight: 1.5,
+                fillOpacity: 0.9,
+              });
+            },
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const name = props.name || 'Amenity / POI Node';
+              const category = props.amenity || props.building || 'Commercial Node';
+              const osmId = props['@id'] || 'Not available';
+
+              layer.bindPopup(`
+                <div style="font-family: Inter, sans-serif; padding: 4px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #7c3aed; text-transform: uppercase;">OSM Activity POI</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${name}</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                    <div>Category: <strong>${category}</strong></div>
+                    <div>OSM ID: <code>${osmId}</code></div>
+                  </div>
+                </div>
+              `);
+            },
+          });
+          groupMap.osmPois.addLayer(poiLayer);
+        }
+      }
+
+      // 7. Render OSM Parking Layer
+      if (layers.osmParking) {
+        const data = await fetchOsmLayer('parking');
+        if (data && isSubscribed) {
+          const parkingLayer = L.geoJSON(data as any, {
+            pointToLayer: (feature, latlng) => {
+              return L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: '#0284c7',
+                color: '#ffffff',
+                weight: 2,
+                fillOpacity: 0.95,
+              });
+            },
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const name = props.name || 'Designated Parking Area';
+              const parkingType = props.parking || props.amenity || 'Surface Parking';
+              const osmId = props['@id'] || 'Not available';
+
+              layer.bindPopup(`
+                <div style="font-family: Inter, sans-serif; padding: 4px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase;">🅿️ OSM Parking Facility</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${name}</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                    <div>Parking Type: <strong>${parkingType}</strong></div>
+                    <div>OSM ID: <code>${osmId}</code></div>
+                  </div>
+                </div>
+              `);
+            },
+          });
+          groupMap.osmParking.addLayer(parkingLayer);
+        }
+      }
+
+      // 8. Render OSM EV Charging Stations Layer
+      if (layers.osmEvCharging) {
+        const data = await fetchOsmLayer('ev');
+        if (data && isSubscribed) {
+          const evLayer = L.geoJSON(data as any, {
+            pointToLayer: (feature, latlng) => {
+              const customEvIcon = L.divIcon({
+                className: 'custom-ev-marker',
+                html: `
+                  <div style="width: 22px; height: 22px; border-radius: 50%; background-color: #059669; border: 2px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: white; font-size: 12px; font-weight: bold;">
+                    ⚡
+                  </div>
+                `,
+                iconSize: [22, 22],
+                iconAnchor: [11, 11],
+              });
+              return L.marker(latlng, { icon: customEvIcon });
+            },
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const name = props.name || 'Existing EV Charging Station';
+              const operator = props.operator || 'Not available';
+              const amenity = props.amenity || 'charging_station';
+              const osmId = props['@id'] || 'Not available';
+
+              layer.bindPopup(`
+                <div style="font-family: Inter, sans-serif; padding: 4px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #059669; text-transform: uppercase;">⚡ Existing EV Infrastructure</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${name}</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                    <div>Operator: <strong>${operator}</strong></div>
+                    <div>Amenity Type: <strong>${amenity}</strong></div>
+                    <div>OSM ID: <code>${osmId}</code></div>
+                  </div>
+                </div>
+              `);
+            },
+          });
+          groupMap.osmEvCharging.addLayer(evLayer);
+        }
+      }
     }
 
-    // 2. Arterial Road Corridors
-    const roadLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.roads as any, {
-      style: {
-        color: '#64748b',
-        weight: 4,
-        opacity: 0.8,
-      },
-    });
-    group.addLayer(roadLayer);
+    syncLayers();
 
-    // 3. 33kV Substation Grid Feeders
-    if (layers.substationFeeders) {
-      const feederLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.feeders as any, {
-        style: {
-          color: '#f59e0b',
-          weight: 3,
-          dashArray: '6 6',
-          opacity: 0.9,
-        },
-      });
-      group.addLayer(feederLayer);
-    }
+    return () => {
+      isSubscribed = false;
+    };
   }, [layers]);
 
   // Update Candidate Site Leaflet Markers

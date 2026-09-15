@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSites, getSiteScores, getSiteRisk } from '../services/api/sites';
 import { CandidateSite } from '../types/site';
-import { LeafletMap } from '../gis/components/LeafletMap';
-import { CENTRAL_GIS_LAYERS_REGISTRY } from '../gis/data/layersRegistry';
+import { LeafletMap, LayerVisibilityState } from '../gis/components/LeafletMap';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
@@ -18,15 +17,19 @@ export const SiteIntelligence: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFallback, setIsFallback] = useState<boolean>(false);
 
-  // Active Map Layer Toggles
-  const [layers, setLayers] = useState({
-    solarIrradiance: true,
-    evDemandProxy: true,
+  // Active Map Layer Toggles for OSM & Demo Layers
+  const [layers, setLayers] = useState<LayerVisibilityState>({
+    osmRoads: true,
+    osmBuildings: false,
+    osmPois: true,
+    osmParking: true,
+    osmEvCharging: true,
+    osmLanduse: false,
     substationFeeders: true,
     floodways: true,
   });
 
-  const toggleLayer = (layerKey: keyof typeof layers) => {
+  const toggleLayer = (layerKey: keyof LayerVisibilityState) => {
     setLayers((prev) => ({ ...prev, [layerKey]: !prev[layerKey] }));
   };
 
@@ -66,32 +69,70 @@ export const SiteIntelligence: React.FC = () => {
       {/* 2D GIS Map Controls & Canvas (70% width) */}
       <div className="flex-1 relative bg-slate-100 h-full flex flex-col">
         {/* Map Floating Control Toolbar Header */}
-        <div className="absolute top-4 left-4 z-20 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-border-subtle shadow-md flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary text-[20px]">layers</span>
-          <span className="text-xs font-bold text-text-primary uppercase tracking-wider">Analysis Layers:</span>
+        <div className="absolute top-4 left-4 z-20 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl border border-border-subtle shadow-md flex flex-wrap items-center gap-2 max-w-4xl">
+          <div className="flex items-center gap-1.5 mr-2">
+            <span className="material-symbols-outlined text-primary text-[20px]">map</span>
+            <span className="text-xs font-bold text-text-primary uppercase tracking-wider">GIS Layers:</span>
+          </div>
 
           <button
-            onClick={() => toggleLayer('solarIrradiance')}
+            onClick={() => toggleLayer('osmRoads')}
             className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.solarIrradiance ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+              layers.osmRoads ? 'bg-sky-50 text-sky-800 border-sky-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
             }`}
           >
-            ☀️ Solar Irradiance
+            🛣️ Roads (13.9k)
           </button>
 
           <button
-            onClick={() => toggleLayer('evDemandProxy')}
+            onClick={() => toggleLayer('osmBuildings')}
             className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.evDemandProxy ? 'bg-sky-50 text-sky-800 border-sky-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+              layers.osmBuildings ? 'bg-slate-100 text-slate-800 border-slate-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
             }`}
           >
-            ⚡ EV Demand Proxy
+            🏢 Buildings (49.8k)
+          </button>
+
+          <button
+            onClick={() => toggleLayer('osmPois')}
+            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+              layers.osmPois ? 'bg-purple-50 text-purple-800 border-purple-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+            }`}
+          >
+            📍 POIs (1.0k)
+          </button>
+
+          <button
+            onClick={() => toggleLayer('osmParking')}
+            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+              layers.osmParking ? 'bg-blue-50 text-blue-800 border-blue-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+            }`}
+          >
+            🅿️ Parking (29)
+          </button>
+
+          <button
+            onClick={() => toggleLayer('osmEvCharging')}
+            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+              layers.osmEvCharging ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+            }`}
+          >
+            ⚡ EV Stations (29)
+          </button>
+
+          <button
+            onClick={() => toggleLayer('osmLanduse')}
+            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+              layers.osmLanduse ? 'bg-amber-50 text-amber-800 border-amber-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+            }`}
+          >
+            🏞️ Land Use (645)
           </button>
 
           <button
             onClick={() => toggleLayer('substationFeeders')}
             className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.substationFeeders ? 'bg-amber-50 text-amber-800 border-amber-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+              layers.substationFeeders ? 'bg-orange-50 text-orange-800 border-orange-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
             }`}
           >
             🔌 33kV Feeders
@@ -100,7 +141,7 @@ export const SiteIntelligence: React.FC = () => {
           <button
             onClick={() => toggleLayer('floodways')}
             className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.floodways ? 'bg-blue-50 text-blue-800 border-blue-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
+              layers.floodways ? 'bg-cyan-50 text-cyan-800 border-cyan-300 font-semibold' : 'bg-surface-subtle text-text-muted border-border-subtle'
             }`}
           >
             🌊 Flood Screening
@@ -109,7 +150,7 @@ export const SiteIntelligence: React.FC = () => {
 
         {/* Fallback Banner */}
         {isFallback && (
-          <div className="absolute top-16 left-4 z-20 bg-amber-50/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-amber-200 text-[11px] text-amber-900 font-medium flex items-center gap-2">
+          <div className="absolute top-20 left-4 z-20 bg-amber-50/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-amber-200 text-[11px] text-amber-900 font-medium flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-500"></span>
             <span>Live GIS API Offline — Displaying Nashik Spatial Seed</span>
           </div>

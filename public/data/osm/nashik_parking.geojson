@@ -1,0 +1,474 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-09-15T10:42:34Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/330542963",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7264908,
+          20.0050178
+        ]
+      },
+      "id": "way/330542963"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/406898492",
+        "amenity": "parking",
+        "name": "Kalidas Kala Mandir Parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7846721,
+          19.9993369
+        ]
+      },
+      "id": "way/406898492"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1391331174",
+        "amenity": "parking",
+        "parking": "surface",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7516696,
+          19.948226
+        ]
+      },
+      "id": "way/1391331174"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1431633869",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7045686,
+          19.993234
+        ]
+      },
+      "id": "way/1431633869"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466151420",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7937793,
+          20.0049221
+        ]
+      },
+      "id": "way/1466151420"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466151423",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7927275,
+          20.0050302
+        ]
+      },
+      "id": "way/1466151423"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466151424",
+        "amenity": "parking",
+        "area": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7923524,
+          20.0060563
+        ]
+      },
+      "id": "way/1466151424"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466151425",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7919299,
+          20.0067418
+        ]
+      },
+      "id": "way/1466151425"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466151426",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.791997,
+          20.0068805
+        ]
+      },
+      "id": "way/1466151426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466151430",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7933984,
+          20.0049789
+        ]
+      },
+      "id": "way/1466151430"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466291998",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7354003,
+          19.9594356
+        ]
+      },
+      "id": "way/1466291998"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466291999",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7355307,
+          19.9594705
+        ]
+      },
+      "id": "way/1466291999"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466292000",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7358288,
+          19.9601865
+        ]
+      },
+      "id": "way/1466292000"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466292001",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.735741,
+          19.9603209
+        ]
+      },
+      "id": "way/1466292001"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1466462299",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7646821,
+          20.0012488
+        ]
+      },
+      "id": "way/1466462299"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1469202263",
+        "amenity": "parking",
+        "building": "yes",
+        "parking": "multi-storey",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7924844,
+          20.0050193
+        ]
+      },
+      "id": "way/1469202263"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1470352107",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7897954,
+          20.00864
+        ]
+      },
+      "id": "way/1470352107"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1470386192",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8412045,
+          19.9479217
+        ]
+      },
+      "id": "way/1470386192"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1470387639",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8413289,
+          19.9464576
+        ]
+      },
+      "id": "way/1470387639"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1471433400",
+        "amenity": "parking",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7914598,
+          20.0085206
+        ]
+      },
+      "id": "way/1471433400"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1482837329",
+        "amenity": "parking",
+        "parking": "street_side",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8295763,
+          19.9021573
+        ]
+      },
+      "id": "way/1482837329"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1482837330",
+        "amenity": "parking",
+        "parking": "street_side",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8296404,
+          19.9022078
+        ]
+      },
+      "id": "way/1482837330"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2388107936",
+        "amenity": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8006509,
+          19.9971437
+        ]
+      },
+      "id": "node/2388107936"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2388108042",
+        "amenity": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8015843,
+          19.996927
+        ]
+      },
+      "id": "node/2388108042"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3375086708",
+        "amenity": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7259975,
+          20.0041056
+        ]
+      },
+      "id": "node/3375086708"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3657491857",
+        "amenity": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7827239,
+          20.0022219
+        ]
+      },
+      "id": "node/3657491857"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13159231520",
+        "amenity": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7044831,
+          19.9926427
+        ]
+      },
+      "id": "node/13159231520"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13159231551",
+        "amenity": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7046259,
+          19.9932025
+        ]
+      },
+      "id": "node/13159231551"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13646913719",
+        "amenity": "parking",
+        "layer": "-1",
+        "parking": "underground"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7875249,
+          20.0148779
+        ]
+      },
+      "id": "node/13646913719"
+    }
+  ]
+}

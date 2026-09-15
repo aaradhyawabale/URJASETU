@@ -8,6 +8,7 @@ import { healthRouter } from './routes/healthRouter.js';
 import { sitesRouter } from './routes/sitesRouter.js';
 import { proposalsRouter } from './routes/proposalsRouter.js';
 import { aiRouter } from './routes/aiRouter.js';
+import { gisRouter } from './routes/gisRouter.js';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api', healthRouter);
 app.use('/api/v1', sitesRouter);
 app.use('/api/v1', proposalsRouter);
 app.use('/api/v1', aiRouter);
+app.use('/api/v1', gisRouter);
 
 // Centralized Error Handling
 app.use(errorHandler);

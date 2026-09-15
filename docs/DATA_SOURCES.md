@@ -1,21 +1,32 @@
-# URJASETU — DATA SOURCES & GIS PROVENANCE SPECIFICATION
+# UrjaSetu — Data Sources & Provenance Catalog
 
-## 1. Datasets & Provenance Registry
+## 1. OpenStreetMap (OSM) Dataset
 
-| Dataset Name | Category | Source Provider | Data Type | Coverage / Scope | Classification | Limitations |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Nashik Candidate Sites** | Candidate Sites | UrjaSetu Scoring Engine | Vector Point | NMC Wards 1 to 30 | Precomputed Demo | Precomputed demo candidate points derived from ULB parcel seeds. |
-| **Global Horizontal Irradiance (GHI)** | Solar Irradiance | NREL / SolarGIS Proxy | Raster Heatmap | Godavari Basin | Estimated Proxy | Micro-shading from urban structures requires site survey. |
-| **Activity-Based EV Demand Proxy** | EV Demand Proxy | OSM POI Density & MSRTC Routes | Vector Point | Trimbak & MIDC Satpur | Estimated Proxy | Traffic volume estimated from POI density; live telemetry deferred. |
-| **Digital Elevation Model (DEM)** | Flood Screening | Open DEM (30m Resolution) | Vector Polygon | Riverbank Floodways | Precomputed | DEM screening model; does not replace hydraulic flood studies. |
-| **MSEDCL 33kV Feeder Grid** | Infrastructure | MSEDCL DISCOM Overlay | Vector Polyline | Substation Feeder Axis | Precomputed | Feeder line geometry digitized from municipal utility overlays. |
-| **Arterial Road Corridors** | Accessibility | OpenStreetMap Contributors | Vector Polyline | NH-848 & Trimbak Road | ODbL / Open Data | Road width filtered for >= 12m municipal corridors. |
+* **Source**: OpenStreetMap (OSM)
+* **Geographic Coverage**: Nashik Urban Study Extent, Maharashtra, India
+  * Bounding Box: South 19.90°N, West 73.70°E, North 20.10°N, East 73.95°E
+* **Extraction Method**: Overpass API / Overpass Turbo
+* **Extraction Date**: 2026-09-15
+* **Coordinate Reference System (CRS)**: WGS84 / `EPSG:4326`
+* **Attribution**: © OpenStreetMap contributors
+
+### Layer Summary & Feature Counts
+
+| Layer Name | File Path | Feature Count | Geometry Type | Purpose & Application |
+|---|---|---|---|---|
+| **Roads Network** | `data/osm/nashik_roads.geojson` | 13,904 | LineString | Road accessibility rating, highway proximity, corridor analysis |
+| **Building Footprints** | `data/osm/nashik_buildings.geojson` | 49,871 | Polygon / MultiPolygon | Urban structural density, rooftop solar suitability, setback verification |
+| **Activity POIs** | `data/osm/nashik_pois.geojson` | 1,079 | Point | Commercial POI density, activity proxies for EV demand |
+| **Land Use Zones** | `data/osm/nashik_landuse.geojson` | 645 | Polygon | Zoning context, land conflict screening (industrial, residential, commercial) |
+| **Parking Facilities** | `data/osm/nashik_parking.geojson` | 29 | Point | Public parking co-location screening for EV fast charging hubs |
+| **Existing EV Stations** | `data/osm/nashik_ev_pois.geojson` | 29 | Point | Existing EV charger locations for gap analysis & distance calculations |
+
+### Limitations
+OSM coverage is community-generated and may be incomplete or outdated in rapidly expanding suburban corridors. It must NOT be treated as authoritative cadastral land ownership, legal zoning, or utility interconnection records.
 
 ---
 
-## 2. Data Honesty & Transparency Rule
-All GIS overlays, candidate site metrics, and plot area computations are clearly identified in the UI as:
-- **Precomputed Demo Dataset** (Nashik Seed Dataset)
-- **Estimated available plot area based on the drawn boundary** (Turf.js calculation)
+## 2. Municipal Utility & Raster Data Proxies
 
-No simulated or demo dataset is represented as live, legally binding cadastral data.
+* **MSEDCL Substation Grid Feeders**: 33kV utility feeder polylines digitized for Nashik industrial zones.
+* **Godavari River Basin Floodways**: Open DEM (30m resolution) elevation slope screening vectors for riparian flood screening.

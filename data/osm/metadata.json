@@ -1,0 +1,46 @@
+{
+  "source": "OpenStreetMap",
+  "region": "Nashik, Maharashtra, India",
+  "crs": "EPSG:4326",
+  "extractionMethod": "Overpass API / Overpass Turbo",
+  "extractionDate": "2026-09-15",
+  "boundingBox": {
+    "south": 19.9,
+    "west": 73.7,
+    "north": 20.1,
+    "east": 73.95
+  },
+  "attribution": "© OpenStreetMap contributors",
+  "datasets": {
+    "roads": {
+      "file": "nashik_roads.geojson",
+      "featureCount": 13904,
+      "geometryType": "LineString"
+    },
+    "buildings": {
+      "file": "nashik_buildings.geojson",
+      "featureCount": 49871,
+      "geometryType": "Polygon/MultiPolygon"
+    },
+    "pois": {
+      "file": "nashik_pois.geojson",
+      "featureCount": 1079,
+      "geometryType": "Point"
+    },
+    "landuse": {
+      "file": "nashik_landuse.geojson",
+      "featureCount": 645,
+      "geometryType": "Polygon"
+    },
+    "parking": {
+      "file": "nashik_parking.geojson",
+      "featureCount": 29,
+      "geometryType": "Point"
+    },
+    "ev": {
+      "file": "nashik_ev_pois.geojson",
+      "featureCount": 29,
+      "geometryType": "Point"
+    }
+  }
+}
