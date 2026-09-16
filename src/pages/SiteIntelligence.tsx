@@ -261,6 +261,17 @@ export const SiteIntelligence: React.FC = () => {
               </div>
 
               <button
+                onClick={() => toggleLayer('screenedOpenSpaces')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.screenedOpenSpaces
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-400 font-bold shadow-xs'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🟩 Screened Open Spaces (Turf.js Subtraction)
+              </button>
+
+              <button
                 onClick={() => toggleLayer('osmRoads')}
                 className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
                   layers.osmRoads

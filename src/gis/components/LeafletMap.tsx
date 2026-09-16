@@ -5,6 +5,8 @@ import { CandidateSite } from '../../types/site';
 import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
 import { fetchOsmLayer } from '../services/osmService';
 
+import { getScreenedOpenSpaces } from '../services/screenedSpaceService';
+
 export interface LayerVisibilityState {
   osmRoads?: boolean;
   osmBuildings?: boolean;
@@ -14,6 +16,7 @@ export interface LayerVisibilityState {
   osmLanduse?: boolean;
   substationFeeders?: boolean;
   floodways?: boolean;
+  screenedOpenSpaces?: boolean;
 }
 
 interface LeafletMapProps {
@@ -100,6 +103,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         'osmEvCharging',
         'floodways',
         'substationFeeders',
+        'screenedOpenSpaces',
       ];
 
       layerKeys.forEach((key) => {
@@ -109,6 +113,54 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
           groupMap[key].clearLayers();
         }
       });
+
+      // Render Screened Open-Space Polygons (Turf.js negative-space constraint subtraction)
+      if (layers.screenedOpenSpaces) {
+        const screenedSpaces = await getScreenedOpenSpaces();
+        if (screenedSpaces && isSubscribed) {
+          screenedSpaces.forEach((space) => {
+            const polygonGeoJson = {
+              type: 'Feature',
+              geometry: space.geometry,
+              properties: {
+                id: space.id,
+                code: space.code,
+                name: space.name,
+                divisionName: space.divisionName,
+                areaSqm: space.areaSqm,
+              },
+            };
+
+            const layer = L.geoJSON(polygonGeoJson as any, {
+              style: {
+                color: '#059669',
+                weight: 2,
+                dashArray: '5 5',
+                fillColor: '#10b981',
+                fillOpacity: 0.25,
+              },
+              onEachFeature: (feature, l) => {
+                l.bindPopup(`
+                  <div style="font-family: Inter, sans-serif; padding: 4px; max-width: 260px;">
+                    <div style="font-size: 10px; font-weight: 700; color: #059669; text-transform: uppercase;">
+                      🟩 SCREENED OPEN SPACE (${space.code})
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${space.name}</div>
+                    <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                      <div>Division: <strong>${space.divisionName}</strong></div>
+                      <div>Screened Plot Area: <strong>${space.areaSqm.toLocaleString()} m²</strong></div>
+                    </div>
+                    <div style="font-size: 10px; color: #059669; background: #ecfdf5; padding: 4px 6px; border-radius: 4px; margin-top: 6px; border: 1px solid #a7f3d0;">
+                      <strong>Provenance:</strong> DERIVED_SUITABILITY_SCREENED_AREA (Turf.js constraint subtraction)
+                    </div>
+                  </div>
+                `);
+              },
+            });
+            groupMap.screenedOpenSpaces.addLayer(layer);
+          });
+        }
+      }
 
       // 2. Render Demo Floodways & Feeders if toggled
       if (layers.floodways) {
