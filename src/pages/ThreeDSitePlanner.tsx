@@ -9,6 +9,7 @@ import { CandidateSite, Proposal, IPlacedComponent } from '../types/site';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 import { getPlanningDesign, savePlanningDesign } from '../services/planningStateService';
 import { PlanningDesign } from '../types/site';
+import { ThreeDSceneCanvas } from '../components/3d/ThreeDSceneCanvas';
 
 interface OSMBuildingFeature {
   id: string;
@@ -194,161 +195,22 @@ export const ThreeDSitePlanner: React.FC = () => {
           </div>
         </div>
 
-        {/* Interactive 3D Perspective Viewport Canvas */}
-        <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
-          {/* Sky & Perspective Grid Canvas */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-            {/* 3D Perspective Coordinate Container */}
-            <div
-              className="relative transition-transform duration-200 ease-out flex items-center justify-center"
-              style={{
-                transform: `rotateX(${pitch}deg) rotateZ(${rotation}deg) scale(${scale})`,
-                transformStyle: 'preserve-3d',
-              }}
-            >
-              {/* 3D Ground Plane Grid (1000m x 1000m grid representation) */}
-              <div className="w-[600px] h-[600px] rounded-3xl bg-slate-900/80 border-2 border-slate-700/60 shadow-2xl relative flex items-center justify-center overflow-hidden">
-                <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 600 600">
-                  <defs>
-                    <pattern id="grid3d_mesh" width="30" height="30" patternUnits="userSpaceOnUse">
-                      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#94a3b8" strokeWidth="0.5" />
-                    </pattern>
-                  </defs>
-                  <rect width="600" height="600" fill="url(#grid3d_mesh)" />
-                </svg>
-
-                {/* Confirmed 2D Plot Polygon Extrusion Base */}
-                <div className="w-80 h-52 rounded-2xl bg-emerald-950/60 border-3 border-emerald-400 shadow-[0_0_35px_rgba(16,185,129,0.35)] flex flex-col items-center justify-center relative backdrop-blur-xs p-3">
-                  {/* Confirmed 2D Parcel Boundary Badge */}
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-bold font-mono px-3.5 py-0.5 rounded-full border border-emerald-300 shadow-md whitespace-nowrap">
-                    STEP 5: 3D CONFIRMED PARCEL ({plotAreaSqm.toLocaleString()} m²)
-                  </div>
-
-                  {/* 3D Placed Infrastructure Component Layout Container */}
-                  <div className="w-full h-full relative bg-slate-900/60 border border-emerald-500/30 rounded-xl overflow-hidden flex items-center justify-center">
-                    {/* Grid Overlay */}
-                    <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:12px_12px] opacity-20"></div>
-
-                    {/* Render Individual 3D Placed Infrastructure Component Blocks (Procedural 3D Primitives) */}
-                    {(planningDesign?.components || proposal?.placedComponents || [
-                      { id: 'c1', type: 'SOLAR_CANOPY', name: 'Solar Carport Array A', xMeters: -8, yMeters: 6, widthMeters: 15, lengthMeters: 8, rotationDegrees: 0, specs: {} },
-                      { id: 'c2', type: 'EV_CHARGER', name: 'DC Fast Charger Bay 1', xMeters: 8, yMeters: -6, widthMeters: 4, lengthMeters: 2, rotationDegrees: 0, specs: {} },
-                      { id: 'c3', type: 'BESS_CONTAINER', name: 'BESS Storage Unit 1', xMeters: 10, yMeters: 7, widthMeters: 6, lengthMeters: 2.5, rotationDegrees: 0, specs: {} },
-                      { id: 'c4', type: 'TRANSFORMER', name: 'Interconnect Kiosk', xMeters: -10, yMeters: -7, widthMeters: 3, lengthMeters: 3, rotationDegrees: 0, specs: {} },
-                    ]).map((comp: IPlacedComponent) => {
-                      const widthPx = Math.max(38, comp.widthMeters * 3.8);
-                      const heightPx = Math.max(26, comp.lengthMeters * 3.8);
-                      const posX = comp.xMeters * 4.5;
-                      const posY = comp.yMeters * 3.2;
-
-                      if (comp.type === 'SOLAR_CANOPY') {
-                        return (
-                          <div
-                            key={comp.id}
-                            className="absolute rounded-lg border-2 border-amber-400 bg-slate-900 shadow-xl overflow-hidden flex flex-col justify-between p-1 group cursor-pointer"
-                            style={{
-                              width: `${widthPx}px`,
-                              height: `${heightPx}px`,
-                              transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
-                              boxShadow: '0 8px 15px rgba(0,0,0,0.5)',
-                            }}
-                          >
-                            {/* Solar PV Grid Pattern Texture */}
-                            <div className="w-full h-full rounded bg-[linear-gradient(45deg,#0284c7_25%,#0369a1_25%,#0369a1_50%,#0284c7_50%,#0284c7_75%,#0369a1_75%)] [background-size:6px_6px] opacity-90 border border-sky-400/40 flex items-center justify-center">
-                              <span className="text-[10px] font-bold text-white drop-shadow-md">☀️ 24kWp</span>
-                            </div>
-                            <span className="text-[8px] font-mono text-amber-300 font-bold truncate text-center">
-                              {comp.name.split(' ')[0]}
-                            </span>
-                          </div>
-                        );
-                      }
-
-                      if (comp.type === 'EV_CHARGER') {
-                        return (
-                          <div
-                            key={comp.id}
-                            className="absolute rounded-md border-2 border-sky-400 bg-sky-950 shadow-lg flex items-center justify-between px-1.5 py-0.5 text-white cursor-pointer"
-                            style={{
-                              width: `${widthPx}px`,
-                              height: `${heightPx}px`,
-                              transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
-                            }}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span className="text-[9px] font-bold font-mono text-sky-200">🔌 120kW</span>
-                            <span className="text-[7px] text-sky-300 font-mono">2P</span>
-                          </div>
-                        );
-                      }
-
-                      if (comp.type === 'BESS_CONTAINER') {
-                        return (
-                          <div
-                            key={comp.id}
-                            className="absolute rounded-md border-2 border-purple-400 bg-purple-950 shadow-xl flex flex-col justify-between p-1 text-white cursor-pointer"
-                            style={{
-                              width: `${widthPx}px`,
-                              height: `${heightPx}px`,
-                              transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
-                            }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                              <span className="text-[8px] font-bold font-mono text-purple-200">🔋 BESS</span>
-                            </div>
-                            <span className="text-[7px] font-mono text-purple-300">250 kWh Container</span>
-                          </div>
-                        );
-                      }
-
-                      // Transformer Kiosk
-                      return (
-                        <div
-                          key={comp.id}
-                          className="absolute rounded-md border-2 border-red-400 bg-red-950 shadow-lg flex items-center justify-center p-1 text-white cursor-pointer"
-                          style={{
-                            width: `${widthPx}px`,
-                            height: `${heightPx}px`,
-                            transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
-                          }}
-                        >
-                          <span className="text-[9px] font-bold font-mono text-red-200 flex items-center gap-0.5">
-                            <span>⚡</span>
-                            <span>500kVA</span>
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 3D Spatially Filtered Surrounding OSM Buildings */}
-                {showBuildings && surroundingBuildings.map((bldg, idx) => {
-                  const angle = (idx * (360 / Math.max(1, surroundingBuildings.length)) * Math.PI) / 180;
-                  const radius = 210 + (idx % 3) * 15;
-                  const offsetX = Math.round(Math.cos(angle) * radius);
-                  const offsetY = Math.round(Math.sin(angle) * radius);
-
-                  return (
-                    <div
-                      key={bldg.id}
-                      className="absolute rounded-lg bg-slate-800/90 border border-slate-600 flex flex-col items-center justify-center p-1 text-[9px] text-slate-300 font-mono shadow-xl transition-all"
-                      style={{
-                        width: '70px',
-                        height: '50px',
-                        transform: `translate(${offsetX}px, ${offsetY}px)`,
-                        boxShadow: showShadows ? `${shadowLengthMeters * 1.5}px ${shadowLengthMeters * 1.5}px 15px rgba(0,0,0,0.7)` : 'none',
-                      }}
-                    >
-                      <span className="font-bold text-slate-200 truncate max-w-[60px]">{bldg.name}</span>
-                      <span className="text-amber-400 font-semibold">{bldg.heightMeters}m</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+        {/* Interactive 3D Perspective Viewport Canvas (WebGL Three.js / React Three Fiber) */}
+        <div className="w-full h-full relative overflow-hidden">
+          <ThreeDSceneCanvas
+            components={planningDesign?.components || proposal?.placedComponents || [
+              { id: 'c1', type: 'SOLAR_CANOPY', name: 'Solar Carport Array A', xMeters: -8, yMeters: 6, widthMeters: 15, lengthMeters: 8, rotationDegrees: 0, specs: {} },
+              { id: 'c2', type: 'EV_CHARGER', name: 'DC Fast Charger Bay 1', xMeters: 8, yMeters: -6, widthMeters: 4, lengthMeters: 2, rotationDegrees: 0, specs: {} },
+              { id: 'c3', type: 'BESS_CONTAINER', name: 'BESS Storage Unit 1', xMeters: 10, yMeters: 7, widthMeters: 6, lengthMeters: 2.5, rotationDegrees: 0, specs: {} },
+              { id: 'c4', type: 'TRANSFORMER', name: 'Interconnect Kiosk', xMeters: -10, yMeters: -7, widthMeters: 3, lengthMeters: 3, rotationDegrees: 0, specs: {} },
+            ]}
+            plotAreaSqm={plotAreaSqm}
+            plotGeometry={planningDesign?.plotGeometry}
+            solarElevation={solarElevation}
+            rotation={rotation}
+            pitch={pitch}
+            scale={scale}
+          />
 
           {/* 3D Viewport Legend Strip */}
           <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-700 text-xs text-slate-300 flex items-center gap-4 shadow-lg">
