@@ -95,8 +95,8 @@ export class ElevationService {
     const tier = tiers.find((t) => slopePercent <= t.maxSlope) || tiers[tiers.length - 1];
 
     return {
-      datasetName: dem?.datasetName || 'Copernicus DEM GLO-30 Nashik Grid',
-      provider: dem?.provider || 'European Space Agency (ESA) Copernicus',
+      datasetName: dem?.datasetName || 'Copernicus DEM GLO-30 (DSM) Nashik Grid',
+      provider: dem?.provider || 'European Space Agency (ESA) Copernicus / OpenTopography',
       classification: 'DERIVED',
       latitude: lat,
       longitude: lng,
@@ -105,7 +105,7 @@ export class ElevationService {
       slopeCategory: tier.label,
       terrainScore: tier.score,
       rationale: tier.description,
-      methodology: 'Bilinear grid sampling over 546-cell Copernicus DEM 30m raster grid; 4-neighbor spatial gradient slope calculation.',
+      methodology: 'Bilinear grid sampling over 546-cell Copernicus DEM GLO-30 (DSM) 0.01° sampled grid; 4-neighbor spatial gradient slope calculation.',
       citation: SCORING_CONFIG.slopeModel.sourceGuidance.citation,
     };
   }
