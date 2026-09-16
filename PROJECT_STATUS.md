@@ -26,6 +26,7 @@
 - [x] **Derived Indicators** (Regional GHI solar factor, EV demand proxy, road accessibility rating, DEM slope score)
 - [x] **Grid-Based Candidate Site Generation** (Automated Nashik spatial grid candidate generator with configurable spacing, hard constraint masks for slope >15%, river 30m setback, and building overlaps)
 - [x] **Suitability MCDA Engine** (Decomposable multi-criteria decision analysis pipeline with 5 factors: solar, road access, EV infrastructure gap proxy, terrain slope, parking accessibility)
+- [x] **MCDA Weight Calibration & Sensitivity Testing Engine** (Dynamic weight normalization, score recalculation, and 4-scenario rank sensitivity matrix; weights classified as **`PROJECT_MODELING_ASSUMPTION`**; sensitivity matrix classified as **`MODEL_OUTPUT_SENSITIVITY_ANALYSIS`**; REST endpoints `/api/v1/gis/mcda/recalculate` & `/api/v1/gis/mcda/sensitivity`)
 
 ### PRODUCT & UX
 - [x] **2D Leaflet Map Canvas** (Carto Light tiles, layer controls, zoom-gated canvas rendering, OpenStreetMap attribution)

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { CandidateService, ICandidateGenerationParams } from '../services/candidateService.js';
 import { WardService } from '../services/wardService.js';
+import { SensitivityService } from '../services/sensitivityService.js';
 
 export const getCandidates = async (req: Request, res: Response) => {
   try {
@@ -144,4 +145,38 @@ export const getDivisionAggregation = async (_req: Request, res: Response) => {
     });
   }
 };
+
+export const recalculateMcdaScores = async (req: Request, res: Response) => {
+  try {
+    const { weights, scenarioName } = req.body;
+    const candidates = await CandidateService.generateCandidates({ includeExcluded: true });
+    const result = SensitivityService.recalculateScores(candidates, weights || {}, scenarioName || 'Custom Weights');
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'MCDA_RECALCULATION_FAILED', message: (err as Error).message },
+    });
+  }
+};
+
+export const getMcdaSensitivityMatrix = async (_req: Request, res: Response) => {
+  try {
+    const candidates = await CandidateService.generateCandidates({ includeExcluded: true });
+    const matrix = SensitivityService.generateSensitivityMatrix(candidates);
+    return res.status(200).json({
+      success: true,
+      data: matrix,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SENSITIVITY_MATRIX_FAILED', message: (err as Error).message },
+    });
+  }
+};
+
 
