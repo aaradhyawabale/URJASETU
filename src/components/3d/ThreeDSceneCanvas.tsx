@@ -24,7 +24,8 @@ interface ThreeDSceneCanvasProps {
   centerLng?: number;
   buildings?: OSMBuildingFeature[];
   selectedComponentId?: string | null;
-  onSelectComponent?: (comp: IPlacedComponent) => void;
+  onSelectComponent?: (comp: IPlacedComponent | null) => void;
+  onUpdateComponent?: (comp: IPlacedComponent) => void;
 }
 
 // 3D Building Extrusion Mesh from OSM Polygon Footprints
@@ -460,47 +461,52 @@ export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
         {components.map((comp) => {
           const isSelected = comp.id === selectedComponentId;
           const handleSelect = () => onSelectComponent?.(comp);
-
-          if (comp.type === 'SOLAR_CANOPY') {
-            return (
-              <SolarCanopyMesh
-                key={comp.id}
-                comp={comp}
-                isSelected={isSelected}
-                onSelect={handleSelect}
-              />
-            );
-          }
-
-          if (comp.type === 'EV_CHARGER' || comp.type === 'CHARGING_BAY') {
-            return (
-              <EVChargerMesh
-                key={comp.id}
-                comp={comp}
-                isSelected={isSelected}
-                onSelect={handleSelect}
-              />
-            );
-          }
-
-          if (comp.type === 'BESS_CONTAINER') {
-            return (
-              <BESSContainerMesh
-                key={comp.id}
-                comp={comp}
-                isSelected={isSelected}
-                onSelect={handleSelect}
-              />
-            );
-          }
+          const maxDim = Math.max(comp.widthMeters || 4, comp.lengthMeters || 3);
 
           return (
-            <TransformerMesh
-              key={comp.id}
-              comp={comp}
-              isSelected={isSelected}
-              onSelect={handleSelect}
-            />
+            <group key={comp.id}>
+              {/* Pulsing Highlight Ring around Selected Component */}
+              {isSelected && (
+                <group position={[comp.xMeters, 0.1, -comp.yMeters]} rotation={[-Math.PI / 2, 0, 0]}>
+                  <mesh>
+                    <ringGeometry args={[maxDim / 2 + 0.3, maxDim / 2 + 0.7, 32]} />
+                    <meshBasicMaterial color="#f59e0b" side={THREE.DoubleSide} transparent opacity={0.85} />
+                  </mesh>
+                </group>
+              )}
+
+              {comp.type === 'SOLAR_CANOPY' && (
+                <SolarCanopyMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {(comp.type === 'EV_CHARGER' || comp.type === 'CHARGING_BAY') && (
+                <EVChargerMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {comp.type === 'BESS_CONTAINER' && (
+                <BESSContainerMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {comp.type === 'TRANSFORMER' && (
+                <TransformerMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+            </group>
           );
         })}
       </Canvas>
