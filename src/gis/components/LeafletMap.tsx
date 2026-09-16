@@ -380,10 +380,12 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       const lat = site.latitude || site.lat || 19.9975;
       const lng = site.longitude || site.lng || 73.7898;
       const isSelected = selectedSite?.id === site.id;
+      const isExcluded = site.isRetained === false || site.status === 'EXCLUDED' || site.status === 'DISQUALIFIED';
 
-      let markerColor = '#059669'; // Emerald
-      if (site.status === 'UNDER_REVIEW') markerColor = '#d97706'; // Amber
-      if (site.status === 'SCREENING' || site.status === 'DISQUALIFIED') markerColor = '#dc2626'; // Red
+      let markerColor = '#059669'; // Emerald (High Suitability)
+      if (site.status === 'MODERATE_SUITABILITY' || site.status === 'UNDER_REVIEW') markerColor = '#d97706'; // Amber
+      if (site.status === 'LOW_SUITABILITY') markerColor = '#64748b'; // Slate
+      if (isExcluded) markerColor = '#ef4444'; // Red
 
       const customIcon = L.divIcon({
         className: 'custom-site-marker',
@@ -396,11 +398,11 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
             }
             <div style="width: ${isSelected ? '32px' : '26px'}; height: ${
           isSelected ? '32px' : '26px'
-        }; border-radius: 50%; background-color: #ffffff; border: 2.5px solid ${markerColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+        }; border-radius: 50%; background-color: ${isExcluded ? '#fef2f2' : '#ffffff'}; border: 2.5px solid ${markerColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
               <div style="width: 10px; height: 10px; border-radius: 50%; background-color: ${markerColor};"></div>
             </div>
-            <div style="position: absolute; top: 32px; font-family: Inter, sans-serif; font-size: 11px; font-weight: 700; color: #0f172a; white-space: nowrap; background: rgba(255,255,255,0.9); padding: 1px 5px; border-radius: 4px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-              ${site.code}
+            <div style="position: absolute; top: 32px; font-family: Inter, sans-serif; font-size: 11px; font-weight: 700; color: ${isExcluded ? '#991b1b' : '#0f172a'}; white-space: nowrap; background: ${isExcluded ? 'rgba(254,242,242,0.95)' : 'rgba(255,255,255,0.95)'}; padding: 1px 5px; border-radius: 4px; border: 1px solid ${isExcluded ? '#fca5a5' : '#cbd5e1'}; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+              ${site.code} ${isExcluded ? '❌' : ''}
             </div>
           </div>
         `,
@@ -412,10 +414,20 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
 
       // Popup Content
       marker.bindPopup(`
-        <div style="font-family: Inter, sans-serif; padding: 4px;">
-          <div style="font-size: 10px; font-weight: 700; color: #059669; text-transform: uppercase;">${site.code}</div>
+        <div style="font-family: Inter, sans-serif; padding: 4px; max-width: 260px;">
+          <div style="font-size: 10px; font-weight: 700; color: ${markerColor}; text-transform: uppercase;">
+            ${isExcluded ? '❌ EXCLUDED CANDIDATE' : '📍 CANDIDATE SITE'} (${site.code})
+          </div>
           <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${site.name}</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 2px;">Opportunity Score: <strong>${site.opportunityScore}/100</strong></div>
+          ${
+            isExcluded
+              ? `<div style="font-size: 11px; color: #b91c1c; background: #fef2f2; padding: 4px 6px; border-radius: 4px; margin-top: 6px; border: 1px solid #fecaca;">
+                  <strong>Exclusion Reason:</strong> ${site.exclusionReason || 'Violates project screening constraints.'}
+                </div>`
+              : `<div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                  Opportunity Score: <strong>${site.opportunityScore}/100</strong>
+                </div>`
+          }
         </div>
       `);
 

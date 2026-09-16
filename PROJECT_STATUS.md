@@ -23,8 +23,8 @@
 - [x] **Centralized Siting Model Config** (`backend/src/config/scoringConfig.ts` separating IRC:73-1980 & IRC:86-1983 urban road ruling gradients from UrjaSetu project modeling thresholds)
 - [x] **Spatial Utilities** (Turf.js geodesic distance to road, nearest EV charger, POI density, elevation bilinear sampling, 4-neighbor slope gradient)
 - [x] **Derived Indicators** (Regional GHI solar factor, EV demand proxy, road accessibility rating, DEM slope score)
-- [ ] **Grid-Based Candidate Site Generation** (Automated spatial grid candidate generator deferred)
-- [ ] **Suitability MCDA Engine** (Full multi-criteria decision analysis pipeline deferred)
+- [x] **Grid-Based Candidate Site Generation** (Automated Nashik spatial grid candidate generator with configurable spacing, hard constraint masks for slope >15%, river 30m setback, and building overlaps)
+- [x] **Suitability MCDA Engine** (Decomposable multi-criteria decision analysis pipeline with 5 factors: solar, road access, EV infrastructure gap proxy, terrain slope, parking accessibility)
 
 ### PRODUCT & UX
 - [x] **2D Leaflet Map Canvas** (Carto Light tiles, layer controls, zoom-gated canvas rendering, OpenStreetMap attribution)

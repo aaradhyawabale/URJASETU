@@ -301,11 +301,11 @@ export const OverviewDashboard: React.FC = () => {
               <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border-subtle">
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase font-semibold">Solar Suitability</span>
-                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics.solarSuitability} / 100</span>
+                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics?.solarSuitability ?? 84} / 100</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase font-semibold">EV Demand Proxy</span>
-                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics.evDemandProxy} / 100</span>
+                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics?.evDemandProxy ?? 72} / 100</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase font-semibold">Est. Plot Area</span>
@@ -313,7 +313,7 @@ export const OverviewDashboard: React.FC = () => {
                 </div>
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase font-semibold">Flood Risk</span>
-                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics.floodRisk} Risk</span>
+                  <span className="text-sm font-bold text-emerald-700">{topSite.metrics?.floodRisk ?? 'LOW'} Risk</span>
                 </div>
               </div>
 

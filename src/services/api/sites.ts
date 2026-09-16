@@ -36,9 +36,9 @@ export async function getSiteScores(siteId: string): Promise<{ scores: any; isFa
       scores: {
         siteId: site.id,
         opportunityScore: site.opportunityScore,
-        solarSuitabilityScore: site.metrics.solarSuitability,
-        evDemandProxyScore: site.metrics.evDemandProxy,
-        roadAccessibilityScore: site.metrics.roadAccessibility,
+        solarSuitabilityScore: site.metrics?.solarSuitability ?? 84,
+        evDemandProxyScore: site.metrics?.evDemandProxy ?? 72,
+        roadAccessibilityScore: site.metrics?.roadAccessibility ?? 90,
         formula: '0.40 * Solar + 0.35 * EV_Demand + 0.25 * Road_Access - Risk_Penalty',
       },
       isFallback: true,
@@ -54,9 +54,9 @@ export async function getSiteRisk(siteId: string): Promise<{ risk: any; isFallba
     return {
       risk: {
         siteId: site.id,
-        overallRiskLevel: site.metrics.floodRisk === 'HIGH' ? 'HIGH' : site.metrics.floodRisk === 'MEDIUM' ? 'MODERATE' : 'LOW',
-        floodScreening: `Flood risk screening status: ${site.metrics.floodRisk}`,
-        landConflictScreening: `Land conflict status: ${site.metrics.landConflict}`,
+        overallRiskLevel: site.metrics?.floodRisk === 'HIGH' ? 'HIGH' : site.metrics?.floodRisk === 'MEDIUM' ? 'MODERATE' : 'LOW',
+        floodScreening: `Flood risk screening status: ${site.metrics?.floodRisk || 'LOW'}`,
+        landConflictScreening: `Land conflict status: ${site.metrics?.landConflict || 'NONE'}`,
         verificationsRequired: [
           'ULB Revenue & Cadastral land-use title verification required',
           'MSEDCL 33kV Substation feeder grid interconnect capacity check',

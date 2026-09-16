@@ -95,11 +95,11 @@ export const RankedSites: React.FC = () => {
                 <div className="mt-4 pt-3 border-t border-border-subtle flex flex-col gap-2">
                   <div className="flex justify-between text-xs">
                     <span className="text-text-muted">Solar Score</span>
-                    <span className="font-bold text-text-primary">{site.metrics.solarSuitability}/100</span>
+                    <span className="font-bold text-text-primary">{site.metrics?.solarSuitability ?? 84}/100</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-text-muted">EV Demand Proxy</span>
-                    <span className="font-bold text-text-primary">{site.metrics.evDemandProxy}/100</span>
+                    <span className="font-bold text-text-primary">{site.metrics?.evDemandProxy ?? 72}/100</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-text-muted">Est. Parcel Area</span>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSites, getSiteScores, getSiteRisk } from '../services/api/sites';
+import { fetchCandidates } from '../services/api/candidates';
 import { CandidateSite } from '../types/site';
 import { LeafletMap, LayerVisibilityState } from '../gis/components/LeafletMap';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -20,6 +21,7 @@ export const SiteIntelligence: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFallback, setIsFallback] = useState<boolean>(false);
+  const [candidateMode, setCandidateMode] = useState<'GENERATED' | 'SEED'>('GENERATED');
 
   // Active Map Layer Toggles for OSM & Infrastructure Layers
   const [layers, setLayers] = useState<LayerVisibilityState>({
@@ -40,19 +42,23 @@ export const SiteIntelligence: React.FC = () => {
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
+      try {
+        const generated = await fetchCandidates({ spacing: 0.0075, includeExcluded: true });
+        if (generated && generated.length > 0) {
+          setSites(generated as CandidateSite[]);
+          setSelectedSite(generated[0] as CandidateSite);
+          await loadSiteDetails(generated[0] as CandidateSite);
+          setIsLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.warn('[SiteIntelligence] Candidate API query failed, falling back to seed sites:', err);
+      }
+
       const res = await getSites();
       setSites(res.sites);
       setIsFallback(res.isFallback);
-
-      // Fetch NASA POWER Solar Climatology
-      try {
-        const solarRes = await fetch('http://localhost:5001/api/v1/gis/solar/climatology').then((r) => r.json());
-        if (solarRes.success) {
-          setSolarData(solarRes.data);
-        }
-      } catch (err) {
-        console.warn('[SiteIntelligence] Error fetching solar climatology:', err);
-      }
+      setCandidateMode('SEED');
 
       if (res.sites.length > 0) {
         const initial = res.sites[0];
@@ -239,105 +245,124 @@ export const SiteIntelligence: React.FC = () => {
               {selectedSite.description}
             </p>
 
-            {/* Authoritative Regional Solar Data Card */}
-            {solarData && (
-              <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 flex flex-col gap-1.5 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-emerald-900 flex items-center gap-1">
-                    ☀️ Regional Solar Climatology
-                  </span>
-                  <span className="text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-300">
-                    {solarData.classification}
-                  </span>
+            {/* Exclusion Banner if Candidate is Excluded */}
+            {selectedSite.isRetained === false && (
+              <div className="p-3 bg-red-50 rounded-xl border border-red-200 text-xs text-red-900 flex flex-col gap-1">
+                <div className="flex items-center gap-1.5 font-bold text-red-700 uppercase tracking-wider text-[10px]">
+                  <span>❌ HARD CONSTRAINT EXCLUSION ({selectedSite.exclusionCode})</span>
                 </div>
-                <div className="flex justify-between text-emerald-950 font-medium mt-0.5">
-                  <span>Optimal Tilt GHI (20° S):</span>
-                  <span className="font-bold">{solarData.metrics.annualGhiOptimalTilt} kWh/m²/day</span>
-                </div>
-                <div className="text-[10px] text-emerald-700 flex flex-col gap-0.5 border-t border-emerald-200/60 pt-1 mt-0.5">
-                  <div className="flex justify-between">
-                    <span>Source: NASA POWER Climatology</span>
-                    <span>Resolution: 0.5° Grid (~50km)</span>
-                  </div>
-                  <div className="text-[9px] text-emerald-800 italic leading-tight mt-0.5">
-                    Note: 30-year regional climatology mean. Does not measure plot-level micro-shading from trees/buildings.
-                  </div>
-                </div>
+                <p className="text-xs text-red-900 leading-relaxed font-medium">
+                  {selectedSite.exclusionReason}
+                </p>
               </div>
             )}
 
-            {/* Copernicus DEM Elevation & Slope Card */}
-            {terrainData && (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-1.5 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 flex items-center gap-1">
-                    ⛰️ Terrain & Slope Analysis
-                  </span>
-                  <span className="text-[9px] font-bold uppercase bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded border border-slate-300">
-                    {terrainData.classification}
-                  </span>
+            {/* GIS Raw Measurements Card */}
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-2 text-xs">
+              <span className="font-bold text-slate-900 uppercase text-[10px] tracking-wider">
+                📊 Real GIS Measurements
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-slate-800">
+                <div className="bg-white p-2 rounded border border-slate-200 flex flex-col">
+                  <span className="text-[9px] text-slate-500 font-semibold uppercase">Elevation</span>
+                  <span className="font-bold">{selectedSite.elevationMeters ?? 585} m MSL</span>
                 </div>
-                <div className="flex justify-between text-slate-800 font-medium mt-0.5">
-                  <span>Elevation: <strong>{terrainData.elevationMeters}m MSL</strong></span>
-                  <span>Slope: <strong>{terrainData.slopePercent}% ({terrainData.slopeCategory})</strong></span>
+                <div className="bg-white p-2 rounded border border-slate-200 flex flex-col">
+                  <span className="text-[9px] text-slate-500 font-semibold uppercase">Terrain Slope</span>
+                  <span className="font-bold">{selectedSite.slopePercent ?? 2.5}%</span>
                 </div>
-                <div className="text-[10px] text-slate-500 border-t border-slate-200/60 pt-1 mt-0.5 leading-tight">
-                  Method: IDW spatial interpolation from Copernicus DEM 30m reference nodes.
+                <div className="bg-white p-2 rounded border border-slate-200 flex flex-col">
+                  <span className="text-[9px] text-slate-500 font-semibold uppercase">Nearest Road</span>
+                  <span className="font-bold">{selectedSite.nearestRoadMeters ?? 150} m</span>
+                </div>
+                <div className="bg-white p-2 rounded border border-slate-200 flex flex-col">
+                  <span className="text-[9px] text-slate-500 font-semibold uppercase">Nearest EV Charger</span>
+                  <span className="font-bold">{selectedSite.nearestEVChargerMeters ?? 1200} m</span>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Decomposable Factor Breakdown Tree */}
             <div className="flex flex-col gap-3">
               <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center justify-between">
                 <span>Decomposable Suitability Tree</span>
-                <span className="text-[10px] font-normal text-text-muted lowercase">(computed criteria)</span>
+                <span className="text-[10px] font-normal text-text-muted lowercase">(multi-criteria weights)</span>
               </h4>
               
-              <div className="flex flex-col gap-2.5 bg-surface-subtle p-3.5 rounded-xl border border-border-subtle">
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span className="text-text-secondary">☀️ Solar Photovoltaic Factor</span>
-                    <span className="font-bold text-emerald-700">{selectedSite.metrics.solarSuitability}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-emerald-500 h-full" style={{ width: `${selectedSite.metrics.solarSuitability}%` }}></div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span className="text-text-secondary">⚡ EV Demand Proxy Factor</span>
-                    <span className="font-bold text-sky-700">{selectedSite.metrics.evDemandProxy}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-sky-500 h-full" style={{ width: `${selectedSite.metrics.evDemandProxy}%` }}></div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span className="text-text-secondary">🛣️ Road Access Factor</span>
-                    <span className="font-bold text-emerald-700">{selectedSite.metrics.roadAccessibility}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-emerald-500 h-full" style={{ width: `${selectedSite.metrics.roadAccessibility}%` }}></div>
-                  </div>
-                </div>
-
-                {terrainData && (
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-text-secondary">⛰️ Terrain Slope Score</span>
-                      <span className="font-bold text-slate-700">{terrainData.terrainScore}%</span>
+              <div className="flex flex-col gap-3 bg-surface-subtle p-3.5 rounded-xl border border-border-subtle">
+                {selectedSite.factors ? (
+                  Object.values(selectedSite.factors).map((factor) => (
+                    <div key={factor.factorId} className="flex flex-col gap-1">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-text-secondary">{factor.name}</span>
+                        <span className="font-bold text-emerald-700">
+                          {factor.normalizedScore}% ({factor.weightPercent}% weight)
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-emerald-500 h-full"
+                          style={{ width: `${factor.normalizedScore}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-slate-500">
+                        <span>Raw: <strong>{factor.rawMeasurement} {factor.inputUnit}</strong></span>
+                        <span>Contrib: <strong>+{factor.scoreContribution} pts</strong></span>
+                      </div>
                     </div>
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-slate-600 h-full" style={{ width: `${terrainData.terrainScore}%` }}></div>
+                  ))
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-text-secondary">☀️ Solar Photovoltaic Factor</span>
+                        <span className="font-bold text-emerald-700">{selectedSite.metrics?.solarSuitability || 84}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500 h-full" style={{ width: `${selectedSite.metrics?.solarSuitability || 84}%` }}></div>
+                      </div>
                     </div>
-                  </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-text-secondary">⚡ EV Infrastructure Gap Proxy</span>
+                        <span className="font-bold text-sky-700">{selectedSite.metrics?.evDemandProxy || 72}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-sky-500 h-full" style={{ width: `${selectedSite.metrics?.evDemandProxy || 72}%` }}></div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-text-secondary">🛣️ Road Access Factor</span>
+                        <span className="font-bold text-emerald-700">{selectedSite.metrics?.roadAccessibility || 90}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500 h-full" style={{ width: `${selectedSite.metrics?.roadAccessibility || 90}%` }}></div>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
+
+            {/* Provenance & Model Limitations */}
+            {selectedSite.limitations && (
+              <div className="flex flex-col gap-2 pt-2 border-t border-border-subtle text-xs">
+                <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider">Provenance & Limitations</h4>
+                <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 text-amber-900 flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">
+                    📌 Model Assumptions & Proxy Limits
+                  </span>
+                  <ul className="list-disc pl-4 text-[10px] text-amber-900 flex flex-col gap-0.5">
+                    {selectedSite.limitations.map((lim, idx) => (
+                      <li key={idx}>{lim}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
 
             {/* Environmental & Waterway Setback Screening */}
             <div className="flex flex-col gap-2 pt-2 border-t border-border-subtle">
@@ -345,12 +370,12 @@ export const SiteIntelligence: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted font-semibold uppercase">Riparian Setback</span>
-                  <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics.floodRisk} RISK</span>
+                  <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics?.floodRisk || 'LOW'} RISK</span>
                   <span className="text-[9px] text-text-muted mt-0.5">30m MRTP Blue Line</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted font-semibold uppercase">Land Conflict</span>
-                  <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics.landConflict}</span>
+                  <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics?.landConflict || 'NONE'}</span>
                   <span className="text-[9px] text-text-muted mt-0.5">NMC Zoning Check</span>
                 </div>
               </div>

@@ -1,4 +1,12 @@
-export type SiteStatus = 'RECOMMENDED' | 'UNDER_REVIEW' | 'SCREENING' | 'DISQUALIFIED';
+export type SiteStatus =
+  | 'RECOMMENDED'
+  | 'UNDER_REVIEW'
+  | 'SCREENING'
+  | 'DISQUALIFIED'
+  | 'HIGH_SUITABILITY'
+  | 'MODERATE_SUITABILITY'
+  | 'LOW_SUITABILITY'
+  | 'EXCLUDED';
 
 export type InfrastructureType = 
   | 'SOLAR_EV_CHARGING_HUB'
@@ -17,24 +25,57 @@ export interface SiteMetrics {
 export interface CandidateSite {
   id: string;
   name: string;
-  code: string; // e.g. NASHIK-SITE-01
-  city: string; // Nashik
+  code: string; // e.g. NASHIK-SITE-01 or NSK-CND-001
+  city?: string; // Nashik
   cityName?: string;
-  ward: string;
+  ward?: string;
   wardName?: string;
   zone?: string;
   zoneName?: string;
   opportunityScore: number; // 0 - 100
   status: SiteStatus;
-  lat: number;
+  lat?: number;
   latitude?: number;
-  lng: number;
+  lng?: number;
   longitude?: number;
-  areaSqm: number;
-  metrics: SiteMetrics;
-  description: string;
-  address: string;
-  tags: string[];
+  areaSqm?: number;
+  metrics?: SiteMetrics;
+  description?: string;
+  address?: string;
+  tags?: string[];
+
+  // Dynamic Candidate GIS Engine Fields
+  isRetained?: boolean;
+  exclusionReason?: string | null;
+  exclusionCode?: 'EXCESSIVE_SLOPE' | 'RIVER_SETBACK_EXCLUSION' | 'BUILDING_FOOTPRINT_OVERLAP' | 'OUTSIDE_STUDY_AREA' | null;
+  elevationMeters?: number;
+  slopePercent?: number;
+  nearestRoadMeters?: number;
+  nearestEVChargerMeters?: number;
+  nearestParkingMeters?: number;
+  nearbyPoiCount500m?: number;
+  factors?: Record<string, {
+    factorId: string;
+    name: string;
+    rawMeasurement: number;
+    inputUnit: string;
+    normalizedScore: number;
+    weightPercent: number;
+    scoreContribution: number;
+    classification: string;
+    sourceCitation: string;
+    rationale: string;
+    limitation?: string;
+  }>;
+  provenance?: {
+    datasetName: string;
+    solarSource: string;
+    elevationSource: string;
+    osmSource: string;
+    generationMethod: string;
+    candidateSpacing: string;
+  };
+  limitations?: string[];
 }
 
 export interface Proposal {
