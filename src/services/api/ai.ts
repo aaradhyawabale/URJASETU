@@ -12,6 +12,16 @@ export interface IAIReviewResponse {
   strengths: string[];
   risksAndConsiderations: string[];
   verificationsRequired: string[];
+  structuredSections?: {
+    siteSummary: string;
+    opportunityAnalysis: string;
+    riskScreening: string;
+    infrastructureConcept: string;
+    gridConsiderations: string;
+    implementationPlan: string;
+    dataConfidenceAndProvenance: string;
+    recommendationRationale: string;
+  };
   technicalCapacity?: {
     solarCapacityKwp: number;
     annualGenerationMwh: number;

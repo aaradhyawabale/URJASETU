@@ -73,7 +73,36 @@ ${aiReview.risksAndConsiderations.map((r) => `- ${r}`).join('\n')}
 
 ---
 
-## 2. Preliminary Technical Capacity & Financials
+## 2. Structured Proposal Sections
+${aiReview.structuredSections ? `
+### Site Summary
+${aiReview.structuredSections.siteSummary}
+
+### Opportunity & Siting Analysis
+${aiReview.structuredSections.opportunityAnalysis}
+
+### Risk & Environmental Screening
+${aiReview.structuredSections.riskScreening}
+
+### Infrastructure Capacity Concept
+${aiReview.structuredSections.infrastructureConcept}
+
+### MSEDCL Grid Considerations
+${aiReview.structuredSections.gridConsiderations}
+
+### Implementation Plan & Feasibility Check
+${aiReview.structuredSections.implementationPlan}
+
+### Data Confidence & Provenance
+${aiReview.structuredSections.dataConfidenceAndProvenance}
+
+### Recommendation Rationale
+${aiReview.structuredSections.recommendationRationale}
+` : ''}
+
+---
+
+## 3. Preliminary Technical Capacity & Financials
 - **Solar Canopy Yield:** ${aiReview.technicalCapacity?.solarCapacityKwp ?? 360} kWp
 - **Modeled Annual Generation:** ${aiReview.technicalCapacity?.annualGenerationMwh ?? 659.6} MWh/year (Preliminary Modeled Annual Generation Estimate)
 - **DC Fast Charging Bays:** ${aiReview.technicalCapacity?.evChargerPorts ?? 4} Ports
@@ -82,7 +111,7 @@ ${aiReview.risksAndConsiderations.map((r) => `- ${r}`).join('\n')}
 
 ---
 
-## 3. Data Provenance & Honesty Audit Certificate
+## 4. Data Provenance & Honesty Audit Certificate
 - **Solar Resource Baseline:** ${aiReview.provenanceAudit?.solarResourceClassification || 'OPEN (NASA POWER 50km Climatology)'}
 - **Terrain Elevation:** ${aiReview.provenanceAudit?.elevationClassification || 'DERIVED (Copernicus DEM 30m GLO-30 DSM)'}
 - **Administrative Extents:** ${aiReview.provenanceAudit?.administrativeDivisionClassification || 'DERIVED_NMC_ADMINISTRATIVE_ZONES'}
@@ -94,7 +123,7 @@ ${aiReview.risksAndConsiderations.map((r) => `- ${r}`).join('\n')}
 
 ---
 
-## 4. Required Municipal & Utility Verifications
+## 5. Required Municipal & Utility Verifications
 ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
 `;
 
@@ -235,13 +264,13 @@ ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
             </div>
           )}
 
-          {/* AI Synthesis Section */}
+          {/* AI Synthesis Executive Section */}
           {aiReview && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-[22px]">psychology</span>
-                  <h3 className="text-base font-bold text-text-primary">AI Executive Synthesis</h3>
+                  <h3 className="text-base font-bold text-text-primary">AI Executive Synthesis & Explanation</h3>
                 </div>
                 <button
                   onClick={handleRegenerate}
@@ -280,6 +309,74 @@ ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
                       ))}
                     </ul>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Structured Proposal Sections */}
+          {aiReview?.structuredSections && (
+            <div className="flex flex-col gap-4 pt-2">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">toc</span>
+                <span>Structured Municipal Decision Sections</span>
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-primary text-[18px]">info</span>
+                    <span>1. Site Summary</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">{aiReview.structuredSections.siteSummary}</p>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-emerald-600 text-[18px]">auto_graph</span>
+                    <span>2. Opportunity Analysis</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">{aiReview.structuredSections.opportunityAnalysis}</p>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-amber-600 text-[18px]">security</span>
+                    <span>3. Risk & Flood Screening</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">{aiReview.structuredSections.riskScreening}</p>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sky-600 text-[18px]">solar_power</span>
+                    <span>4. Infrastructure Concept</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">{aiReview.structuredSections.infrastructureConcept}</p>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-purple-600 text-[18px]">electrical_services</span>
+                    <span>5. MSEDCL Grid Considerations</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">{aiReview.structuredSections.gridConsiderations}</p>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-slate-700 text-[18px]">assignment_turned_in</span>
+                    <span>6. Implementation & NOC Check</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">{aiReview.structuredSections.implementationPlan}</p>
+                </div>
+
+                <div className="p-4 bg-white rounded-xl border border-border-subtle flex flex-col gap-1.5 shadow-xs md:col-span-2">
+                  <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-emerald-600 text-[18px]">verified</span>
+                    <span>7. Recommendation Rationale</span>
+                  </span>
+                  <p className="text-text-secondary leading-relaxed font-medium">{aiReview.structuredSections.recommendationRationale}</p>
                 </div>
               </div>
             </div>
