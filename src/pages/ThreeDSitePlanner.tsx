@@ -210,6 +210,9 @@ export const ThreeDSitePlanner: React.FC = () => {
             rotation={rotation}
             pitch={pitch}
             scale={scale}
+            centerLat={site?.latitude || site?.lat || 19.9975}
+            centerLng={site?.longitude || site?.lng || 73.7898}
+            buildings={surroundingBuildings}
           />
 
           {/* 3D Viewport Legend Strip */}

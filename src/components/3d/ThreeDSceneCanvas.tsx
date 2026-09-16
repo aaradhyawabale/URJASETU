@@ -1,8 +1,16 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { IPlacedComponent } from '../../types/site';
+
+export interface OSMBuildingFeature {
+  id: string;
+  name: string;
+  heightMeters: number;
+  distanceMeters: number;
+  coordinates: number[][]; // [lng, lat][]
+}
 
 interface ThreeDSceneCanvasProps {
   components: IPlacedComponent[];
@@ -12,9 +20,123 @@ interface ThreeDSceneCanvasProps {
   rotation: number;
   pitch: number;
   scale: number;
+  centerLat?: number;
+  centerLng?: number;
+  buildings?: OSMBuildingFeature[];
   selectedComponentId?: string | null;
   onSelectComponent?: (comp: IPlacedComponent) => void;
 }
+
+// 3D Building Extrusion Mesh from OSM Polygon Footprints
+const BuildingExtrusionMesh: React.FC<{
+  bldg: OSMBuildingFeature;
+  centerLat: number;
+  centerLng: number;
+}> = ({ bldg, centerLat, centerLng }) => {
+  const geom = React.useMemo(() => {
+    if (!bldg.coordinates || bldg.coordinates.length < 3) return null;
+
+    const deg2rad = Math.PI / 180;
+    const cosLat = Math.cos(centerLat * deg2rad);
+    const R = 6371000;
+
+    const shape = new THREE.Shape();
+    bldg.coordinates.forEach(([lng, lat], i) => {
+      const x = (lng - centerLng) * deg2rad * R * cosLat;
+      const z = -(lat - centerLat) * deg2rad * R;
+      if (i === 0) shape.moveTo(x, z);
+      else shape.lineTo(x, z);
+    });
+
+    const extrudeSettings = {
+      depth: bldg.heightMeters,
+      bevelEnabled: true,
+      bevelThickness: 0.3,
+      bevelSize: 0.2,
+      bevelSegments: 2,
+    };
+
+    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  }, [bldg, centerLat, centerLng]);
+
+  if (!geom) return null;
+
+  const deg2rad = Math.PI / 180;
+  const cosLat = Math.cos(centerLat * deg2rad);
+  const labelX = (bldg.coordinates[0][0] - centerLng) * deg2rad * 6371000 * cosLat;
+  const labelZ = -(bldg.coordinates[0][1] - centerLat) * deg2rad * 6371000;
+
+  return (
+    <group>
+      <mesh geometry={geom} rotation={[-Math.PI / 2, 0, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#475569" metalness={0.4} roughness={0.6} />
+      </mesh>
+
+      {/* Building 3D Name & Height Badge */}
+      <Html position={[labelX, bldg.heightMeters + 3, labelZ]} center distanceFactor={35}>
+        <div className="bg-slate-900/90 text-slate-200 border border-slate-700 px-2 py-0.5 rounded text-[9px] font-mono shadow-md whitespace-nowrap pointer-events-none">
+          <span className="font-bold text-white">{bldg.name}</span>
+          <span className="text-amber-400 font-semibold ml-1">({bldg.heightMeters}m)</span>
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// 3D Candidate Plot Boundary Mesh
+const PlotBoundaryMesh: React.FC<{
+  plotGeometry?: number[][][] | null;
+  plotAreaSqm: number;
+  centerLat: number;
+  centerLng: number;
+}> = ({ plotGeometry, plotAreaSqm, centerLat, centerLng }) => {
+  const geom = React.useMemo(() => {
+    if (!plotGeometry || !plotGeometry[0] || plotGeometry[0].length < 3) return null;
+
+    const deg2rad = Math.PI / 180;
+    const cosLat = Math.cos(centerLat * deg2rad);
+    const R = 6371000;
+
+    const shape = new THREE.Shape();
+    plotGeometry[0].forEach(([lng, lat], i) => {
+      const x = (lng - centerLng) * deg2rad * R * cosLat;
+      const z = -(lat - centerLat) * deg2rad * R;
+      if (i === 0) shape.moveTo(x, z);
+      else shape.lineTo(x, z);
+    });
+
+    const extrudeSettings = {
+      depth: 0.2,
+      bevelEnabled: false,
+    };
+
+    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  }, [plotGeometry, centerLat, centerLng]);
+
+  if (geom) {
+    return (
+      <group position={[0, 0.05, 0]}>
+        <mesh geometry={geom} rotation={[-Math.PI / 2, 0, 0]} receiveShadow castShadow>
+          <meshStandardMaterial color="#065f46" opacity={0.6} transparent metalness={0.2} roughness={0.4} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Fallback box base if plotGeometry is not yet drawn
+  const sideLength = Math.sqrt(plotAreaSqm || 2450);
+  const plotWidth = Math.max(30, Math.min(120, sideLength * 0.95));
+  const plotDepth = Math.max(20, Math.min(90, sideLength * 0.65));
+
+  return (
+    <group position={[0, 0.05, 0]}>
+      <mesh receiveShadow castShadow>
+        <boxGeometry args={[plotWidth, 0.15, plotDepth]} />
+        <meshStandardMaterial color="#065f46" opacity={0.65} transparent metalness={0.2} roughness={0.4} />
+      </mesh>
+    </group>
+  );
+};
 
 // Procedural 3D Mesh: Solar Canopy Array
 const SolarCanopyMesh: React.FC<{
@@ -257,18 +379,17 @@ const TransformerMesh: React.FC<{
 export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
   components,
   plotAreaSqm,
+  plotGeometry,
   solarElevation,
+  centerLat = 19.9975,
+  centerLng = 73.7898,
+  buildings = [],
   selectedComponentId,
   onSelectComponent,
 }) => {
   const sunRad = (Math.max(10, solarElevation) * Math.PI) / 180;
   const sunY = Math.sin(sunRad) * 70;
   const sunZ = Math.cos(sunRad) * 70;
-
-  // Compute 3D plot dimensions based on plotAreaSqm
-  const sideLength = Math.sqrt(plotAreaSqm || 2450);
-  const plotWidth = Math.max(30, Math.min(120, sideLength * 0.95));
-  const plotDepth = Math.max(20, Math.min(90, sideLength * 0.65));
 
   return (
     <div className="w-full h-full relative select-none">
@@ -318,25 +439,22 @@ export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
         />
 
         {/* Confirmed 2D Plot Boundary Polygon Base Mesh */}
-        <group position={[0, 0.05, 0]}>
-          {/* Glassmorphism Ground Pad */}
-          <mesh receiveShadow castShadow>
-            <boxGeometry args={[plotWidth, 0.15, plotDepth]} />
-            <meshStandardMaterial
-              color="#065f46"
-              opacity={0.65}
-              transparent
-              metalness={0.2}
-              roughness={0.4}
-            />
-          </mesh>
+        <PlotBoundaryMesh
+          plotGeometry={plotGeometry}
+          plotAreaSqm={plotAreaSqm}
+          centerLat={centerLat}
+          centerLng={centerLng}
+        />
 
-          {/* Plot Boundary Border Ring */}
-          <lineSegments>
-            <edgesGeometry args={[new THREE.BoxGeometry(plotWidth + 0.4, 0.2, plotDepth + 0.4)]} />
-            <lineBasicMaterial color="#34d399" linewidth={2} />
-          </lineSegments>
-        </group>
+        {/* Extruded Spatially Filtered Nearby OSM 3D Buildings (<500m) */}
+        {buildings.map((bldg) => (
+          <BuildingExtrusionMesh
+            key={bldg.id}
+            bldg={bldg}
+            centerLat={centerLat}
+            centerLng={centerLng}
+          />
+        ))}
 
         {/* Render Procedural 3D Infrastructure Components */}
         {components.map((comp) => {
