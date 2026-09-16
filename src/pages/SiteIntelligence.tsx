@@ -7,6 +7,8 @@ import { LeafletMap, LayerVisibilityState } from '../gis/components/LeafletMap';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
+import { searchLocations, SearchResult } from '../gis/services/searchService';
+
 export const SiteIntelligence: React.FC = () => {
   const navigate = useNavigate();
 
@@ -35,8 +37,56 @@ export const SiteIntelligence: React.FC = () => {
     floodways: true,
   });
 
+  // Target Infrastructure Problem Picker State
+  const [targetInfraType, setTargetInfraType] = useState<
+    'SOLAR_EV_CHARGING_HUB' | 'STANDALONE_EV_STATION' | 'ROOFTOP_SOLAR_ONLY' | 'BATTERY_STORAGE_SYSTEM'
+  >('SOLAR_EV_CHARGING_HUB');
+
+  // Advanced Layers Drawer Visibility Toggle
+  const [showAdvancedLayers, setShowAdvancedLayers] = useState<boolean>(false);
+
+  // Search Input & Results State
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [flyToTarget, setFlyToTarget] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
+
   const toggleLayer = (layerKey: keyof LayerVisibilityState) => {
     setLayers((prev) => ({ ...prev, [layerKey]: !prev[layerKey] }));
+  };
+
+  // Perform search asynchronously when query changes
+  useEffect(() => {
+    let active = true;
+    async function executeSearch() {
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+      setIsSearching(true);
+      const results = await searchLocations(searchQuery, sites);
+      if (active) {
+        setSearchResults(results);
+        setIsSearching(false);
+      }
+    }
+    executeSearch();
+    return () => {
+      active = false;
+    };
+  }, [searchQuery, sites]);
+
+  const handleSelectSearchResult = (result: SearchResult) => {
+    setFlyToTarget({ lat: result.lat, lng: result.lng, zoom: result.zoom || 15 });
+    setSearchResults([]);
+
+    // Check if result corresponds to a candidate site
+    const matchedSite = sites.find((s) => s.id === result.id || result.name.includes(s.code));
+    if (matchedSite) {
+      setSelectedSite(matchedSite);
+      loadSiteDetails(matchedSite);
+    }
   };
 
   useEffect(() => {
@@ -98,16 +148,7 @@ export const SiteIntelligence: React.FC = () => {
     await loadSiteDetails(site);
   };
 
-  // Target Infrastructure Problem Picker State
-  const [targetInfraType, setTargetInfraType] = useState<
-    'SOLAR_EV_CHARGING_HUB' | 'STANDALONE_EV_STATION' | 'ROOFTOP_SOLAR_ONLY' | 'BATTERY_STORAGE_SYSTEM'
-  >('SOLAR_EV_CHARGING_HUB');
 
-  // Advanced Layers Drawer Visibility Toggle
-  const [showAdvancedLayers, setShowAdvancedLayers] = useState<boolean>(false);
-
-  // Search Input State
-  const [searchQuery, setSearchQuery] = useState<string>('');
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
@@ -118,22 +159,62 @@ export const SiteIntelligence: React.FC = () => {
           {/* Main Controls Row: Search + Problem Picker + Advanced Layers Toggle */}
           <div className="bg-white/95 backdrop-blur-md p-3 rounded-xl border border-border-subtle shadow-md flex flex-wrap items-center justify-between gap-3">
             {/* Search Input Bar */}
-            <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 flex-1 min-w-[240px]">
-              <span className="material-symbols-outlined text-slate-500 text-[18px]">search</span>
-              <input
-                type="text"
-                placeholder="Search Nashik locations, wards, roads, POIs..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-xs text-text-primary focus:outline-none w-full placeholder:text-text-muted"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-bold"
-                >
-                  ✕
-                </button>
+            <div className="relative flex-1 min-w-[240px]">
+              <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 w-full">
+                <span className="material-symbols-outlined text-slate-500 text-[18px]">search</span>
+                <input
+                  type="text"
+                  placeholder="Search Nashik locations, wards, roads, POIs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-xs text-text-primary focus:outline-none w-full placeholder:text-text-muted"
+                />
+                {isSearching && (
+                  <span className="w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {searchQuery && !isSearching && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSearchResults([]);
+                    }}
+                    className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Interactive Search Results Dropdown Popover */}
+              {searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-border-subtle rounded-xl shadow-xl overflow-hidden z-30 max-h-72 overflow-y-auto">
+                  <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex justify-between">
+                    <span>Search Results ({searchResults.length})</span>
+                    <span>Click to Fly To Location</span>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {searchResults.map((res) => (
+                      <div
+                        key={res.id}
+                        onClick={() => handleSelectSearchResult(res)}
+                        className="p-2.5 hover:bg-emerald-50/70 cursor-pointer transition-colors flex flex-col gap-0.5 group"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900 group-hover:text-primary">
+                            {res.name}
+                          </span>
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                            {res.type}
+                          </span>
+                        </div>
+                        {res.subtitle && <span className="text-[10px] text-slate-500">{res.subtitle}</span>}
+                        <span className="text-[9px] text-emerald-800 font-mono italic mt-0.5">
+                          Source: {res.provenance}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 
@@ -292,6 +373,7 @@ export const SiteIntelligence: React.FC = () => {
             selectedSite={selectedSite}
             onSelectSite={handleSelectSite}
             layers={layers}
+            flyToLocation={flyToTarget}
           />
         </div>
       </div>

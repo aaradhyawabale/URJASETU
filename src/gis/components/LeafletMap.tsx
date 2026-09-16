@@ -21,6 +21,7 @@ interface LeafletMapProps {
   selectedSite: CandidateSite | null;
   onSelectSite: (site: CandidateSite) => void;
   layers: LayerVisibilityState;
+  flyToLocation?: { lat: number; lng: number; zoom?: number } | null;
 }
 
 export const LeafletMap: React.FC<LeafletMapProps> = ({
@@ -28,11 +29,22 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   selectedSite,
   onSelectSite,
   layers,
+  flyToLocation,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
   const geojsonLayersRef = useRef<Record<string, L.LayerGroup>>({});
+
+  // Fly to target location effect
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !flyToLocation) return;
+    map.flyTo([flyToLocation.lat, flyToLocation.lng], flyToLocation.zoom || 15, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
+  }, [flyToLocation]);
 
   // Initialize Leaflet Map Instance
   useEffect(() => {
