@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { ClimateService } from '../services/climateService.js';
+import { ElevationService } from '../services/elevationService.js';
 
 // In-memory cache for parsed GeoJSON layers to prevent redundant file parsing
 const geojsonCache: Record<string, any> = {};
 
 const getOsmDir = (): string => {
   const cwd = process.cwd();
-  // Check cwd/data/osm
   const path1 = path.join(cwd, 'data', 'osm');
   if (fs.existsSync(path1)) return path1;
 
-  // Check parent/data/osm if cwd is backend/
   const path2 = path.join(cwd, '..', 'data', 'osm');
   if (fs.existsSync(path2)) return path2;
 
@@ -113,6 +113,25 @@ export const getOsmMetadata = (_req: Request, res: Response) => {
   }
 };
 
+export const getSolarClimatology = async (_req: Request, res: Response) => {
+  const data = await ClimateService.getNashikSolarClimatology();
+  return res.status(200).json({
+    success: true,
+    data,
+  });
+};
+
+export const getElevationAnalysis = (req: Request, res: Response) => {
+  const lat = parseFloat(req.query.lat as string) || 19.9975;
+  const lng = parseFloat(req.query.lng as string) || 73.7898;
+
+  const data = ElevationService.evaluateTerrain(lat, lng);
+  return res.status(200).json({
+    success: true,
+    data,
+  });
+};
+
 // Spatial Indicators Endpoint (Point -> nearest road distance, POI density, nearest EV charger)
 export const getSpatialIndicators = (req: Request, res: Response) => {
   const { latitude, longitude } = req.body;
@@ -129,6 +148,7 @@ export const getSpatialIndicators = (req: Request, res: Response) => {
 
   const evData = loadGeoJsonLayer('ev');
   const poisData = loadGeoJsonLayer('pois');
+  const terrain = ElevationService.evaluateTerrain(latitude, longitude);
 
   let nearestEVChargerDistanceMeters: number | null = null;
   if (evData && evData.features && evData.features.length > 0) {
@@ -163,9 +183,14 @@ export const getSpatialIndicators = (req: Request, res: Response) => {
       longitude,
       nearestEVChargerDistanceMeters,
       nearbyPoiCount500m,
+      elevationMeters: terrain.elevationMeters,
+      slopePercent: terrain.slopePercent,
+      slopeCategory: terrain.slopeCategory,
       units: {
         distance: 'meters',
         radius: '500m',
+        elevation: 'meters',
+        slope: 'percent',
       },
     },
   });
