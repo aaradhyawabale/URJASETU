@@ -73,6 +73,7 @@ export interface IAIReviewPayload {
   nearestSubstationDistanceMeters?: number;
   annualGhiKwhM2Day?: number;
   estimatedShadingLossPercent?: number;
+  placedComponents?: any[];
   structuredContext?: IAIStructuredContext;
 }
 
@@ -116,10 +117,33 @@ export class AIService {
     const areaSqm = Math.max(500, payload.estimatedAreaSqm || 2450);
     const ghi = payload.annualGhiKwhM2Day || 5.02;
 
-    const solarCapacityKwp = Math.round(areaSqm * 0.60 * 0.20);
+    let solarCapacityKwp = 0;
+    let evChargerPorts = 0;
+    let bessCapacityKwh = 0;
+
+    if (payload.placedComponents && Array.isArray(payload.placedComponents) && payload.placedComponents.length > 0) {
+      for (const comp of payload.placedComponents) {
+        if (comp.type === 'SOLAR_CANOPY') {
+          solarCapacityKwp += comp.specs?.capacityKwp ? Number(comp.specs.capacityKwp) : 24;
+        } else if (comp.type === 'EV_CHARGER' || comp.type === 'CHARGING_BAY') {
+          evChargerPorts += comp.specs?.ports ? Number(comp.specs.ports) : 2;
+        } else if (comp.type === 'BESS_CONTAINER') {
+          bessCapacityKwh += comp.specs?.capacityKwh ? Number(comp.specs.capacityKwh) : 250;
+        }
+      }
+    }
+
+    if (solarCapacityKwp === 0) {
+      solarCapacityKwp = Math.round(areaSqm * 0.60 * 0.20);
+    }
+    if (evChargerPorts === 0) {
+      evChargerPorts = Math.max(2, Math.min(32, Math.floor(areaSqm / 250) * 2));
+    }
+    if (bessCapacityKwh === 0) {
+      bessCapacityKwh = Math.round(solarCapacityKwp * 0.50);
+    }
+
     const annualGenerationMwh = Number(((solarCapacityKwp * ghi * 365 * 0.80) / 1000).toFixed(1));
-    const evChargerPorts = Math.max(2, Math.min(32, Math.floor(areaSqm / 250) * 2));
-    const bessCapacityKwh = Math.round(solarCapacityKwp * 0.50);
     const estimatedCapexInr = (solarCapacityKwp * 45000) + (evChargerPorts * 800000) + (bessCapacityKwh * 18000);
 
     const capexLakhs = (estimatedCapexInr / 100000).toFixed(2);

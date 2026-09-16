@@ -4,6 +4,7 @@ export interface IAIReviewPayload {
   siteId: string;
   estimatedAreaSqm?: number;
   infrastructureType?: string;
+  placedComponents?: any[];
 }
 
 export interface IAIReviewResponse {

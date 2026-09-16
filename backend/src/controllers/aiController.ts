@@ -25,6 +25,7 @@ export const postAIReview = async (req: Request, res: Response) => {
     landConflict: site.metrics?.landConflict || 'NONE',
     estimatedAreaSqm: req.body.estimatedAreaSqm || site.areaSqm || 2450,
     infrastructureType: req.body.infrastructureType || 'SOLAR_EV_CHARGING_HUB',
+    placedComponents: req.body.placedComponents || [],
 
     divisionName: wardInfo?.divisionName || 'Panchavati Division',
     elevationMeters: 585,
