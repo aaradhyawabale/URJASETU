@@ -5,7 +5,7 @@ import { getSiteById } from '../services/api/sites';
 import { getProposals } from '../services/api/proposals';
 import { fetchOsmLayer } from '../gis/services/osmService';
 import { calculatePlotCapacityMetrics } from '../gis/utils/turfUtils';
-import { CandidateSite, Proposal } from '../types/site';
+import { CandidateSite, Proposal, IPlacedComponent } from '../types/site';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
 interface OSMBuildingFeature {
@@ -183,23 +183,54 @@ export const ThreeDSitePlanner: React.FC = () => {
                 </svg>
 
                 {/* Confirmed 2D Plot Polygon Extrusion Base */}
-                <div className="w-72 h-44 rounded-2xl bg-emerald-500/20 border-3 border-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] flex flex-col items-center justify-center relative backdrop-blur-xs p-3">
+                <div className="w-80 h-52 rounded-2xl bg-emerald-950/60 border-3 border-emerald-400 shadow-[0_0_35px_rgba(16,185,129,0.35)] flex flex-col items-center justify-center relative backdrop-blur-xs p-3">
                   {/* Confirmed 2D Parcel Boundary Badge */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-bold font-mono px-3 py-0.5 rounded-full border border-emerald-300 shadow-md">
-                    2D CONFIRMED PARCEL: {plotAreaSqm.toLocaleString()} m²
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-bold font-mono px-3.5 py-0.5 rounded-full border border-emerald-300 shadow-md whitespace-nowrap">
+                    STEP 5: 3D CONFIRMED PARCEL ({plotAreaSqm.toLocaleString()} m²)
                   </div>
 
-                  {/* 3D Solar Canopy Model Overlay */}
-                  <div className="w-full h-full bg-emerald-600/30 border border-emerald-300/40 rounded-xl flex flex-col items-center justify-center gap-1 shadow-inner">
-                    <span className="material-symbols-outlined text-emerald-300 text-[42px] animate-pulse">
-                      solar_power
-                    </span>
-                    <span className="text-xs font-bold text-white tracking-wider uppercase">
-                      3D Solar PV Canopy Array
-                    </span>
-                    <span className="text-[10px] text-emerald-200 font-mono">
-                      {capacityMetrics.solarCapacityKwp} kWp • {capacityMetrics.evChargerPorts} EV Fast Ports
-                    </span>
+                  {/* 3D Placed Infrastructure Component Layout Container */}
+                  <div className="w-full h-full relative bg-slate-900/60 border border-emerald-500/30 rounded-xl overflow-hidden flex items-center justify-center">
+                    {/* Grid Overlay */}
+                    <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:12px_12px] opacity-20"></div>
+
+                    {/* Render Individual 3D Placed Infrastructure Component Blocks */}
+                    {(proposal?.placedComponents || [
+                      { id: 'c1', type: 'SOLAR_CANOPY', name: 'Solar Carport Array A', xMeters: -8, yMeters: 6, widthMeters: 15, lengthMeters: 8, rotationDegrees: 0, specs: {} },
+                      { id: 'c2', type: 'EV_CHARGER', name: 'DC Fast Charger Bay 1', xMeters: 8, yMeters: -6, widthMeters: 4, lengthMeters: 2, rotationDegrees: 0, specs: {} },
+                      { id: 'c3', type: 'BESS_CONTAINER', name: 'BESS Storage Unit 1', xMeters: 10, yMeters: 7, widthMeters: 6, lengthMeters: 2.5, rotationDegrees: 0, specs: {} },
+                      { id: 'c4', type: 'TRANSFORMER', name: 'Interconnect Kiosk', xMeters: -10, yMeters: -7, widthMeters: 3, lengthMeters: 3, rotationDegrees: 0, specs: {} },
+                    ]).map((comp: IPlacedComponent) => {
+                      let compBg = 'bg-amber-600/40 border-amber-300 text-amber-200';
+                      let symbol = '☀️';
+                      if (comp.type === 'EV_CHARGER') {
+                        compBg = 'bg-sky-600/80 border-sky-300 text-sky-100';
+                        symbol = '🔌';
+                      } else if (comp.type === 'BESS_CONTAINER') {
+                        compBg = 'bg-purple-600/80 border-purple-300 text-purple-100';
+                        symbol = '🔋';
+                      } else if (comp.type === 'TRANSFORMER') {
+                        compBg = 'bg-red-600/80 border-red-300 text-red-100';
+                        symbol = '⚡';
+                      }
+
+                      return (
+                        <div
+                          key={comp.id}
+                          className={`absolute rounded-lg border flex flex-col items-center justify-center p-1 text-[9px] font-mono shadow-lg transition-all ${compBg}`}
+                          style={{
+                            width: `${Math.max(32, comp.widthMeters * 3.5)}px`,
+                            height: `${Math.max(22, comp.lengthMeters * 3.5)}px`,
+                            transform: `translate(${comp.xMeters * 4.5}px, ${comp.yMeters * 3.2}px) rotate(${comp.rotationDegrees || 0}deg)`,
+                          }}
+                        >
+                          <span className="font-bold flex items-center gap-0.5">
+                            <span>{symbol}</span>
+                            <span className="truncate max-w-[45px] text-[8px]">{comp.name.split(' ')[0]}</span>
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 

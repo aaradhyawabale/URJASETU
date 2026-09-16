@@ -137,5 +137,6 @@ export interface Proposal {
   aiSummary?: string;
   author: string;
   plotGeometry?: any;
+  placedComponents?: IPlacedComponent[];
 }
 
