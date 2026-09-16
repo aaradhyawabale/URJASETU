@@ -4,6 +4,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { OverviewDashboard } from '../pages/OverviewDashboard';
 import { SiteIntelligence } from '../pages/SiteIntelligence';
 import { RankedSites } from '../pages/RankedSites';
+import { SiteComparison } from '../pages/SiteComparison';
 import { SitePlanningWorkspace } from '../pages/SitePlanningWorkspace';
 import { ThreeDSitePlanner } from '../pages/ThreeDSitePlanner';
 import { AIProposalReview } from '../pages/AIProposalReview';
@@ -25,6 +26,7 @@ export const AppRoutes: React.FC = () => {
 
           {/* Screen 3: Ranked Site Results / Site Comparison */}
           <Route path="/sites/ranked" element={<RankedSites />} />
+          <Route path="/sites/compare" element={<SiteComparison />} />
 
           {/* Screen 4: Site Planning Workspace */}
           <Route path="/planning/:siteId" element={<SitePlanningWorkspace />} />

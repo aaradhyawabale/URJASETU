@@ -50,6 +50,10 @@ export const SitePlanningWorkspace: React.FC = () => {
       <div className="flex-1 relative bg-slate-100 h-full flex flex-col">
         <InteractivePlotDrawer
           initialAreaSqm={plotAreaSqm}
+          siteLat={site?.latitude || site?.lat || 19.9975}
+          siteLng={site?.longitude || site?.lng || 73.7898}
+          siteCode={site?.code || 'NSK-CND-001'}
+          siteName={site?.name || 'Nashik Candidate Site'}
           onAreaChange={(newArea) => setPlotAreaSqm(newArea)}
         />
       </div>

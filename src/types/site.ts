@@ -54,6 +54,7 @@ export interface CandidateSite {
   nearestEVChargerMeters?: number;
   nearestParkingMeters?: number;
   nearbyPoiCount500m?: number;
+  landCoverCategory?: string;
   factors?: Record<string, {
     factorId: string;
     name: string;

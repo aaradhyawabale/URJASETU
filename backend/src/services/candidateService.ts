@@ -421,9 +421,18 @@ function isWithinRiparianBuffer(lat: number, lng: number): boolean {
   return false;
 }
 
-function isInsideBuildingFootprint(lat: number, lng: number, buildingsData: any): boolean {
-  if (!buildingsData || !buildingsData.features) return false;
-  // Bounding box check for performance
+// Precomputed spatial bucket indexes for fast point-in-polygon & distance queries
+let buildingBucketIndex: Record<string, any[]> | null = null;
+let landuseBucketIndex: Record<string, any[]> | null = null;
+
+function getBucketKey(lat: number, lng: number): string {
+  return `${Math.floor(lat * 20)}_${Math.floor(lng * 20)}`;
+}
+
+function buildBuildingBucketIndex(buildingsData: any) {
+  if (buildingBucketIndex || !buildingsData || !buildingsData.features) return;
+  buildingBucketIndex = {};
+
   for (const f of buildingsData.features) {
     if (f.geometry && f.geometry.type === 'Polygon' && f.geometry.coordinates[0]) {
       const ring = f.geometry.coordinates[0];
@@ -435,9 +444,36 @@ function isInsideBuildingFootprint(lat: number, lng: number, buildingsData: any)
         if (pLat > maxY) maxY = pLat;
       });
 
-      if (lng >= minX && lng <= maxX && lat >= minY && lat <= maxY) {
-        return true;
+      f._bbox = [minX, minY, maxX, maxY];
+
+      const minBucketLat = Math.floor(minY * 20);
+      const maxBucketLat = Math.floor(maxY * 20);
+      const minBucketLng = Math.floor(minX * 20);
+      const maxBucketLng = Math.floor(maxX * 20);
+
+      for (let bLat = minBucketLat; bLat <= maxBucketLat; bLat++) {
+        for (let bLng = minBucketLng; bLng <= maxBucketLng; bLng++) {
+          const key = `${bLat}_${bLng}`;
+          if (!buildingBucketIndex[key]) buildingBucketIndex[key] = [];
+          buildingBucketIndex[key].push(f);
+        }
       }
+    }
+  }
+}
+
+function isInsideBuildingFootprint(lat: number, lng: number, buildingsData: any): boolean {
+  if (!buildingsData || !buildingsData.features) return false;
+  if (!buildingBucketIndex) buildBuildingBucketIndex(buildingsData);
+
+  const key = getBucketKey(lat, lng);
+  const bucket = buildingBucketIndex?.[key];
+  if (!bucket || bucket.length === 0) return false;
+
+  for (const f of bucket) {
+    const [minX, minY, maxX, maxY] = f._bbox;
+    if (lng >= minX && lng <= maxX && lat >= minY && lat <= maxY) {
+      return true;
     }
   }
   return false;
