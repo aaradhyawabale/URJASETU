@@ -31,8 +31,8 @@
 - [x] **Layer Controls** (Toggles for Roads, Buildings, POIs, Parking, EV Stations, Land Use, Feeders, Floodways)
 - [x] **Site Intelligence Dossier** (Candidate site dossier displaying NASA POWER regional solar climatology disclaimers, Copernicus DEM terrain elevation, and decomposable suitability tree)
 - [x] **Decomposable Score Explainability** (Factor tree visualization decomposing scores into Solar, EV Demand Proxy, Road Access, and Slope)
-- [ ] **3D Cesium Planning Workspace** (Conceptual solar canopy & EV hub model placement)
-- [x] **AI / Gemini Proposal Generation** (Structured GIS review fallback & AI summary)
+- [x] **3D Cesium & Interactive Plot Planning Workspace** (3D solar canopy GLB/SVG model canvas, rotation/scale placement controls, Turf.js geodesic plot area & engineering capacity estimation)
+- [x] **AI / Gemini Proposal Generation** (Structured GIS review fallback & AI synthesis incorporating NASA POWER GHI, Copernicus DEM elevation/slope, and calculated solar kWp/capex)
 
 ### QUALITY & RELIABILITY
 - [x] **TypeScript Type-check** (Backend `npm run typecheck` passing with 0 errors)

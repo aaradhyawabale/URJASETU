@@ -4,6 +4,7 @@ import { getSiteById } from '../services/api/sites';
 import { createProposal } from '../services/api/proposals';
 import { CandidateSite, InfrastructureType } from '../types/site';
 import { InteractivePlotDrawer } from '../gis/components/InteractivePlotDrawer';
+import { calculatePlotCapacityMetrics } from '../gis/utils/turfUtils';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 
 export const SitePlanningWorkspace: React.FC = () => {
@@ -112,14 +113,49 @@ export const SitePlanningWorkspace: React.FC = () => {
             </div>
 
             {/* Plot Area Summary Card */}
-            <div className="p-4 rounded-xl bg-surface-subtle border border-border-subtle flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-text-muted uppercase">Drawn Boundary Area Summary</span>
-              <div className="flex items-baseline justify-between">
-                <span className="text-xs text-text-secondary">Estimated Plot Area:</span>
-                <span className="text-lg font-bold text-primary font-mono">{plotAreaSqm.toLocaleString()} m²</span>
-              </div>
-              <p className="text-[11px] text-text-muted">Calculated via Turf.js browser-side polygon area computation engine.</p>
-            </div>
+            {(() => {
+              const metrics = calculatePlotCapacityMetrics(plotAreaSqm);
+              return (
+                <div className="p-4 rounded-xl bg-surface-subtle border border-border-subtle flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-border-subtle pb-2">
+                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                      Drawn Boundary Area & Capacity
+                    </span>
+                    <span className="text-xs font-mono font-bold text-primary">{plotAreaSqm.toLocaleString()} m²</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                      <span className="text-[9px] text-text-muted uppercase font-semibold">Solar PV Capacity</span>
+                      <span className="font-bold text-emerald-700">{metrics.solarCapacityKwp} kWp</span>
+                    </div>
+                    <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                      <span className="text-[9px] text-text-muted uppercase font-semibold">Annual Generation</span>
+                      <span className="font-bold text-emerald-700">{metrics.annualGenerationMwh} MWh/yr</span>
+                    </div>
+                    <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                      <span className="text-[9px] text-text-muted uppercase font-semibold">EV Fast Charger Ports</span>
+                      <span className="font-bold text-sky-700">{metrics.evChargerPorts} Ports</span>
+                    </div>
+                    <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                      <span className="text-[9px] text-text-muted uppercase font-semibold">BESS Storage</span>
+                      <span className="font-bold text-purple-700">{metrics.bessCapacityKwh} kWh</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs">
+                    <span className="text-[10px] font-bold text-emerald-900 uppercase">Estimated Civil Capex:</span>
+                    <span className="font-bold font-mono text-emerald-800">
+                      ₹{(metrics.estimatedCapexInr / 100000).toFixed(2)} Lakhs
+                    </span>
+                  </div>
+
+                  <p className="text-[10px] text-text-muted italic">
+                    Calculated from Turf.js geodesic polygon area & NASA POWER 5.02 kWh/m²/day GHI.
+                  </p>
+                </div>
+              );
+            })()}
           </div>
         ) : (
           <div className="p-6 text-xs text-text-muted">Loading planning workspace...</div>
