@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSiteById } from '../services/api/sites';
 import { createProposal } from '../services/api/proposals';
 import { CandidateSite, InfrastructureType } from '../types/site';
@@ -9,10 +9,16 @@ import { ScoreBadge } from '../components/ui/ScoreBadge';
 
 export const SitePlanningWorkspace: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const isAcquired = searchParams.get('acquired') === 'true';
+  const customLat = searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : null;
+  const customLng = searchParams.get('lng') ? parseFloat(searchParams.get('lng')!) : null;
+  const customArea = searchParams.get('area') ? parseFloat(searchParams.get('area')!) : null;
+
   const [site, setSite] = useState<CandidateSite | null>(null);
-  const [plotAreaSqm, setPlotAreaSqm] = useState<number>(2450);
+  const [plotAreaSqm, setPlotAreaSqm] = useState<number>(customArea || 2450);
   const [plotGeometry, setPlotGeometry] = useState<number[][][] | null>(null);
   const [selectedInfra, setSelectedInfra] = useState<InfrastructureType>('SOLAR_EV_CHARGING_HUB');
   const [isSaving, setIsSaving] = useState(false);
@@ -22,11 +28,11 @@ export const SitePlanningWorkspace: React.FC = () => {
       if (siteId) {
         const res = await getSiteById(siteId);
         setSite(res.site);
-        if (res.site.areaSqm) setPlotAreaSqm(res.site.areaSqm);
+        if (res.site.areaSqm && !customArea) setPlotAreaSqm(res.site.areaSqm);
       }
     }
     loadSite();
-  }, [siteId]);
+  }, [siteId, customArea]);
 
   const handleCreateProposalAndProceed = async () => {
     if (!site) return;
@@ -46,14 +52,31 @@ export const SitePlanningWorkspace: React.FC = () => {
     navigate(`/planning/${site.id}/3d`);
   };
 
+  const effectiveLat = customLat || site?.latitude || site?.lat || 19.9975;
+  const effectiveLng = customLng || site?.longitude || site?.lng || 73.7898;
+
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
       {/* Interactive Turf.js & Leaflet 2D Plot Drawer (70% width) */}
       <div className="flex-1 relative bg-slate-100 h-full flex flex-col">
+        {/* Acquired Plot Geometry Banner */}
+        {isAcquired && (
+          <div className="absolute top-4 left-4 z-20 bg-emerald-900/90 text-white backdrop-blur-md px-4 py-2 rounded-xl border border-emerald-700 shadow-md flex items-center justify-between gap-4 max-w-xl">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="font-bold">PLOT GEOMETRY ACQUIRED:</span>
+              <span>Loaded derived candidate plot boundary ({plotAreaSqm.toLocaleString()} m²)</span>
+            </div>
+            <span className="text-[10px] font-mono bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded border border-emerald-700">
+              DERIVED_CANDIDATE_PLOT_GEOMETRY
+            </span>
+          </div>
+        )}
+
         <InteractivePlotDrawer
           initialAreaSqm={plotAreaSqm}
-          siteLat={site?.latitude || site?.lat || 19.9975}
-          siteLng={site?.longitude || site?.lng || 73.7898}
+          siteLat={effectiveLat}
+          siteLng={effectiveLng}
           siteCode={site?.code || 'NSK-CND-001'}
           siteName={site?.name || 'Nashik Candidate Site'}
           onAreaChange={(newArea) => setPlotAreaSqm(newArea)}

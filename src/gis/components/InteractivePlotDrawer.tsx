@@ -45,6 +45,18 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
     ];
   });
 
+  // Synchronize ring points when site center coordinates change (Click-to-Acquire)
+  useEffect(() => {
+    const dLat = 0.00022;
+    const dLng = 0.00024;
+    setRingPts([
+      [siteLng - dLng, siteLat + dLat],
+      [siteLng + dLng, siteLat + dLat],
+      [siteLng + dLng, siteLat - dLat],
+      [siteLng - dLng, siteLat - dLat],
+    ]);
+  }, [siteLat, siteLng]);
+
   const [isEditing, setIsEditing] = useState<boolean>(true);
   const [isClickToAdd, setIsClickToAdd] = useState<boolean>(false);
   const [selectedNodeIdx, setSelectedNodeIdx] = useState<number | null>(null);

@@ -561,11 +561,18 @@ export const SiteIntelligence: React.FC = () => {
         {selectedSite && (
           <div className="p-4 bg-surface-subtle border-t border-border-subtle flex flex-col gap-2">
             <button
-              onClick={() => navigate(`/planning/${selectedSite.id}`)}
+              onClick={() => {
+                const lat = selectedSite.latitude || selectedSite.lat || 19.9975;
+                const lng = selectedSite.longitude || selectedSite.lng || 73.7898;
+                const area = selectedSite.areaSqm || 2450;
+                navigate(
+                  `/planning/${selectedSite.id}?acquired=true&lat=${lat}&lng=${lng}&area=${area}`
+                );
+              }}
               className="w-full py-2.5 px-4 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 shadow-xs"
             >
               <span className="material-symbols-outlined text-[18px]">design_services</span>
-              <span>Proceed to Plot Planning</span>
+              <span>Acquire & Load Plot into 2D Designer</span>
             </button>
           </div>
         )}
