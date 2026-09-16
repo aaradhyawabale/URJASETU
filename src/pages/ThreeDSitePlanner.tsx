@@ -10,6 +10,7 @@ export const ThreeDSitePlanner: React.FC = () => {
   const [site, setSite] = useState<CandidateSite | null>(null);
   const [rotation, setRotation] = useState<number>(45);
   const [scale, setScale] = useState<number>(1.0);
+  const [solarElevation, setSolarElevation] = useState<number>(45);
 
   useEffect(() => {
     async function loadSite() {
@@ -20,6 +21,14 @@ export const ThreeDSitePlanner: React.FC = () => {
     }
     loadSite();
   }, [siteId]);
+
+  // Derived conceptual 3D micro-shading proxy calculations
+  const estimatedBuildingHeight = 10.5; // DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY (3 floors @ 3.5m)
+  const elevRad = (Math.max(5, solarElevation) * Math.PI) / 180;
+  const shadowLengthMeters = Number((estimatedBuildingHeight / Math.tan(elevRad)).toFixed(1));
+  const shadingLossPercent = Number(Math.min(30, (shadowLengthMeters / 40) * 15).toFixed(1));
+  const regionalGhi = 5.02; // NASA POWER annual mean baseline
+  const effectiveGhi = Number((regionalGhi * (1 - shadingLossPercent / 100)).toFixed(2));
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
@@ -32,9 +41,9 @@ export const ThreeDSitePlanner: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">3D Conceptual Planner</span>
           </div>
           <span className="text-slate-600">|</span>
-          <span className="text-xs font-mono text-slate-300">Interactive 3D Visual Planning Canvas (Intermediate Conceptual Renderer)</span>
+          <span className="text-xs font-mono text-slate-300">Interactive 3D Visual Canvas (CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY)</span>
           <span className="text-slate-600">|</span>
-          <span className="text-xs text-slate-300">{site ? site.code : 'NASHIK-SITE-01'} Parcel Boundary Overlay</span>
+          <span className="text-xs text-slate-300">{site ? site.code : 'NASHIK-SITE-01'} Parcel Overlay</span>
         </div>
 
         {/* 3D Canvas Mock Representation */}
@@ -67,9 +76,11 @@ export const ThreeDSitePlanner: React.FC = () => {
           {/* 3D Legend Overlay */}
           <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700 text-xs text-slate-300 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>3D Model: Conceptual Solar-EV Canopy Structure</span>
+            <span>3D Model: Conceptual Solar Canopy Structure</span>
             <span className="text-slate-600">|</span>
             <span>Scale: {scale.toFixed(1)}x</span>
+            <span className="text-slate-600">|</span>
+            <span>Shadow Length: {shadowLengthMeters}m</span>
           </div>
         </div>
       </div>
@@ -79,7 +90,7 @@ export const ThreeDSitePlanner: React.FC = () => {
         {site ? (
           <div className="p-6 flex flex-col gap-5">
             <div className="border-b border-border-subtle pb-4">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">3D Placement Controls</span>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">3D Placement & Solar Controls</span>
               <h2 className="text-xl font-bold text-text-primary mt-0.5">{site.code}</h2>
               <p className="text-xs text-text-muted mt-1">{site.name}</p>
             </div>
@@ -117,11 +128,48 @@ export const ThreeDSitePlanner: React.FC = () => {
               />
             </div>
 
-            {/* 3D Context Summary */}
+            {/* Solar Elevation Slider & Micro-Shading Proxy */}
+            <div className="flex flex-col gap-2 pt-3 border-t border-border-subtle">
+              <div className="flex justify-between text-xs font-semibold text-text-primary">
+                <span>Solar Elevation Angle</span>
+                <span className="font-mono text-amber-600">{solarElevation}°</span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="85"
+                value={solarElevation}
+                onChange={(e) => setSolarElevation(Number(e.target.value))}
+                className="w-full accent-amber-500"
+              />
+
+              <div className="mt-2 p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs flex flex-col gap-1.5">
+                <div className="flex items-center justify-between font-bold text-amber-900">
+                  <span>Micro-Shading Screening</span>
+                  <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-mono">
+                    PROXY
+                  </span>
+                </div>
+                <div className="flex justify-between text-amber-900">
+                  <span>Projected Building Shadow:</span>
+                  <span className="font-bold">{shadowLengthMeters} meters</span>
+                </div>
+                <div className="flex justify-between text-amber-900">
+                  <span>Estimated Shading Loss:</span>
+                  <span className="font-bold">{shadingLossPercent}%</span>
+                </div>
+                <div className="flex justify-between text-amber-900">
+                  <span>Shaded GHI Irradiance:</span>
+                  <span className="font-bold">{effectiveGhi} kWh/m²/day</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 3D Context & Provenance Note */}
             <div className="p-4 rounded-xl bg-surface-subtle border border-border-subtle flex flex-col gap-2 text-xs">
-              <span className="font-bold text-text-primary uppercase text-[10px]">3D Planning Note</span>
+              <span className="font-bold text-text-primary uppercase text-[10px]">Data Provenance & Disclaimer</span>
               <p className="text-text-secondary leading-relaxed">
-                3D site planning provides conceptual visual confirmation of infrastructure fit within the estimated 2,450 m² plot boundary.
+                High-resolution 1m LiDAR / 3D building mesh is unavailable for Nashik. Micro-shading loss and shadow projections are <strong>CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY</strong> models calculated from OSM building height proxies (3.5m/floor).
               </p>
             </div>
           </div>

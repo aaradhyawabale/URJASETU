@@ -97,8 +97,17 @@ OSM coverage is community-generated and may be incomplete or outdated in rapidly
 * **Voltage Levels**: 33kV Subtransmission Corridors & 33/11kV Distribution Substations (Satpur, Panchavati, Govardhan, Nashik Road, CIDCO Ambad, Dwarka)
 * **Classification**: **`DERIVED_GRID_INFRASTRUCTURE_PROXY`**
 * **Feeder Capacity Status**: **`ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY`**
+---
+
+## 7. Solar PV Micro-Shading & 3D Building Shadow Screening
+
+* **Primary Dataset Source**: OpenStreetMap Building Footprint Polygons (`data/osm/nashik_buildings.geojson`, 49,871 polygons) & Solar Elevation Geometry
+* **Height Provenance**: Estimated building floor levels ($h_{\text{est}} = \text{levels} \times 3.5\text{m}$)
+* **Height Classification**: **`DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY`**
+* **Shading Classification**: **`CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY`**
 * **Limitations & Disclaimers**:
-  * Feeder proximity measurements compute geodesic distance to digitized 33kV corridor lines.
-  * Available hosting capacity figures are preliminary non-SCADA planning estimates and do NOT constitute formal MSEDCL grid NOC interconnection approval or real-time transformer loading telemetry.
+  * High-resolution 1m LiDAR / 3D urban canopy mesh is **UNAVAILABLE** in public open data for Nashik.
+  * Building heights and 3D shadow lengths are ray-cast geometric proxies. They do NOT constitute bankable CAD engineering shadow analysis.
+
 
 

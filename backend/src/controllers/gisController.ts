@@ -5,6 +5,7 @@ import { ClimateService } from '../services/climateService.js';
 import { ElevationService } from '../services/elevationService.js';
 import { RiskService } from '../services/riskService.js';
 import { GridService } from '../services/gridService.js';
+import { ShadingService } from '../services/shadingService.js';
 
 // In-memory cache for parsed GeoJSON layers to prevent redundant file parsing
 const geojsonCache: Record<string, any> = {};
@@ -232,6 +233,29 @@ export const getMsedclGridAnalysis = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getMicroShadingAnalysis = async (req: Request, res: Response) => {
+  try {
+    const lat = req.query.lat ? parseFloat(req.query.lat as string) : 19.9975;
+    const lng = req.query.lng ? parseFloat(req.query.lng as string) : 73.7898;
+    const area = req.query.area ? parseFloat(req.query.area as string) : 2450;
+    const elev = req.query.elevation ? parseFloat(req.query.elevation as string) : 45.0;
+    const azim = req.query.azimuth ? parseFloat(req.query.azimuth as string) : 180.0;
+
+    const shading = ShadingService.calculateMicroShading(lat, lng, area, elev, azim);
+
+    return res.status(200).json({
+      success: true,
+      data: shading,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SHADING_ANALYSIS_FAILED', message: (err as Error).message },
+    });
+  }
+};
+
 
 
 function calculateHaversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
