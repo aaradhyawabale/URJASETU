@@ -219,6 +219,8 @@ export const ThreeDSitePlanner: React.FC = () => {
   const riparianSetbackMeters = site?.exclusionCode === 'RIVER_SETBACK_EXCLUSION' ? 0 : 185;
   const riparianStatusText = riparianSetbackMeters > 50 ? `${riparianSetbackMeters}m Clear (Safe)` : 'Setback Violation (<50m)';
 
+  const [isSplitView, setIsSplitView] = useState<boolean>(false);
+
   const handleResetCamera = () => {
     setRotation(45);
     setPitch(55);
@@ -232,6 +234,15 @@ export const ThreeDSitePlanner: React.FC = () => {
     setScale(1.4);
     setSolarElevation(55);
   };
+
+  const handleEyeLevelCamera = () => {
+    setRotation(0);
+    setPitch(15);
+    setScale(1.8);
+    setSolarElevation(35);
+  };
+
+  const mapillaryUrl = `https://www.mapillary.com/app/?lat=${site?.latitude || site?.lat || 19.9975}&lng=${site?.longitude || site?.lng || 73.7898}&z=17&focus=map`;
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden select-none">
@@ -267,6 +278,26 @@ export const ThreeDSitePlanner: React.FC = () => {
             >
               <span>🦅</span>
               <span>Bird's-Eye View</span>
+            </button>
+
+            <button
+              onClick={handleEyeLevelCamera}
+              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <span>🚶</span>
+              <span>Eye-Level Street</span>
+            </button>
+
+            <button
+              onClick={() => setIsSplitView(!isSplitView)}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1.5 shadow-xs ${
+                isSplitView
+                  ? 'bg-purple-600 text-white animate-pulse'
+                  : 'bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700'
+              }`}
+            >
+              <span>📱</span>
+              <span>{isSplitView ? 'Exit Split View' : 'Split: Real Street vs 3D'}</span>
             </button>
 
             <button
@@ -317,23 +348,51 @@ export const ThreeDSitePlanner: React.FC = () => {
           </div>
         </div>
 
-        {/* Interactive 3D Perspective Viewport Canvas (WebGL Three.js / React Three Fiber) */}
-        <div className="w-full h-full relative overflow-hidden">
-          <ThreeDSceneCanvas
-            components={activeComponents}
-            plotAreaSqm={plotAreaSqm}
-            plotGeometry={planningDesign?.plotGeometry}
-            solarElevation={solarElevation}
-            rotation={rotation}
-            pitch={pitch}
-            scale={scale}
-            centerLat={site?.latitude || site?.lat || 19.9975}
-            centerLng={site?.longitude || site?.lng || 73.7898}
-            buildings={surroundingBuildings}
-            selectedComponentId={selectedComponentId}
-            onSelectComponent={(comp) => setSelectedComponentId(comp ? comp.id : null)}
-            onUpdateComponent={handleUpdateComponent}
-          />
+        {/* Viewport Area (Full Canvas or Side-by-Side Split View) */}
+        <div className="w-full h-full relative overflow-hidden flex">
+          {/* Left Panel: Real-Life Mapillary Street View Stream (Only shown in Split Mode) */}
+          {isSplitView && (
+            <div className="w-1/2 h-full border-r-2 border-purple-500/50 relative bg-slate-900 z-10 flex flex-col">
+              <div className="bg-purple-950/90 px-3 py-1.5 text-xs text-purple-200 font-bold flex items-center justify-between border-b border-purple-800">
+                <span className="flex items-center gap-1.5">
+                  <span>📸 Real-Life Street View (Mapillary Nashik)</span>
+                </span>
+                <span className="font-mono text-[10px] bg-purple-900 px-1.5 py-0.5 rounded text-purple-300">
+                  REAL_LIFE_STREET_IMAGERY
+                </span>
+              </div>
+              <iframe
+                src={mapillaryUrl}
+                title="Mapillary Nashik Real Street View"
+                className="w-full h-full border-0"
+                allow="geolocation"
+              />
+            </div>
+          )}
+
+          {/* Right Panel (or Full Width): Interactive 3D WebGL Perspective Scene */}
+          <div className={`${isSplitView ? 'w-1/2' : 'w-full'} h-full relative overflow-hidden`}>
+            {isSplitView && (
+              <div className="absolute top-2 left-2 z-20 bg-slate-900/90 px-3 py-1 text-xs text-emerald-400 font-bold rounded border border-slate-700">
+                <span>🏙️ 3D Model (Hospital on Plot + 3D Real Buildings)</span>
+              </div>
+            )}
+            <ThreeDSceneCanvas
+              components={activeComponents}
+              plotAreaSqm={plotAreaSqm}
+              plotGeometry={planningDesign?.plotGeometry}
+              solarElevation={solarElevation}
+              rotation={rotation}
+              pitch={pitch}
+              scale={scale}
+              centerLat={site?.latitude || site?.lat || 19.9975}
+              centerLng={site?.longitude || site?.lng || 73.7898}
+              buildings={surroundingBuildings}
+              selectedComponentId={selectedComponentId}
+              onSelectComponent={(comp) => setSelectedComponentId(comp ? comp.id : null)}
+              onUpdateComponent={handleUpdateComponent}
+            />
+          </div>
 
           {/* 3D Viewport Legend Strip */}
           <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-700 text-xs text-slate-300 flex items-center gap-4 shadow-lg">
