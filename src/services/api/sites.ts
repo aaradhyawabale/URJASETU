@@ -67,3 +67,91 @@ export async function getSiteRisk(siteId: string): Promise<{ risk: any; isFallba
   }
   return { risk: result.data, isFallback: false };
 }
+
+export interface IDivisionSummary {
+  divisionId: string;
+  divisionCode: string;
+  divisionName: string;
+  retainedCandidates: number;
+  candidatesPerKm2: number;
+  aggregateModeledSolarCapacityMwp: number;
+  aggregateModeledEvChargerPorts: number;
+  meanOpportunityScore: number;
+  classification: string;
+}
+
+export async function getDivisionAggregations(): Promise<{ aggregations: IDivisionSummary[]; isFallback: boolean }> {
+  const result = await fetchApi<IDivisionSummary[]>('/gis/wards/aggregation');
+  if (result.isFallback || !result.data) {
+    const seedAggregations: IDivisionSummary[] = [
+      {
+        divisionId: 'nmc_div_01',
+        divisionCode: 'NMC-DIV-01',
+        divisionName: 'Panchavati Division',
+        retainedCandidates: 4,
+        candidatesPerKm2: 0.07,
+        aggregateModeledSolarCapacityMwp: 2.0,
+        aggregateModeledEvChargerPorts: 16,
+        meanOpportunityScore: 82,
+        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+      },
+      {
+        divisionId: 'nmc_div_02',
+        divisionCode: 'NMC-DIV-02',
+        divisionName: 'Nashik East Division',
+        retainedCandidates: 3,
+        candidatesPerKm2: 0.09,
+        aggregateModeledSolarCapacityMwp: 1.5,
+        aggregateModeledEvChargerPorts: 12,
+        meanOpportunityScore: 79,
+        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+      },
+      {
+        divisionId: 'nmc_div_03',
+        divisionCode: 'NMC-DIV-03',
+        divisionName: 'Nashik West Division',
+        retainedCandidates: 2,
+        candidatesPerKm2: 0.13,
+        aggregateModeledSolarCapacityMwp: 1.0,
+        aggregateModeledEvChargerPorts: 8,
+        meanOpportunityScore: 76,
+        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+      },
+      {
+        divisionId: 'nmc_div_04',
+        divisionCode: 'NMC-DIV-04',
+        divisionName: 'CIDCO Division',
+        retainedCandidates: 5,
+        candidatesPerKm2: 0.14,
+        aggregateModeledSolarCapacityMwp: 2.5,
+        aggregateModeledEvChargerPorts: 20,
+        meanOpportunityScore: 85,
+        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+      },
+      {
+        divisionId: 'nmc_div_05',
+        divisionCode: 'NMC-DIV-05',
+        divisionName: 'Satpur Division',
+        retainedCandidates: 6,
+        candidatesPerKm2: 0.13,
+        aggregateModeledSolarCapacityMwp: 3.0,
+        aggregateModeledEvChargerPorts: 24,
+        meanOpportunityScore: 81,
+        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+      },
+      {
+        divisionId: 'nmc_div_06',
+        divisionCode: 'NMC-DIV-06',
+        divisionName: 'Nashik Road Division',
+        retainedCandidates: 3,
+        candidatesPerKm2: 0.08,
+        aggregateModeledSolarCapacityMwp: 1.5,
+        aggregateModeledEvChargerPorts: 12,
+        meanOpportunityScore: 74,
+        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+      },
+    ];
+    return { aggregations: seedAggregations, isFallback: true };
+  }
+  return { aggregations: result.data, isFallback: false };
+}
