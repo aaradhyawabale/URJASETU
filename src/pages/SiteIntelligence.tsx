@@ -98,104 +98,183 @@ export const SiteIntelligence: React.FC = () => {
     await loadSiteDetails(site);
   };
 
+  // Target Infrastructure Problem Picker State
+  const [targetInfraType, setTargetInfraType] = useState<
+    'SOLAR_EV_CHARGING_HUB' | 'STANDALONE_EV_STATION' | 'ROOFTOP_SOLAR_ONLY' | 'BATTERY_STORAGE_SYSTEM'
+  >('SOLAR_EV_CHARGING_HUB');
+
+  // Advanced Layers Drawer Visibility Toggle
+  const [showAdvancedLayers, setShowAdvancedLayers] = useState<boolean>(false);
+
+  // Search Input State
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
       {/* 2D GIS Map Controls & Canvas (70% width) */}
       <div className="flex-1 relative bg-slate-100 h-full flex flex-col">
-        {/* Map Floating Control Toolbar Header */}
-        <div className="absolute top-4 left-4 z-20 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl border border-border-subtle shadow-md flex flex-wrap items-center gap-2 max-w-4xl">
-          <div className="flex items-center gap-1.5 mr-2">
-            <span className="material-symbols-outlined text-primary text-[20px]">map</span>
-            <span className="text-xs font-bold text-text-primary uppercase tracking-wider">GIS Layers:</span>
+        {/* Step 1 Map Floating Control Toolbar Header */}
+        <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-2 max-w-5xl pointer-events-auto">
+          {/* Main Controls Row: Search + Problem Picker + Advanced Layers Toggle */}
+          <div className="bg-white/95 backdrop-blur-md p-3 rounded-xl border border-border-subtle shadow-md flex flex-wrap items-center justify-between gap-3">
+            {/* Search Input Bar */}
+            <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 flex-1 min-w-[240px]">
+              <span className="material-symbols-outlined text-slate-500 text-[18px]">search</span>
+              <input
+                type="text"
+                placeholder="Search Nashik locations, wards, roads, POIs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent text-xs text-text-primary focus:outline-none w-full placeholder:text-text-muted"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Target Infrastructure Problem Picker */}
+            <div className="flex items-center gap-1.5 bg-emerald-50/80 border border-emerald-200/80 rounded-lg px-2.5 py-1">
+              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider hidden sm:inline">
+                Target Infra:
+              </span>
+              <select
+                value={targetInfraType}
+                onChange={(e: any) => setTargetInfraType(e.target.value)}
+                className="bg-white text-xs font-semibold text-emerald-900 border border-emerald-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+              >
+                <option value="SOLAR_EV_CHARGING_HUB">⚡ Hybrid Solar-EV Charging Hub</option>
+                <option value="STANDALONE_EV_STATION">🔌 Standalone EV Fast Charger</option>
+                <option value="ROOFTOP_SOLAR_ONLY">☀️ Rooftop Solar PV Only</option>
+                <option value="BATTERY_STORAGE_SYSTEM">🔋 Battery Energy Storage (BESS)</option>
+              </select>
+            </div>
+
+            {/* Advanced GIS Layers Toggle */}
+            <button
+              onClick={() => setShowAdvancedLayers((prev) => !prev)}
+              className={`text-xs px-3 py-1.5 rounded-lg border font-semibold flex items-center gap-1.5 transition-colors ${
+                showAdvancedLayers
+                  ? 'bg-primary text-white border-primary shadow-xs'
+                  : 'bg-white text-text-secondary border-border-subtle hover:bg-slate-50'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">layers</span>
+              <span>{showAdvancedLayers ? 'Hide GIS Layers' : 'Advanced GIS Layers'}</span>
+              <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded border border-slate-200 font-mono ml-0.5">
+                {Object.values(layers).filter(Boolean).length}
+              </span>
+            </button>
           </div>
 
-          <button
-            onClick={() => toggleLayer('osmRoads')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.osmRoads
-                ? 'bg-sky-50 text-sky-800 border-sky-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            🛣️ Roads (13.9k)
-          </button>
+          {/* Collapsible Advanced Layers Drawer */}
+          {showAdvancedLayers && (
+            <div className="bg-white/95 backdrop-blur-md p-3 rounded-xl border border-border-subtle shadow-md flex flex-wrap items-center gap-2 transition-all">
+              <div className="flex items-center gap-1.5 mr-2">
+                <span className="material-symbols-outlined text-primary text-[18px]">tune</span>
+                <span className="text-xs font-bold text-text-primary uppercase tracking-wider">Active GIS Overlays:</span>
+              </div>
 
-          <button
-            onClick={() => toggleLayer('osmBuildings')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.osmBuildings
-                ? 'bg-slate-100 text-slate-800 border-slate-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            🏢 Buildings (49.8k)
-          </button>
+              <button
+                onClick={() => toggleLayer('osmRoads')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.osmRoads
+                    ? 'bg-sky-50 text-sky-800 border-sky-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🛣️ Roads Network
+              </button>
 
-          <button
-            onClick={() => toggleLayer('osmPois')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.osmPois
-                ? 'bg-purple-50 text-purple-800 border-purple-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            📍 POIs (1.0k)
-          </button>
+              <button
+                onClick={() => toggleLayer('osmEvCharging')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.osmEvCharging
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                ⚡ Existing EV Chargers
+              </button>
 
-          <button
-            onClick={() => toggleLayer('osmParking')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.osmParking
-                ? 'bg-blue-50 text-blue-800 border-blue-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            🅿️ Parking (29)
-          </button>
+              <button
+                onClick={() => toggleLayer('floodways')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.floodways
+                    ? 'bg-cyan-50 text-cyan-800 border-cyan-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🌊 Flood Buffer Setbacks
+              </button>
 
-          <button
-            onClick={() => toggleLayer('osmEvCharging')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.osmEvCharging
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            ⚡ EV Stations (29)
-          </button>
+              <button
+                onClick={() => toggleLayer('substationFeeders')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.substationFeeders
+                    ? 'bg-orange-50 text-orange-800 border-orange-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🔌 33kV MSEDCL Feeders
+              </button>
 
-          <button
-            onClick={() => toggleLayer('osmLanduse')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.osmLanduse
-                ? 'bg-amber-50 text-amber-800 border-amber-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            🏞️ Land Use (645)
-          </button>
+              <button
+                onClick={() => toggleLayer('osmBuildings')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.osmBuildings
+                    ? 'bg-slate-100 text-slate-800 border-slate-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🏢 Building Footprints (49.8k)
+              </button>
 
-          <button
-            onClick={() => toggleLayer('substationFeeders')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.substationFeeders
-                ? 'bg-orange-50 text-orange-800 border-orange-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            🔌 33kV Feeders
-          </button>
+              <button
+                onClick={() => toggleLayer('osmPois')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.osmPois
+                    ? 'bg-purple-50 text-purple-800 border-purple-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                📍 POIs & Amenities
+              </button>
 
-          <button
-            onClick={() => toggleLayer('floodways')}
-            className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-              layers.floodways
-                ? 'bg-cyan-50 text-cyan-800 border-cyan-300 font-semibold'
-                : 'bg-surface-subtle text-text-muted border-border-subtle'
-            }`}
-          >
-            🌊 Flood Screening
-          </button>
+              <button
+                onClick={() => toggleLayer('osmParking')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.osmParking
+                    ? 'bg-blue-50 text-blue-800 border-blue-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🅿️ Designated Parking
+              </button>
+
+              <button
+                onClick={() => toggleLayer('osmLanduse')}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                  layers.osmLanduse
+                    ? 'bg-amber-50 text-amber-800 border-amber-300 font-semibold'
+                    : 'bg-surface-subtle text-text-muted border-border-subtle'
+                }`}
+              >
+                🏞️ Land Use Zones
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Data Honesty Footer Badge on Map */}
+        <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-border-subtle text-[11px] text-text-secondary flex items-center gap-2 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="font-semibold text-text-primary">PROVENANCE:</span>
+          <span>Copernicus DEM 30m • NASA POWER Climatology • MSEDCL Grid Proxy</span>
         </div>
 
         {/* Fallback Banner */}
