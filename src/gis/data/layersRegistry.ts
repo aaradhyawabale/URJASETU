@@ -125,4 +125,18 @@ export const CENTRAL_GIS_LAYERS_REGISTRY: GISLayerMetadata[] = [
     isFallback: true,
     defaultVisible: true,
   },
+  {
+    id: 'layer-nmc-divisions',
+    name: 'NMC Administrative Divisions (DERIVED)',
+    category: 'OSM_LANDUSE',
+    source: 'Nashik Municipal Corporation (NMC Divisional Offices)',
+    type: 'Vector Polygon',
+    status: 'Estimated Proxy',
+    description: 'Digitized boundaries of 6 NMC Administrative Divisions (Panchavati, Nashik East, Nashik West, CIDCO, Satpur, Nashik Road) for spatial aggregation of candidate sites.',
+    coverage: 'Nashik Municipal Area (6 Divisions)',
+    limitations: 'Digitized approximation of NMC 6 divisional boundaries. Not authoritative cadastral vector data.',
+    isFallback: false,
+    defaultVisible: true,
+    featureCount: 6,
+  },
 ];

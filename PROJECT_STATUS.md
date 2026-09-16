@@ -16,7 +16,7 @@
 - [ ] **High-Resolution Local Solar Heatmap / Micro-Shading** (Deferred until plot-level LiDAR / rooftop solar CAD data acquired)
 - [x] **Hydrological Riverbed Distance & Flood Screening** (Godavari riverbed spatial corridor geodesic distance proxy `DERIVED_HYDROLOGICAL_DISTANCE_PROXY` & flood hazard screening proxy `FLOOD_HAZARD_SCREENING_PROXY`; REST `/api/v1/gis/hydrology`)
 - [x] **LULC Physical Land-Use & Statutory Legal Zoning Status** (OSM 645 landuse polygons point-in-polygon proxy `DERIVED_LAND_COVER_PROXY` & statutory legal zoning status `UNVERIFIED_STATUTORY_ZONING`)
-- [ ] **Administrative Ward GeoJSON Extents** (NMC 30-ward polygon boundaries deferred)
+- [x] **NMC Administrative Divisions GeoJSON Extents** (6 NMC Administrative Divisions verified: Panchavati, Nashik East, Nashik West, CIDCO, Satpur, Nashik Road; digitized GeoJSON `data/geo/nashik_administrative_wards.geojson`; classified as **`DERIVED_NMC_ADMINISTRATIVE_ZONES`**; spatial aggregation model output REST endpoints `/api/v1/gis/wards` & `/api/v1/gis/wards/aggregation`)
 
 ### GIS ENGINE
 - [x] **Data Validation & Normalization** (EPSG:4326 WGS84 CRS enforcement, geometry checks)

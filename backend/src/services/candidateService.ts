@@ -3,6 +3,7 @@ import path from 'path';
 import { SCORING_CONFIG } from '../config/scoringConfig.js';
 import { ElevationService } from './elevationService.js';
 import { ClimateService } from './climateService.js';
+import { WardService } from './wardService.js';
 
 export interface IFactorDecomposition {
   factorId: string;
@@ -38,6 +39,10 @@ export interface ICandidateSite {
   landCoverCategory: string;
   landCoverClassification: 'DERIVED_LAND_COVER_PROXY';
   statutoryLegalZoning: 'UNVERIFIED_STATUTORY_ZONING';
+  divisionId?: string;
+  divisionName?: string;
+  divisionCode?: string;
+  divisionClassification?: 'DERIVED_NMC_ADMINISTRATIVE_ZONES';
   factors: Record<string, IFactorDecomposition>;
   provenance: {
     datasetName: string;
@@ -245,6 +250,7 @@ export class CandidateService {
         const candidateName = `Candidate Site ${candidateCode} (${roundedLat.toFixed(3)}, ${roundedLng.toFixed(3)})`;
 
         const landCoverCategory = detectLandCoverCategory(roundedLat, roundedLng, landuseData);
+        const adminDivision = WardService.getDivisionForCoordinate(roundedLat, roundedLng);
 
         candidates.push({
           id: `cnd_${candidateIndex}`,
@@ -266,6 +272,10 @@ export class CandidateService {
           landCoverCategory,
           landCoverClassification: 'DERIVED_LAND_COVER_PROXY',
           statutoryLegalZoning: 'UNVERIFIED_STATUTORY_ZONING',
+          divisionId: adminDivision?.divisionId,
+          divisionName: adminDivision?.divisionName,
+          divisionCode: adminDivision?.divisionCode,
+          divisionClassification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
           factors: {
             solarPhotovoltaic: {
               factorId: 'solarPhotovoltaic',

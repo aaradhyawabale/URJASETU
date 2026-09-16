@@ -74,3 +74,19 @@ OSM coverage is community-generated and may be incomplete or outdated in rapidly
 * **Dataset Type**: Vector Buffer Exclusion Zone
 * **Methodology**: 30-meter Blue Line setback exclusion buffer generated along Godavari river banks and natural drainage channels.
 * **Classification**: **`DERIVED`**
+
+---
+
+## 5. Administrative Divisions (NMC 6 Divisional Offices)
+
+* **Official Publisher**: Nashik Municipal Corporation (NMC - Nashik Mahanagarpalika)
+* **Dataset Reference**: `data/geo/nashik_administrative_wards.geojson` (6 Polygons)
+* **Official Structure**: 6 Administrative Divisions / Zones (Panchavati, Nashik East, Nashik West, CIDCO, Satpur, Nashik Road) as published by NMC Divisional Offices (`https://nashikcorporation.in/`).
+* **Geometry Provenance**: Digitized vector polygons covering Nashik urban study area extent (`19.90°N, 73.70°E` to `20.10°N, 73.95°E`).
+* **Classification**: **`DERIVED_NMC_ADMINISTRATIVE_ZONES`**
+* **Data Honesty Rules & Provenance Constraints**:
+  * **Population**: Marked **`UNKNOWN`** due to postponed 2021 Indian Census.
+  * **Revenue Category**: Marked **`PROJECT_MODELING_ASSUMPTION`**.
+  * **Municipal Annual Revenue**: Set to **`NOT_MODELED`** / **`UNKNOWN`** (Municipal land lease and license fees depend on site-specific public tenders and auctions).
+  * **Spatial Aggregation Metrics**: Candidate count, site density (candidates/km²), retained candidate count, aggregate modeled solar MWp capacity, aggregate modeled EV fast charger ports, and mean opportunity score are explicitly classified as **`AGGREGATE_MODEL_OUTPUT`**.
+

@@ -76,6 +76,30 @@ export interface CandidateSite {
     candidateSpacing: string;
   };
   limitations?: string[];
+
+  // Administrative Division Fields
+  divisionId?: string;
+  divisionName?: string;
+  divisionCode?: string;
+  divisionClassification?: 'DERIVED_NMC_ADMINISTRATIVE_ZONES';
+}
+
+export interface IDivisionSummary {
+  divisionId: string;
+  divisionCode: string;
+  divisionName: string;
+  ulbCode: string;
+  classification: string;
+  totalCandidates: number;
+  retainedCandidates: number;
+  candidatesPerKm2: number;
+  aggregateModeledSolarCapacityMwp: number;
+  aggregateModeledEvChargerPorts: number;
+  meanOpportunityScore: number;
+  populationStatus: string;
+  revenueStatus: string;
+  metricClassification: 'AGGREGATE_MODEL_OUTPUT';
+  disclaimer: string;
 }
 
 export interface Proposal {
@@ -93,3 +117,4 @@ export interface Proposal {
   aiSummary?: string;
   author: string;
 }
+

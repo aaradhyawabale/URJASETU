@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { CandidateService, ICandidateGenerationParams } from '../services/candidateService.js';
+import { WardService } from '../services/wardService.js';
 
 export const getCandidates = async (req: Request, res: Response) => {
   try {
@@ -105,3 +106,42 @@ export const generateCandidates = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getAdministrativeDivisions = async (_req: Request, res: Response) => {
+  try {
+    const geojson = WardService.getAdministrativeDivisionsGeoJson();
+    if (!geojson) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'GEOJSON_NOT_FOUND', message: 'Administrative division GeoJSON dataset not found.' },
+      });
+    }
+    return res.status(200).json(geojson);
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'WARD_FETCH_FAILED', message: (err as Error).message },
+    });
+  }
+};
+
+export const getDivisionAggregation = async (_req: Request, res: Response) => {
+  try {
+    const candidates = await CandidateService.generateCandidates({ includeExcluded: true });
+    const aggregation = WardService.aggregateSitesByDivision(candidates);
+    return res.status(200).json({
+      success: true,
+      count: aggregation.length,
+      metricClassification: 'AGGREGATE_MODEL_OUTPUT',
+      revenueStatus: 'NOT_MODELED',
+      disclaimer: 'Spatial aggregation metrics are aggregate MODEL OUTPUTS derived from UrjaSetu candidate grid evaluation. They do NOT represent official municipal revenue forecasts, approved utility interconnection capacities, or statutory zoning limits.',
+      data: aggregation,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'AGGREGATION_FAILED', message: (err as Error).message },
+    });
+  }
+};
+

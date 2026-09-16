@@ -9,6 +9,7 @@ export const RankedSites: React.FC = () => {
   const navigate = useNavigate();
 
   const [sites, setSites] = useState<CandidateSite[]>([]);
+  const [selectedDivision, setSelectedDivision] = useState<string>('ALL');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFallback, setIsFallback] = useState<boolean>(false);
 
@@ -22,6 +23,21 @@ export const RankedSites: React.FC = () => {
     }
     loadRanked();
   }, []);
+
+  const divisions = [
+    { id: 'ALL', name: 'All NMC Administrative Divisions (6 Divisions)' },
+    { id: 'nmc_div_01', name: 'Panchavati Division (NMC-DIV-01)' },
+    { id: 'nmc_div_02', name: 'Nashik East Division (NMC-DIV-02)' },
+    { id: 'nmc_div_03', name: 'Nashik West Division (NMC-DIV-03)' },
+    { id: 'nmc_div_04', name: 'Cidco Division (NMC-DIV-04)' },
+    { id: 'nmc_div_05', name: 'Satpur Division (NMC-DIV-05)' },
+    { id: 'nmc_div_06', name: 'Nashik Road Division (NMC-DIV-06)' },
+  ];
+
+  const filteredSites = sites.filter((s) => {
+    if (selectedDivision === 'ALL') return true;
+    return s.divisionId === selectedDivision || (s.zoneName && s.zoneName.toLowerCase().includes(selectedDivision.toLowerCase()));
+  });
 
   return (
     <div className="p-6 xl:p-8 flex flex-col gap-6">
@@ -46,31 +62,52 @@ export const RankedSites: React.FC = () => {
               Multi-Criteria Decision Matrix
             </span>
             <span className="text-[11px] font-mono text-text-secondary bg-surface-subtle border border-border-subtle px-2 py-0.5 rounded">
-              Nashik ULB Seed
+              NMC 6 Divisional Offices (DERIVED)
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-text-primary mt-1">Ranked Site Results & Site Comparison</h1>
+          <h1 className="text-2xl font-bold text-text-primary mt-1">Ranked Candidate Sites & Spatial Division Filter</h1>
           <p className="text-xs text-text-secondary mt-1">
-            Deterministic opportunity scoring evaluating solar irradiance, EV demand density, electrical feeder proximity, and environmental constraints.
+            Deterministic opportunity scoring evaluating solar irradiance, EV demand proxy, road accessibility, and environmental constraints aggregated across Nashik Municipal Corporation Administrative Divisions.
           </p>
         </div>
 
-        {sites.length > 0 && (
-          <button
-            onClick={() => navigate(`/planning/${sites[0].id}`)}
-            className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-xs shrink-0"
-          >
-            Plan Top Site ({sites[0].code}) →
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-text-muted">Filter by Administrative Division:</label>
+            <select
+              value={selectedDivision}
+              onChange={(e) => setSelectedDivision(e.target.value)}
+              className="px-3 py-2 text-xs font-semibold bg-white border border-border-strong rounded-lg text-text-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            >
+              {divisions.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {filteredSites.length > 0 && (
+            <button
+              onClick={() => navigate(`/planning/${filteredSites[0].id}`)}
+              className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-xs shrink-0 self-end"
+            >
+              Plan Top Site ({filteredSites[0].code}) →
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Grid of Ranked Sites Cards */}
       {isLoading ? (
         <div className="p-8 text-xs text-text-muted text-center">Loading site ranking matrix...</div>
+      ) : filteredSites.length === 0 ? (
+        <div className="p-12 text-center bg-white rounded-xl border border-border-subtle text-xs text-text-muted">
+          No candidate sites found matching selected administrative division filter ({selectedDivision}).
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          {sites.map((site, index) => (
+          {filteredSites.map((site, index) => (
             <div
               key={site.id}
               className={`bg-white rounded-xl p-5 border flex flex-col justify-between shadow-xs transition-all ${
