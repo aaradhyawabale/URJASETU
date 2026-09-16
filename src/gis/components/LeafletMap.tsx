@@ -25,6 +25,7 @@ interface LeafletMapProps {
   onSelectSite: (site: CandidateSite) => void;
   layers: LayerVisibilityState;
   flyToLocation?: { lat: number; lng: number; zoom?: number } | null;
+  basemapMode?: 'LIGHT' | 'SATELLITE';
 }
 
 export const LeafletMap: React.FC<LeafletMapProps> = ({
@@ -33,9 +34,11 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   onSelectSite,
   layers,
   flyToLocation,
+  basemapMode = 'LIGHT',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
   const geojsonLayersRef = useRef<Record<string, L.LayerGroup>>({});
 
@@ -62,16 +65,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         preferCanvas: true, // Use canvas renderer for high feature counts
       });
 
-      // Add Cartographic Light Tile Layer with explicit OSM attribution
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19,
-      }).addTo(map);
-
-      // Add Zoom Control to bottom-right
       L.control.zoom({ position: 'bottomright' }).addTo(map);
-
       mapInstanceRef.current = map;
     }
 
@@ -82,6 +76,36 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       }
     };
   }, []);
+
+  // Sync Tile Layer (Light Carto vs Esri Satellite)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (tileLayerRef.current) {
+      tileLayerRef.current.remove();
+      tileLayerRef.current = null;
+    }
+
+    if (basemapMode === 'SATELLITE') {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+          maxZoom: 19,
+        }
+      ).addTo(map);
+    } else {
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; CARTO',
+          subdomains: 'abcd',
+          maxZoom: 19,
+        }
+      ).addTo(map);
+    }
+  }, [basemapMode]);
 
   // Sync OSM and Demo GeoJSON Layers asynchronously
   useEffect(() => {

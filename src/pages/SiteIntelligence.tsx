@@ -42,6 +42,9 @@ export const SiteIntelligence: React.FC = () => {
     'SOLAR_EV_CHARGING_HUB' | 'STANDALONE_EV_STATION' | 'ROOFTOP_SOLAR_ONLY' | 'BATTERY_STORAGE_SYSTEM'
   >('SOLAR_EV_CHARGING_HUB');
 
+  // Basemap View Mode Toggle (Light Carto Vector vs Esri Satellite Imagery)
+  const [basemapMode, setBasemapMode] = useState<'LIGHT' | 'SATELLITE'>('LIGHT');
+
   // Advanced Layers Drawer Visibility Toggle
   const [showAdvancedLayers, setShowAdvancedLayers] = useState<boolean>(false);
 
@@ -235,6 +238,32 @@ export const SiteIntelligence: React.FC = () => {
               </select>
             </div>
 
+            {/* Basemap Mode Switcher (Light Carto Vector vs Esri Satellite) */}
+            <div className="flex items-center bg-white border border-border-subtle rounded-lg p-0.5 shadow-xs">
+              <button
+                onClick={() => setBasemapMode('LIGHT')}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 ${
+                  basemapMode === 'LIGHT'
+                    ? 'bg-primary text-white shadow-xs'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-slate-50'
+                }`}
+              >
+                <span>🗺️</span>
+                <span>Light Vector</span>
+              </button>
+              <button
+                onClick={() => setBasemapMode('SATELLITE')}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 ${
+                  basemapMode === 'SATELLITE'
+                    ? 'bg-primary text-white shadow-xs'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-slate-50'
+                }`}
+              >
+                <span>🛰️</span>
+                <span>Satellite</span>
+              </button>
+            </div>
+
             {/* Advanced GIS Layers Toggle */}
             <button
               onClick={() => setShowAdvancedLayers((prev) => !prev)}
@@ -385,6 +414,7 @@ export const SiteIntelligence: React.FC = () => {
             onSelectSite={handleSelectSite}
             layers={layers}
             flyToLocation={flyToTarget}
+            basemapMode={basemapMode}
           />
         </div>
       </div>

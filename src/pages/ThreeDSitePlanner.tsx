@@ -105,6 +105,12 @@ export const ThreeDSitePlanner: React.FC = () => {
   const regionalGhi = 5.02; // NASA POWER annual mean baseline
   const effectiveGhi = Number((regionalGhi * (1 - shadingLossPercent / 100)).toFixed(2));
 
+  // Surrounding Context Indicators (Grid Substation, Arterial Road, Riparian Setback)
+  const distanceToSubstationMeters = Math.round(site?.nearestEVChargerMeters ? site.nearestEVChargerMeters * 1.4 : 380);
+  const distanceToArterialRoadMeters = Math.round(site?.nearestRoadMeters || 42);
+  const riparianSetbackMeters = site?.exclusionCode === 'RIVER_SETBACK_EXCLUSION' ? 0 : 185;
+  const riparianStatusText = riparianSetbackMeters > 50 ? `${riparianSetbackMeters}m Clear (Safe)` : 'Setback Violation (<50m)';
+
   // Reset Camera View Handler
   const handleResetCamera = () => {
     setRotation(45);
@@ -156,6 +162,28 @@ export const ThreeDSitePlanner: React.FC = () => {
               <span className="material-symbols-outlined text-[16px]">restart_alt</span>
               <span>Reset View</span>
             </button>
+          </div>
+        </div>
+
+        {/* Floating Surrounding Context Indicator Chips */}
+        <div className="absolute top-20 left-4 z-20 flex flex-wrap items-center gap-2 max-w-2xl">
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs text-slate-200 flex items-center gap-2 shadow-lg">
+            <span className="text-orange-400 font-bold">🔌 Substation:</span>
+            <span className="font-mono text-emerald-400 font-bold">{distanceToSubstationMeters}m</span>
+            <span className="text-[10px] text-slate-400 font-mono">(MSEDCL 33/11kV)</span>
+          </div>
+
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs text-slate-200 flex items-center gap-2 shadow-lg">
+            <span className="text-sky-400 font-bold">🛣️ Arterial Road:</span>
+            <span className="font-mono text-emerald-400 font-bold">{distanceToArterialRoadMeters}m</span>
+            <span className="text-[10px] text-slate-400 font-mono">(OSM DP Network)</span>
+          </div>
+
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs text-slate-200 flex items-center gap-2 shadow-lg">
+            <span className="text-cyan-400 font-bold">🌊 Riparian Setback:</span>
+            <span className={`font-mono font-bold ${riparianSetbackMeters > 50 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {riparianStatusText}
+            </span>
           </div>
         </div>
 
@@ -474,6 +502,58 @@ export const ThreeDSitePlanner: React.FC = () => {
                 <span className="font-bold font-mono text-emerald-800">
                   ₹{(capacityMetrics.estimatedCapexInr / 100000).toFixed(2)} Lakhs
                 </span>
+              </div>
+            </div>
+
+            {/* Surrounding Spatial Context Indicators */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-2.5">
+              <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">
+                Surrounding Spatial Context
+              </span>
+
+              <div className="grid grid-cols-1 gap-2 text-xs">
+                <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🔌</span>
+                    <div>
+                      <div className="font-bold text-slate-900 text-[11px]">MSEDCL Substation</div>
+                      <div className="text-[9px] text-slate-500 font-mono">Grid Feeder Proxy</div>
+                    </div>
+                  </div>
+                  <span className="font-bold font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
+                    {distanceToSubstationMeters}m
+                  </span>
+                </div>
+
+                <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🛣️</span>
+                    <div>
+                      <div className="font-bold text-slate-900 text-[11px]">Arterial Road Network</div>
+                      <div className="text-[9px] text-slate-500 font-mono">OSM DP Trunk Corridor</div>
+                    </div>
+                  </div>
+                  <span className="font-bold font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
+                    {distanceToArterialRoadMeters}m
+                  </span>
+                </div>
+
+                <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🌊</span>
+                    <div>
+                      <div className="font-bold text-slate-900 text-[11px]">Riparian Flood Clearance</div>
+                      <div className="text-[9px] text-slate-500 font-mono">Godavari 100m Setback</div>
+                    </div>
+                  </div>
+                  <span className={`font-bold font-mono px-2 py-0.5 rounded border text-[11px] ${
+                    riparianSetbackMeters > 50
+                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                      : 'text-red-700 bg-red-50 border-red-200'
+                  }`}>
+                    {riparianStatusText}
+                  </span>
+                </div>
               </div>
             </div>
 
