@@ -194,39 +194,93 @@ export const ThreeDSitePlanner: React.FC = () => {
                     {/* Grid Overlay */}
                     <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:12px_12px] opacity-20"></div>
 
-                    {/* Render Individual 3D Placed Infrastructure Component Blocks */}
+                    {/* Render Individual 3D Placed Infrastructure Component Blocks (Procedural 3D Primitives) */}
                     {(proposal?.placedComponents || [
                       { id: 'c1', type: 'SOLAR_CANOPY', name: 'Solar Carport Array A', xMeters: -8, yMeters: 6, widthMeters: 15, lengthMeters: 8, rotationDegrees: 0, specs: {} },
                       { id: 'c2', type: 'EV_CHARGER', name: 'DC Fast Charger Bay 1', xMeters: 8, yMeters: -6, widthMeters: 4, lengthMeters: 2, rotationDegrees: 0, specs: {} },
                       { id: 'c3', type: 'BESS_CONTAINER', name: 'BESS Storage Unit 1', xMeters: 10, yMeters: 7, widthMeters: 6, lengthMeters: 2.5, rotationDegrees: 0, specs: {} },
                       { id: 'c4', type: 'TRANSFORMER', name: 'Interconnect Kiosk', xMeters: -10, yMeters: -7, widthMeters: 3, lengthMeters: 3, rotationDegrees: 0, specs: {} },
                     ]).map((comp: IPlacedComponent) => {
-                      let compBg = 'bg-amber-600/40 border-amber-300 text-amber-200';
-                      let symbol = '☀️';
-                      if (comp.type === 'EV_CHARGER') {
-                        compBg = 'bg-sky-600/80 border-sky-300 text-sky-100';
-                        symbol = '🔌';
-                      } else if (comp.type === 'BESS_CONTAINER') {
-                        compBg = 'bg-purple-600/80 border-purple-300 text-purple-100';
-                        symbol = '🔋';
-                      } else if (comp.type === 'TRANSFORMER') {
-                        compBg = 'bg-red-600/80 border-red-300 text-red-100';
-                        symbol = '⚡';
+                      const widthPx = Math.max(38, comp.widthMeters * 3.8);
+                      const heightPx = Math.max(26, comp.lengthMeters * 3.8);
+                      const posX = comp.xMeters * 4.5;
+                      const posY = comp.yMeters * 3.2;
+
+                      if (comp.type === 'SOLAR_CANOPY') {
+                        return (
+                          <div
+                            key={comp.id}
+                            className="absolute rounded-lg border-2 border-amber-400 bg-slate-900 shadow-xl overflow-hidden flex flex-col justify-between p-1 group cursor-pointer"
+                            style={{
+                              width: `${widthPx}px`,
+                              height: `${heightPx}px`,
+                              transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
+                              boxShadow: '0 8px 15px rgba(0,0,0,0.5)',
+                            }}
+                          >
+                            {/* Solar PV Grid Pattern Texture */}
+                            <div className="w-full h-full rounded bg-[linear-gradient(45deg,#0284c7_25%,#0369a1_25%,#0369a1_50%,#0284c7_50%,#0284c7_75%,#0369a1_75%)] [background-size:6px_6px] opacity-90 border border-sky-400/40 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-white drop-shadow-md">☀️ 24kWp</span>
+                            </div>
+                            <span className="text-[8px] font-mono text-amber-300 font-bold truncate text-center">
+                              {comp.name.split(' ')[0]}
+                            </span>
+                          </div>
+                        );
                       }
 
+                      if (comp.type === 'EV_CHARGER') {
+                        return (
+                          <div
+                            key={comp.id}
+                            className="absolute rounded-md border-2 border-sky-400 bg-sky-950 shadow-lg flex items-center justify-between px-1.5 py-0.5 text-white cursor-pointer"
+                            style={{
+                              width: `${widthPx}px`,
+                              height: `${heightPx}px`,
+                              transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
+                            }}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span className="text-[9px] font-bold font-mono text-sky-200">🔌 120kW</span>
+                            <span className="text-[7px] text-sky-300 font-mono">2P</span>
+                          </div>
+                        );
+                      }
+
+                      if (comp.type === 'BESS_CONTAINER') {
+                        return (
+                          <div
+                            key={comp.id}
+                            className="absolute rounded-md border-2 border-purple-400 bg-purple-950 shadow-xl flex flex-col justify-between p-1 text-white cursor-pointer"
+                            style={{
+                              width: `${widthPx}px`,
+                              height: `${heightPx}px`,
+                              transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                              <span className="text-[8px] font-bold font-mono text-purple-200">🔋 BESS</span>
+                            </div>
+                            <span className="text-[7px] font-mono text-purple-300">250 kWh Container</span>
+                          </div>
+                        );
+                      }
+
+                      // Transformer Kiosk
                       return (
                         <div
                           key={comp.id}
-                          className={`absolute rounded-lg border flex flex-col items-center justify-center p-1 text-[9px] font-mono shadow-lg transition-all ${compBg}`}
+                          className="absolute rounded-md border-2 border-red-400 bg-red-950 shadow-lg flex items-center justify-center p-1 text-white cursor-pointer"
                           style={{
-                            width: `${Math.max(32, comp.widthMeters * 3.5)}px`,
-                            height: `${Math.max(22, comp.lengthMeters * 3.5)}px`,
-                            transform: `translate(${comp.xMeters * 4.5}px, ${comp.yMeters * 3.2}px) rotate(${comp.rotationDegrees || 0}deg)`,
+                            width: `${widthPx}px`,
+                            height: `${heightPx}px`,
+                            transform: `translate(${posX}px, ${posY}px) rotate(${comp.rotationDegrees || 0}deg)`,
                           }}
                         >
-                          <span className="font-bold flex items-center gap-0.5">
-                            <span>{symbol}</span>
-                            <span className="truncate max-w-[45px] text-[8px]">{comp.name.split(' ')[0]}</span>
+                          <span className="text-[9px] font-bold font-mono text-red-200 flex items-center gap-0.5">
+                            <span>⚡</span>
+                            <span>500kVA</span>
                           </span>
                         </div>
                       );
