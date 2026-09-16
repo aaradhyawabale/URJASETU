@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSiteById } from '../services/api/sites';
 import { createProposal } from '../services/api/proposals';
-import { CandidateSite, InfrastructureType } from '../types/site';
+import { CandidateSite, InfrastructureType, IPlacedComponent, ComponentType } from '../types/site';
 import { InteractivePlotDrawer } from '../gis/components/InteractivePlotDrawer';
 import { calculatePlotCapacityMetrics } from '../gis/utils/turfUtils';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
@@ -22,6 +22,116 @@ export const SitePlanningWorkspace: React.FC = () => {
   const [plotGeometry, setPlotGeometry] = useState<number[][][] | null>(null);
   const [selectedInfra, setSelectedInfra] = useState<InfrastructureType>('SOLAR_EV_CHARGING_HUB');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Stage 7: 2D Placed Components State
+  const [placedComponents, setPlacedComponents] = useState<IPlacedComponent[]>([
+    {
+      id: 'comp-solar-01',
+      type: 'SOLAR_CANOPY',
+      name: 'Solar Carport Array A',
+      xMeters: -10,
+      yMeters: 6,
+      widthMeters: 15,
+      lengthMeters: 8,
+      rotationDegrees: 0,
+      specs: { capacityKwp: 24, moduleCount: 60 },
+    },
+    {
+      id: 'comp-ev-01',
+      type: 'EV_CHARGER',
+      name: 'DC Fast Charger Bay 1',
+      xMeters: 10,
+      yMeters: -6,
+      widthMeters: 4,
+      lengthMeters: 2,
+      rotationDegrees: 0,
+      specs: { ports: 2, powerKw: 120 },
+    },
+    {
+      id: 'comp-bess-01',
+      type: 'BESS_CONTAINER',
+      name: 'BESS Storage Unit 1',
+      xMeters: 12,
+      yMeters: 8,
+      widthMeters: 6,
+      lengthMeters: 2.5,
+      rotationDegrees: 0,
+      specs: { capacityKwh: 250 },
+    },
+    {
+      id: 'comp-trans-01',
+      type: 'TRANSFORMER',
+      name: 'Interconnect Kiosk',
+      xMeters: -12,
+      yMeters: -8,
+      widthMeters: 3,
+      lengthMeters: 3,
+      rotationDegrees: 0,
+      specs: { ratingKva: 500 },
+    },
+  ]);
+
+  const handleAddComponent = (type: ComponentType) => {
+    const id = `comp-${type.toLowerCase()}-${Date.now()}`;
+    const offset = (placedComponents.length + 1) * 3;
+
+    let newComp: IPlacedComponent;
+    if (type === 'SOLAR_CANOPY') {
+      newComp = {
+        id,
+        type,
+        name: `Solar Array ${placedComponents.length + 1}`,
+        xMeters: -5 - offset,
+        yMeters: 5 + offset,
+        widthMeters: 15,
+        lengthMeters: 8,
+        rotationDegrees: 0,
+        specs: { capacityKwp: 24 },
+      };
+    } else if (type === 'EV_CHARGER') {
+      newComp = {
+        id,
+        type,
+        name: `EV Fast Charger ${placedComponents.length + 1}`,
+        xMeters: 5 + offset,
+        yMeters: -5 - offset,
+        widthMeters: 4,
+        lengthMeters: 2,
+        rotationDegrees: 0,
+        specs: { ports: 2, powerKw: 120 },
+      };
+    } else if (type === 'BESS_CONTAINER') {
+      newComp = {
+        id,
+        type,
+        name: `BESS Storage ${placedComponents.length + 1}`,
+        xMeters: 8 + offset,
+        yMeters: 6 + offset,
+        widthMeters: 6,
+        lengthMeters: 2.5,
+        rotationDegrees: 0,
+        specs: { capacityKwh: 250 },
+      };
+    } else {
+      newComp = {
+        id,
+        type,
+        name: `Transformer ${placedComponents.length + 1}`,
+        xMeters: -8 - offset,
+        yMeters: -6 - offset,
+        widthMeters: 3,
+        lengthMeters: 3,
+        rotationDegrees: 0,
+        specs: { ratingKva: 500 },
+      };
+    }
+
+    setPlacedComponents((prev) => [...prev, newComp]);
+  };
+
+  const handleRemoveComponent = (id: string) => {
+    setPlacedComponents((prev) => prev.filter((c) => c.id !== id));
+  };
 
   useEffect(() => {
     async function loadSite() {
@@ -79,6 +189,7 @@ export const SitePlanningWorkspace: React.FC = () => {
           siteLng={effectiveLng}
           siteCode={site?.code || 'NSK-CND-001'}
           siteName={site?.name || 'Nashik Candidate Site'}
+          placedComponents={placedComponents}
           onAreaChange={(newArea) => setPlotAreaSqm(newArea)}
           onPolygonChange={(ringCoordinates) => setPlotGeometry(ringCoordinates)}
         />
@@ -90,7 +201,9 @@ export const SitePlanningWorkspace: React.FC = () => {
           <div className="p-6 flex flex-col gap-5">
             <div className="flex items-center justify-between border-b border-border-subtle pb-4">
               <div>
-                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Site Planning Workspace</span>
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                  STEP 4: 2D PLOT DESIGNER
+                </span>
                 <h2 className="text-xl font-bold text-text-primary mt-0.5">{site.code}</h2>
               </div>
               <ScoreBadge score={site.opportunityScore} size="md" />
@@ -102,54 +215,104 @@ export const SitePlanningWorkspace: React.FC = () => {
               <p className="text-xs text-text-secondary mt-0.5">{site.ward || site.wardName || 'Nashik Municipal Corporation'}</p>
             </div>
 
-            {/* Infrastructure Type Selection */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-text-primary uppercase tracking-wider">
-                Select Infrastructure Model
-              </label>
+            {/* Stage 7: 2D Infrastructure Component Placement Palette */}
+            <div className="flex flex-col gap-2 bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
+                  2D Infrastructure Component Palette
+                </label>
+                <span className="text-[10px] font-mono font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
+                  {placedComponents.length} Placed
+                </span>
+              </div>
+              <p className="text-[11px] text-emerald-800">
+                Place typed infrastructure components on your drawn parcel canvas to simulate layout & capacity:
+              </p>
 
-              <div className="flex flex-col gap-2">
+              <div className="grid grid-cols-2 gap-2 mt-1">
                 <button
-                  onClick={() => setSelectedInfra('SOLAR_EV_CHARGING_HUB')}
-                  className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all ${
-                    selectedInfra === 'SOLAR_EV_CHARGING_HUB'
-                      ? 'bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-500/20'
-                      : 'bg-white border-border-subtle hover:bg-slate-50'
-                  }`}
+                  onClick={() => handleAddComponent('SOLAR_CANOPY')}
+                  className="px-2.5 py-1.5 bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-900 text-xs font-semibold rounded-lg text-left flex items-center gap-1.5 transition-colors shadow-2xs"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-text-primary">Solar-EV Charging Hub</span>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-semibold">
-                      Recommended
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-text-secondary">
-                    Integrated rooftop/canopy solar PV yield + DC fast charger bays + BESS buffer.
-                  </p>
+                  <span>☀️</span>
+                  <span>+ Solar Canopy</span>
                 </button>
-
                 <button
-                  onClick={() => setSelectedInfra('STANDALONE_EV_STATION')}
-                  className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all ${
-                    selectedInfra === 'STANDALONE_EV_STATION'
-                      ? 'bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-500/20'
-                      : 'bg-white border-border-subtle hover:bg-slate-50'
-                  }`}
+                  onClick={() => handleAddComponent('EV_CHARGER')}
+                  className="px-2.5 py-1.5 bg-white border border-sky-300 hover:bg-sky-100 text-sky-900 text-xs font-semibold rounded-lg text-left flex items-center gap-1.5 transition-colors shadow-2xs"
                 >
-                  <span className="text-xs font-bold text-text-primary">Standalone EV Fast Station</span>
-                  <p className="text-[11px] text-text-secondary">Grid-connected DC fast charger cluster without solar array.</p>
+                  <span>🔌</span>
+                  <span>+ EV Fast Charger</span>
+                </button>
+                <button
+                  onClick={() => handleAddComponent('BESS_CONTAINER')}
+                  className="px-2.5 py-1.5 bg-white border border-purple-300 hover:bg-purple-100 text-purple-900 text-xs font-semibold rounded-lg text-left flex items-center gap-1.5 transition-colors shadow-2xs"
+                >
+                  <span>🔋</span>
+                  <span>+ BESS Container</span>
+                </button>
+                <button
+                  onClick={() => handleAddComponent('TRANSFORMER')}
+                  className="px-2.5 py-1.5 bg-white border border-red-300 hover:bg-red-100 text-red-900 text-xs font-semibold rounded-lg text-left flex items-center gap-1.5 transition-colors shadow-2xs"
+                >
+                  <span>⚡</span>
+                  <span>+ Transformer</span>
                 </button>
               </div>
+
+              {/* Placed Component List */}
+              {placedComponents.length > 0 && (
+                <div className="flex flex-col gap-1 mt-2 pt-2 border-t border-emerald-200/80 max-h-36 overflow-y-auto">
+                  <span className="text-[10px] font-bold text-emerald-900 uppercase">Placed Layout Items:</span>
+                  {placedComponents.map((comp) => (
+                    <div
+                      key={comp.id}
+                      className="flex items-center justify-between bg-white px-2 py-1 rounded border border-emerald-200 text-xs"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px]">
+                          {comp.type === 'SOLAR_CANOPY'
+                            ? '☀️'
+                            : comp.type === 'EV_CHARGER'
+                            ? '🔌'
+                            : comp.type === 'BESS_CONTAINER'
+                            ? '🔋'
+                            : '⚡'}
+                        </span>
+                        <span className="font-semibold text-slate-800 text-[11px] truncate max-w-[170px]">
+                          {comp.name}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveComponent(comp.id)}
+                        className="text-slate-400 hover:text-red-600 font-bold text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Plot Area Summary Card */}
+            {/* Plot Area & Placed Component Capacity Summary Card */}
             {(() => {
-              const metrics = calculatePlotCapacityMetrics(plotAreaSqm);
+              const baseMetrics = calculatePlotCapacityMetrics(plotAreaSqm);
+              // Calculate custom aggregated capacity from placed components
+              const solarCanopies = placedComponents.filter((c) => c.type === 'SOLAR_CANOPY');
+              const evChargers = placedComponents.filter((c) => c.type === 'EV_CHARGER' || c.type === 'CHARGING_BAY');
+              const bessUnits = placedComponents.filter((c) => c.type === 'BESS_CONTAINER');
+
+              const totalSolarKwp = solarCanopies.length > 0 ? solarCanopies.length * 24 : baseMetrics.solarCapacityKwp;
+              const totalEvPorts = evChargers.length > 0 ? evChargers.length * 2 : baseMetrics.evChargerPorts;
+              const totalBessKwh = bessUnits.length > 0 ? bessUnits.length * 250 : baseMetrics.bessCapacityKwh;
+              const totalCapexInr = (totalSolarKwp * 45000) + (totalEvPorts * 800000) + (totalBessKwh * 18000);
+
               return (
                 <div className="p-4 rounded-xl bg-surface-subtle border border-border-subtle flex flex-col gap-3">
                   <div className="flex items-center justify-between border-b border-border-subtle pb-2">
                     <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
-                      Drawn Boundary Area & Capacity
+                      Drawn Parcel & Placed Capacity
                     </span>
                     <span className="text-xs font-mono font-bold text-primary">{plotAreaSqm.toLocaleString()} m²</span>
                   </div>
@@ -157,31 +320,33 @@ export const SitePlanningWorkspace: React.FC = () => {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
                       <span className="text-[9px] text-text-muted uppercase font-semibold">Solar PV Capacity</span>
-                      <span className="font-bold text-emerald-700">{metrics.solarCapacityKwp} kWp</span>
+                      <span className="font-bold text-emerald-700">{totalSolarKwp} kWp</span>
                     </div>
                     <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
                       <span className="text-[9px] text-text-muted uppercase font-semibold">Annual Generation</span>
-                      <span className="font-bold text-emerald-700">{metrics.annualGenerationMwh} MWh/yr</span>
+                      <span className="font-bold text-emerald-700">
+                        {((totalSolarKwp * 5.02 * 365 * 0.80) / 1000).toFixed(1)} MWh/yr
+                      </span>
                     </div>
                     <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
-                      <span className="text-[9px] text-text-muted uppercase font-semibold">EV Fast Charger Ports</span>
-                      <span className="font-bold text-sky-700">{metrics.evChargerPorts} Ports</span>
+                      <span className="text-[9px] text-text-muted uppercase font-semibold">EV Charger Ports</span>
+                      <span className="font-bold text-sky-700">{totalEvPorts} Ports</span>
                     </div>
                     <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
                       <span className="text-[9px] text-text-muted uppercase font-semibold">BESS Storage</span>
-                      <span className="font-bold text-purple-700">{metrics.bessCapacityKwh} kWh</span>
+                      <span className="font-bold text-purple-700">{totalBessKwh} kWh</span>
                     </div>
                   </div>
 
                   <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs">
                     <span className="text-[10px] font-bold text-emerald-900 uppercase">Estimated Civil Capex:</span>
                     <span className="font-bold font-mono text-emerald-800">
-                      ₹{(metrics.estimatedCapexInr / 100000).toFixed(2)} Lakhs
+                      ₹{(totalCapexInr / 100000).toFixed(2)} Lakhs
                     </span>
                   </div>
 
                   <p className="text-[10px] text-text-muted italic">
-                    Calculated from Turf.js geodesic polygon area & NASA POWER 5.02 kWh/m²/day GHI baseline. Classified as <strong>PLANNING_HEURISTIC</strong>.
+                    Calculated from Turf.js geodesic polygon area & {placedComponents.length} placed layout components. Classified as <strong>PLANNING_HEURISTIC</strong>.
                   </p>
                 </div>
               );

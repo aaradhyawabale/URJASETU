@@ -6,12 +6,15 @@ import { fetchOsmLayer } from '../services/osmService';
 import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
 import { calculatePolygonAreaSqm } from '../utils/turfUtils';
 
+import { IPlacedComponent } from '../../types/site';
+
 interface InteractivePlotDrawerProps {
   initialAreaSqm: number;
   siteLat?: number;
   siteLng?: number;
   siteCode?: string;
   siteName?: string;
+  placedComponents?: IPlacedComponent[];
   onAreaChange: (newAreaSqm: number) => void;
   onPolygonChange?: (ringGeoJson: number[][][]) => void;
 }
@@ -22,6 +25,7 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
   siteLng = 73.7898,
   siteCode = 'NSK-CND-001',
   siteName = 'Nashik Candidate Site',
+  placedComponents = [],
   onAreaChange,
   onPolygonChange,
 }) => {
@@ -324,6 +328,75 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
       }
     }
   }, [ringPts, isEditing, selectedNodeIdx, isValidGeometry]);
+
+  // Component Markers Layer Ref
+  const componentMarkersRef = useRef<L.Marker[]>([]);
+
+  // Render 2D Placed Infrastructure Component Markers on Leaflet Canvas
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // Clear previous component markers
+    componentMarkersRef.current.forEach((m) => m.remove());
+    componentMarkersRef.current = [];
+
+    const metersPerDegreeLat = 111139;
+    const metersPerDegreeLng = 111139 * Math.cos((siteLat * Math.PI) / 180);
+
+    placedComponents.forEach((comp) => {
+      const compLat = siteLat + comp.yMeters / metersPerDegreeLat;
+      const compLng = siteLng + comp.xMeters / metersPerDegreeLng;
+
+      let iconSymbol = '⚡';
+      let iconBg = '#059669';
+      if (comp.type === 'SOLAR_CANOPY') {
+        iconSymbol = '☀️';
+        iconBg = '#d97706';
+      } else if (comp.type === 'EV_CHARGER') {
+        iconSymbol = '🔌';
+        iconBg = '#0284c7';
+      } else if (comp.type === 'CHARGING_BAY') {
+        iconSymbol = '🅿️';
+        iconBg = '#2563eb';
+      } else if (comp.type === 'BESS_CONTAINER') {
+        iconSymbol = '🔋';
+        iconBg = '#7c3aed';
+      } else if (comp.type === 'TRANSFORMER') {
+        iconSymbol = '⚡';
+        iconBg = '#dc2626';
+      }
+
+      const compIcon = L.divIcon({
+        className: 'placed-component-marker',
+        html: `
+          <div style="background: ${iconBg}; color: white; border: 2px solid white; border-radius: 8px; padding: 3px 6px; display: flex; align-items: center; gap: 4px; font-family: Inter, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.25); white-space: nowrap;">
+            <span>${iconSymbol}</span>
+            <span>${comp.name}</span>
+          </div>
+        `,
+        iconSize: [110, 26],
+        iconAnchor: [55, 13],
+      });
+
+      const marker = L.marker([compLat, compLng], { icon: compIcon, zIndexOffset: 800 }).addTo(map);
+
+      marker.bindPopup(`
+        <div style="font-family: Inter, sans-serif; padding: 4px; max-width: 220px;">
+          <div style="font-size: 10px; font-weight: 700; color: ${iconBg}; text-transform: uppercase;">
+            ${comp.type.replace(/_/g, ' ')}
+          </div>
+          <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${comp.name}</div>
+          <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+            <div>Footprint: <strong>${comp.widthMeters}m × ${comp.lengthMeters}m</strong></div>
+            <div>Offset: <strong>X: ${comp.xMeters}m, Y: ${comp.yMeters}m</strong></div>
+          </div>
+        </div>
+      `);
+
+      componentMarkersRef.current.push(marker);
+    });
+  }, [placedComponents, siteLat, siteLng]);
 
   // Preset Handlers
   const handleApplyPreset = (presetType: 'SQUARE' | 'RECTANGLE' | 'L_SHAPE' | 'CORRIDOR') => {

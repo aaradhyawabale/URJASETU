@@ -14,6 +14,25 @@ export type InfrastructureType =
   | 'ROOFTOP_SOLAR_ONLY'
   | 'BATTERY_STORAGE_SYSTEM';
 
+export type ComponentType =
+  | 'SOLAR_CANOPY'
+  | 'EV_CHARGER'
+  | 'CHARGING_BAY'
+  | 'BESS_CONTAINER'
+  | 'TRANSFORMER';
+
+export interface IPlacedComponent {
+  id: string;
+  type: ComponentType;
+  name: string;
+  xMeters: number; // Offset from plot center (meters)
+  yMeters: number; // Offset from plot center (meters)
+  widthMeters: number;
+  lengthMeters: number;
+  rotationDegrees: number;
+  specs: Record<string, number | string>;
+}
+
 export interface SiteMetrics {
   solarSuitability: number; // 0 - 100
   evDemandProxy: number; // 0 - 100
