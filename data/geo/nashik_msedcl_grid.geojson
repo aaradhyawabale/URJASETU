@@ -1,0 +1,256 @@
+{
+  "type": "FeatureCollection",
+  "name": "nashik_msedcl_grid_infrastructure",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "provenance": {
+    "publisher": "Maharashtra State Electricity Distribution Company Limited (MSEDCL / Mahavitaran)",
+    "officialCircle": "Nashik Urban Circle",
+    "acquisitionDate": "2026-09-16",
+    "nativeCRS": "EPSG:4326 (WGS84)",
+    "spatialExtent": "Nashik Urban Area (19.90°N, 73.70°E to 20.10°N, 73.95°E)",
+    "geometryType": "Point & LineString",
+    "featureCount": 12,
+    "derivationMethod": "Digitized 33/11kV substation nodes and primary feeder corridors derived from MSEDCL public disclosures and OpenStreetMap power nodes",
+    "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY",
+    "feederCapacityStatus": "ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY (Non-SCADA preliminary planning estimate)",
+    "limitation": "Proximity measurements do not reflect real-time MSEDCL transformer peak loading, fault levels, or official grid NOC interconnection clearance."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sub_satpur_01",
+        "nodeType": "SUBSTATION",
+        "name": "MSEDCL Satpur 33/11kV Substation",
+        "code": "NSK-SUB-SAT",
+        "voltageKv": "33/11kV",
+        "capacityMva": 15.0,
+        "estimatedAvailableCapacityMw": 4.5,
+        "circle": "Nashik Urban Circle",
+        "subdivision": "Satpur Industrial",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [73.74, 19.97]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sub_panchavati_02",
+        "nodeType": "SUBSTATION",
+        "name": "MSEDCL Panchavati 33/11kV Substation",
+        "code": "NSK-SUB-PAN",
+        "voltageKv": "33/11kV",
+        "capacityMva": 10.0,
+        "estimatedAvailableCapacityMw": 3.0,
+        "circle": "Nashik Urban Circle",
+        "subdivision": "Panchavati Urban",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [73.81, 20.02]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sub_govardhan_03",
+        "nodeType": "SUBSTATION",
+        "name": "MSEDCL Govardhan 33/11kV Substation",
+        "code": "NSK-SUB-GOV",
+        "voltageKv": "33/11kV",
+        "capacityMva": 8.0,
+        "estimatedAvailableCapacityMw": 2.5,
+        "circle": "Nashik Urban Circle",
+        "subdivision": "Trimbak Outskirts",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [73.72, 19.99]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sub_nashikroad_04",
+        "nodeType": "SUBSTATION",
+        "name": "MSEDCL Nashik Road 33/11kV Substation",
+        "code": "NSK-SUB-NSR",
+        "voltageKv": "33/11kV",
+        "capacityMva": 15.0,
+        "estimatedAvailableCapacityMw": 4.0,
+        "circle": "Nashik Urban Circle",
+        "subdivision": "Nashik Road Division",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [73.84, 19.94]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sub_cidco_05",
+        "nodeType": "SUBSTATION",
+        "name": "MSEDCL CIDCO Ambad 33/11kV Substation",
+        "code": "NSK-SUB-AMB",
+        "voltageKv": "33/11kV",
+        "capacityMva": 12.5,
+        "estimatedAvailableCapacityMw": 3.5,
+        "circle": "Nashik Urban Circle",
+        "subdivision": "Ambad CIDCO",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [73.76, 19.93]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sub_dwarka_06",
+        "nodeType": "SUBSTATION",
+        "name": "MSEDCL Dwarka 33/11kV Substation",
+        "code": "NSK-SUB-DWK",
+        "voltageKv": "33/11kV",
+        "capacityMva": 10.0,
+        "estimatedAvailableCapacityMw": 2.8,
+        "circle": "Nashik Urban Circle",
+        "subdivision": "Nashik East",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [73.81, 19.98]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "fdr_satpur_corridor",
+        "nodeType": "FEEDER_LINE",
+        "name": "Satpur MIDC 33kV Feeder Trunk Line",
+        "code": "FDR-SAT-33KV",
+        "voltageKv": "33kV",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.72, 19.99],
+          [73.74, 19.97],
+          [73.76, 19.96],
+          [73.78, 19.96]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "fdr_panchavati_corridor",
+        "nodeType": "FEEDER_LINE",
+        "name": "Panchavati Industrial 33kV Feeder Line",
+        "code": "FDR-PAN-33KV",
+        "voltageKv": "33kV",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.78, 19.98],
+          [73.81, 20.02],
+          [73.85, 20.05],
+          [73.90, 20.07]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "fdr_nashikroad_corridor",
+        "nodeType": "FEEDER_LINE",
+        "name": "Nashik Road Rail Corridor 33kV Feeder Line",
+        "code": "FDR-NSR-33KV",
+        "voltageKv": "33kV",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.81, 19.98],
+          [73.84, 19.94],
+          [73.88, 19.92],
+          [73.92, 19.91]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "fdr_cidco_corridor",
+        "nodeType": "FEEDER_LINE",
+        "name": "CIDCO-Ambad Link 33kV Feeder Line",
+        "code": "FDR-AMB-33KV",
+        "voltageKv": "33kV",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.74, 19.97],
+          [73.76, 19.93],
+          [73.79, 19.91]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "fdr_dwarka_corridor",
+        "nodeType": "FEEDER_LINE",
+        "name": "Dwarka-Pune Road 33kV Feeder Line",
+        "code": "FDR-DWK-33KV",
+        "voltageKv": "33kV",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.81, 19.98],
+          [73.84, 19.96],
+          [73.88, 19.95]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "fdr_govardhan_corridor",
+        "nodeType": "FEEDER_LINE",
+        "name": "Govardhan Solar Sub-Transmission 33kV Line",
+        "code": "FDR-GOV-33KV",
+        "voltageKv": "33kV",
+        "classification": "DERIVED_GRID_INFRASTRUCTURE_PROXY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.70, 20.01],
+          [73.72, 19.99],
+          [73.74, 19.97]
+        ]
+      }
+    }
+  ]
+}

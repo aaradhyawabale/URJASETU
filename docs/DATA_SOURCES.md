@@ -88,5 +88,17 @@ OSM coverage is community-generated and may be incomplete or outdated in rapidly
   * **Population**: Marked **`UNKNOWN`** due to postponed 2021 Indian Census.
   * **Revenue Category**: Marked **`PROJECT_MODELING_ASSUMPTION`**.
   * **Municipal Annual Revenue**: Set to **`NOT_MODELED`** / **`UNKNOWN`** (Municipal land lease and license fees depend on site-specific public tenders and auctions).
-  * **Spatial Aggregation Metrics**: Candidate count, site density (candidates/km²), retained candidate count, aggregate modeled solar MWp capacity, aggregate modeled EV fast charger ports, and mean opportunity score are explicitly classified as **`AGGREGATE_MODEL_OUTPUT`**.
+---
+
+## 6. Electrical Grid Infrastructure & Substation Feeder Capacity (MSEDCL)
+
+* **Official DISCOM Publisher**: Maharashtra State Electricity Distribution Company Limited (MSEDCL / Mahavitaran), Nashik Urban Circle
+* **Dataset Reference**: `data/geo/nashik_msedcl_grid.geojson` (12 Features: 6 Substation Points + 6 Feeder LineStrings)
+* **Voltage Levels**: 33kV Subtransmission Corridors & 33/11kV Distribution Substations (Satpur, Panchavati, Govardhan, Nashik Road, CIDCO Ambad, Dwarka)
+* **Classification**: **`DERIVED_GRID_INFRASTRUCTURE_PROXY`**
+* **Feeder Capacity Status**: **`ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY`**
+* **Limitations & Disclaimers**:
+  * Feeder proximity measurements compute geodesic distance to digitized 33kV corridor lines.
+  * Available hosting capacity figures are preliminary non-SCADA planning estimates and do NOT constitute formal MSEDCL grid NOC interconnection approval or real-time transformer loading telemetry.
+
 

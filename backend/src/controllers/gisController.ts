@@ -4,6 +4,7 @@ import path from 'path';
 import { ClimateService } from '../services/climateService.js';
 import { ElevationService } from '../services/elevationService.js';
 import { RiskService } from '../services/riskService.js';
+import { GridService } from '../services/gridService.js';
 
 // In-memory cache for parsed GeoJSON layers to prevent redundant file parsing
 const geojsonCache: Record<string, any> = {};
@@ -207,6 +208,31 @@ export const getSpatialIndicators = (req: Request, res: Response) => {
     },
   });
 };
+
+export const getMsedclGridAnalysis = async (req: Request, res: Response) => {
+  try {
+    const lat = req.query.lat ? parseFloat(req.query.lat as string) : 19.9975;
+    const lng = req.query.lng ? parseFloat(req.query.lng as string) : 73.7898;
+
+    const geojson = GridService.getMsedclGridGeoJson();
+    const proximity = GridService.evaluateGridProximity(lat, lng);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        coordinates: { latitude: lat, longitude: lng },
+        proximity,
+        geojson,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'GRID_ANALYSIS_FAILED', message: (err as Error).message },
+    });
+  }
+};
+
 
 function calculateHaversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000;

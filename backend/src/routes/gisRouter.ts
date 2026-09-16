@@ -6,6 +6,7 @@ import {
   getSolarClimatology,
   getElevationAnalysis,
   getHydrologicalAnalysis,
+  getMsedclGridAnalysis,
 } from '../controllers/gisController.js';
 import {
   getCandidates,
@@ -22,6 +23,7 @@ gisRouter.get('/gis/osm/:layer', getOsmLayer);
 gisRouter.get('/gis/solar/climatology', getSolarClimatology);
 gisRouter.get('/gis/elevation', getElevationAnalysis);
 gisRouter.get('/gis/hydrology', getHydrologicalAnalysis);
+gisRouter.get('/gis/grid', getMsedclGridAnalysis);
 gisRouter.get('/gis/wards', getAdministrativeDivisions);
 gisRouter.get('/gis/wards/aggregation', getDivisionAggregation);
 gisRouter.post('/gis/indicators', getSpatialIndicators);
