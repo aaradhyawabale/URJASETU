@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import * as turf from '@turf/turf';
+import { fetchOsmLayer } from '../services/osmService';
+import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
 import { calculatePolygonAreaSqm } from '../utils/turfUtils';
 
 interface InteractivePlotDrawerProps {
@@ -17,172 +21,414 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
   siteLat = 19.9975,
   siteLng = 73.7898,
   siteCode = 'NSK-CND-001',
-  siteName = 'Govardhan Candidate Site',
+  siteName = 'Nashik Candidate Site',
   onAreaChange,
   onPolygonChange,
 }) => {
-  // Nodes in SVG coordinate space (1000 x 650 viewport)
-  const [nodes, setNodes] = useState<Array<{ x: number; y: number }>>([
-    { x: 300, y: 180 },
-    { x: 650, y: 180 },
-    { x: 620, y: 450 },
-    { x: 320, y: 420 },
-  ]);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const polygonLayerRef = useRef<L.Polygon | null>(null);
+  const vertexMarkersRef = useRef<L.Marker[]>([]);
+  const edgeLabelsRef = useRef<L.Marker[]>([]);
+  const osmGroupRef = useRef<L.LayerGroup | null>(null);
+
+  // WGS84 GeoJSON Ring Points: Array of [lng, lat]
+  const [ringPts, setRingPts] = useState<Array<[number, number]>>(() => {
+    // Generate default square polygon around (siteLat, siteLng) ~2450 m2
+    const dLat = 0.00022; // ~25m
+    const dLng = 0.00024; // ~25m
+    return [
+      [siteLng - dLng, siteLat + dLat],
+      [siteLng + dLng, siteLat + dLat],
+      [siteLng + dLng, siteLat - dLat],
+      [siteLng - dLng, siteLat - dLat],
+    ];
+  });
 
   const [isEditing, setIsEditing] = useState<boolean>(true);
+  const [isClickToAdd, setIsClickToAdd] = useState<boolean>(false);
   const [selectedNodeIdx, setSelectedNodeIdx] = useState<number | null>(null);
+  const [layersVisibility, setLayersVisibility] = useState({
+    roads: true,
+    buildings: true,
+    ev: true,
+  });
 
-  // Convert SVG canvas coordinates to real WGS84 GeoJSON polygon coordinates centered around (siteLat, siteLng)
-  const getGeoJsonCoordinates = (canvasNodes: typeof nodes): number[][][] => {
-    // 100 SVG units approx 0.00045 degrees (~50 meters)
-    const ring = canvasNodes.map((n) => {
-      const lngOffset = ((n.x - 500) / 100) * 0.00045;
-      const latOffset = ((325 - n.y) / 100) * 0.00045;
-      return [
-        Number((siteLng + lngOffset).toFixed(6)),
-        Number((siteLat + latOffset).toFixed(6)),
-      ];
-    });
-    // Close polygon ring
-    ring.push(ring[0]);
-    return [ring];
+  // Calculate Turf.js geodesic metrics
+  const getGeoJsonCoordinates = (pts: Array<[number, number]>): number[][][] => {
+    if (pts.length < 3) return [[[]]];
+    const closed = [...pts, pts[0]];
+    return [closed];
   };
 
-  // Recalculate Turf.js geodesic area and segment lengths whenever nodes change
-  const computePlotGeometry = (currentNodes: typeof nodes) => {
-    const geoJsonRing = getGeoJsonCoordinates(currentNodes);
-    const calculatedArea = calculatePolygonAreaSqm(geoJsonRing);
+  const geoJsonRing = getGeoJsonCoordinates(ringPts);
+  const calculatedAreaSqm = ringPts.length >= 3 ? calculatePolygonAreaSqm(geoJsonRing) : 0;
+  const areaHectares = (calculatedAreaSqm / 10000).toFixed(3);
+  const areaAcres = (calculatedAreaSqm / 4046.86).toFixed(3);
 
-    // Calculate perimeter and edge lengths using Turf.js distance
-    const ringPts = geoJsonRing[0];
-    let totalPerimeterMeters = 0;
-    const segmentLengthsMeters: number[] = [];
+  // Check self-intersection using Turf.js kinks
+  const hasKinks = (() => {
+    if (ringPts.length < 4) return false;
+    try {
+      const poly = turf.polygon(geoJsonRing);
+      const kinks = turf.kinks(poly);
+      return kinks.features.length > 0;
+    } catch {
+      return true;
+    }
+  })();
 
-    for (let i = 0; i < ringPts.length - 1; i++) {
-      const from = turf.point(ringPts[i]);
-      const to = turf.point(ringPts[i + 1]);
+  const isValidGeometry = ringPts.length >= 3 && calculatedAreaSqm > 0 && !hasKinks;
+
+  // Segment edge lengths (meters)
+  const segmentLengthsMeters = (() => {
+    if (ringPts.length < 2) return [];
+    const closed = [...ringPts, ringPts[0]];
+    const lengths: number[] = [];
+    for (let i = 0; i < closed.length - 1; i++) {
+      const from = turf.point(closed[i]);
+      const to = turf.point(closed[i + 1]);
       const distKm = turf.distance(from, to, { units: 'kilometers' });
-      const distM = Math.round(distKm * 1000);
-      segmentLengthsMeters.push(distM);
-      totalPerimeterMeters += distM;
+      lengths.push(Math.round(distKm * 1000));
+    }
+    return lengths;
+  })();
+
+  const totalPerimeterMeters = segmentLengthsMeters.reduce((a, b) => a + b, 0);
+
+  // Notify parent component of valid area changes
+  useEffect(() => {
+    if (isValidGeometry) {
+      onAreaChange(calculatedAreaSqm);
+      if (onPolygonChange) onPolygonChange(geoJsonRing);
+    }
+  }, [calculatedAreaSqm, isValidGeometry]);
+
+  // Initialize Leaflet Map
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    if (!mapInstanceRef.current) {
+      const map = L.map(mapContainerRef.current, {
+        center: [siteLat, siteLng],
+        zoom: 18,
+        zoomControl: false,
+        preferCanvas: true,
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20,
+      }).addTo(map);
+
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      // Add Site Location Reference Marker
+      const siteIcon = L.divIcon({
+        className: 'site-center-pin',
+        html: `
+          <div style="display: flex; align-items: center; gap: 4px; background: #059669; color: white; padding: 2px 8px; border-radius: 12px; border: 2px solid white; font-weight: bold; font-size: 11px; font-family: Inter, sans-serif; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            <span>📍</span>
+            <span>${siteCode}</span>
+          </div>
+        `,
+        iconSize: [80, 24],
+        iconAnchor: [40, 12],
+      });
+      L.marker([siteLat, siteLng], { icon: siteIcon, zIndexOffset: 1000 }).addTo(map);
+
+      // Initialize Layer Group for OSM Overlays
+      const osmGroup = L.layerGroup().addTo(map);
+      osmGroupRef.current = osmGroup;
+
+      mapInstanceRef.current = map;
     }
 
-    onAreaChange(calculatedArea > 0 ? calculatedArea : initialAreaSqm);
-    if (onPolygonChange) onPolygonChange(geoJsonRing);
-
-    return { calculatedArea, segmentLengthsMeters, totalPerimeterMeters };
-  };
-
-  const { calculatedArea, segmentLengthsMeters, totalPerimeterMeters } = computePlotGeometry(nodes);
-
-  const handleNodeDrag = (index: number, newX: number, newY: number) => {
-    const updated = [...nodes];
-    updated[index] = {
-      x: Math.max(100, Math.min(900, newX)),
-      y: Math.max(80, Math.min(570, newY)),
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
-    setNodes(updated);
+  }, [siteLat, siteLng, siteCode]);
+
+  // Map Click Listener for "Add Point" mode
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
+      if (isClickToAdd && ringPts.length < 12) {
+        const newLng = Number(e.latlng.lng.toFixed(6));
+        const newLat = Number(e.latlng.lat.toFixed(6));
+        setRingPts((prev) => [...prev, [newLng, newLat]]);
+      }
+    };
+
+    map.on('click', handleMapClick);
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [isClickToAdd, ringPts.length]);
+
+  // Sync OSM Layers on Map
+  useEffect(() => {
+    const osmGroup = osmGroupRef.current;
+    if (!osmGroup) return;
+
+    osmGroup.clearLayers();
+
+    if (layersVisibility.roads) {
+      fetchOsmLayer('roads').then((data) => {
+        if (data && osmGroupRef.current) {
+          const roadLayer = L.geoJSON(data as any, {
+            style: { color: '#0284c7', weight: 3, opacity: 0.7 },
+          });
+          osmGroupRef.current.addLayer(roadLayer);
+        }
+      });
+    }
+
+    if (layersVisibility.buildings) {
+      fetchOsmLayer('buildings').then((data) => {
+        if (data && osmGroupRef.current) {
+          const bldgLayer = L.geoJSON(data as any, {
+            style: { fillColor: '#64748b', fillOpacity: 0.35, weight: 1, color: '#475569' },
+          });
+          osmGroupRef.current.addLayer(bldgLayer);
+        }
+      });
+    }
+
+    if (layersVisibility.ev) {
+      fetchOsmLayer('ev').then((data) => {
+        if (data && osmGroupRef.current) {
+          const evLayer = L.geoJSON(data as any, {
+            pointToLayer: (_, latlng) =>
+              L.circleMarker(latlng, { radius: 5, fillColor: '#059669', color: '#fff', weight: 1.5, fillOpacity: 1 }),
+          });
+          osmGroupRef.current.addLayer(evLayer);
+        }
+      });
+    }
+  }, [layersVisibility]);
+
+  // Redraw Drawn Polygon & Draggable Vertex Markers on Leaflet Map
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // 1. Update Polygon Layer
+    if (polygonLayerRef.current) {
+      polygonLayerRef.current.remove();
+      polygonLayerRef.current = null;
+    }
+
+    const leafletLatLngs = ringPts.map(([lng, lat]) => [lat, lng] as [number, number]);
+
+    if (leafletLatLngs.length >= 3) {
+      const polygonColor = isValidGeometry ? '#059669' : '#dc2626';
+      const poly = L.polygon(leafletLatLngs, {
+        color: polygonColor,
+        weight: 3.5,
+        fillColor: polygonColor,
+        fillOpacity: 0.25,
+        lineJoin: 'round',
+      }).addTo(map);
+
+      polygonLayerRef.current = poly;
+    }
+
+    // 2. Update Vertex Markers
+    vertexMarkersRef.current.forEach((m) => m.remove());
+    vertexMarkersRef.current = [];
+
+    ringPts.forEach(([lng, lat], idx) => {
+      const isSelected = selectedNodeIdx === idx;
+      const markerColor = isSelected ? '#d97706' : isValidGeometry ? '#059669' : '#dc2626';
+
+      const icon = L.divIcon({
+        className: 'vertex-node-marker',
+        html: `
+          <div style="width: ${isSelected ? '22px' : '18px'}; height: ${isSelected ? '22px' : '18px'}; border-radius: 50%; background-color: ${markerColor}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 800; font-size: 10px; font-family: monospace; box-shadow: 0 2px 6px rgba(0,0,0,0.3); cursor: ${
+          isEditing ? 'grab' : 'default'
+        };">
+            ${idx + 1}
+          </div>
+        `,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+      });
+
+      const marker = L.marker([lat, lng], {
+        icon,
+        draggable: isEditing,
+        zIndexOffset: 500 + idx,
+      }).addTo(map);
+
+      marker.on('click', () => {
+        setSelectedNodeIdx(idx);
+      });
+
+      marker.on('drag', (e) => {
+        const newPos = (e.target as L.Marker).getLatLng();
+        setRingPts((prev) => {
+          const updated = [...prev];
+          updated[idx] = [Number(newPos.lng.toFixed(6)), Number(newPos.lat.toFixed(6))];
+          return updated;
+        });
+      });
+
+      vertexMarkersRef.current.push(marker);
+    });
+
+    // 3. Update Segment Edge Distance Labels
+    edgeLabelsRef.current.forEach((m) => m.remove());
+    edgeLabelsRef.current = [];
+
+    if (ringPts.length >= 2) {
+      const closed = [...ringPts, ringPts[0]];
+      for (let i = 0; i < closed.length - 1; i++) {
+        const p1 = closed[i];
+        const p2 = closed[i + 1];
+        const midLng = (p1[0] + p2[0]) / 2;
+        const midLat = (p1[1] + p2[1]) / 2;
+        const distM = segmentLengthsMeters[i] || 0;
+
+        const labelIcon = L.divIcon({
+          className: 'edge-length-label',
+          html: `
+            <div style="background: white; border: 1px solid #059669; color: #047857; font-size: 10px; font-weight: bold; font-family: monospace; padding: 1px 4px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); white-space: nowrap;">
+              ${distM}m
+            </div>
+          `,
+          iconSize: [40, 16],
+          iconAnchor: [20, 8],
+        });
+
+        const labelMarker = L.marker([midLat, midLng], { icon: labelIcon, interactive: false }).addTo(map);
+        edgeLabelsRef.current.push(labelMarker);
+      }
+    }
+  }, [ringPts, isEditing, selectedNodeIdx, isValidGeometry]);
+
+  // Preset Handlers
+  const handleApplyPreset = (presetType: 'SQUARE' | 'RECTANGLE' | 'L_SHAPE' | 'CORRIDOR') => {
+    let newPts: Array<[number, number]> = [];
+
+    if (presetType === 'SQUARE') {
+      const d = 0.00022; // ~2450 m2
+      newPts = [
+        [siteLng - d, siteLat + d],
+        [siteLng + d, siteLat + d],
+        [siteLng + d, siteLat - d],
+        [siteLng - d, siteLat - d],
+      ];
+    } else if (presetType === 'RECTANGLE') {
+      const dLat = 0.00032; // ~5000 m2
+      const dLng = 0.00018;
+      newPts = [
+        [siteLng - dLng, siteLat + dLat],
+        [siteLng + dLng, siteLat + dLat],
+        [siteLng + dLng, siteLat - dLat],
+        [siteLng - dLng, siteLat - dLat],
+      ];
+    } else if (presetType === 'L_SHAPE') {
+      const d = 0.00025; // ~3600 m2
+      newPts = [
+        [siteLng - d, siteLat + d],
+        [siteLng + d, siteLat + d],
+        [siteLng + d, siteLat],
+        [siteLng, siteLat],
+        [siteLng, siteLat - d],
+        [siteLng - d, siteLat - d],
+      ];
+    } else if (presetType === 'CORRIDOR') {
+      const dLat = 0.00012; // ~1800 m2
+      const dLng = 0.00045;
+      newPts = [
+        [siteLng - dLng, siteLat + dLat],
+        [siteLng + dLng, siteLat + dLat],
+        [siteLng + dLng, siteLat - dLat],
+        [siteLng - dLng, siteLat - dLat],
+      ];
+    }
+
+    setRingPts(newPts);
+    setSelectedNodeIdx(null);
+    setIsClickToAdd(false);
   };
 
-  const handleAddVertex = () => {
-    if (nodes.length >= 8) return;
-    // Insert new vertex midpoint between last and first node
-    const last = nodes[nodes.length - 1];
-    const first = nodes[0];
-    const midX = Math.round((last.x + first.x) / 2 + 30);
-    const midY = Math.round((last.y + first.y) / 2 + 30);
-    const updated = [...nodes, { x: midX, y: midY }];
-    setNodes(updated);
-  };
-
-  const handleDeleteVertex = (index: number) => {
-    if (nodes.length <= 3) return; // Keep at least 3 vertices for a valid polygon
-    const updated = nodes.filter((_, idx) => idx !== index);
-    setNodes(updated);
+  const handleRemoveSelectedNode = () => {
+    if (selectedNodeIdx === null || ringPts.length <= 3) return;
+    setRingPts((prev) => prev.filter((_, idx) => idx !== selectedNodeIdx));
     setSelectedNodeIdx(null);
   };
 
-  const handleApplyPreset = (presetType: 'RECTANGLE' | 'L_SHAPE' | 'EXPANDED') => {
-    if (presetType === 'RECTANGLE') {
-      setNodes([
-        { x: 300, y: 200 },
-        { x: 650, y: 200 },
-        { x: 650, y: 420 },
-        { x: 300, y: 420 },
-      ]);
-    } else if (presetType === 'L_SHAPE') {
-      setNodes([
-        { x: 280, y: 180 },
-        { x: 650, y: 180 },
-        { x: 650, y: 320 },
-        { x: 480, y: 320 },
-        { x: 480, y: 450 },
-        { x: 280, y: 450 },
-      ]);
-    } else if (presetType === 'EXPANDED') {
-      setNodes([
-        { x: 220, y: 150 },
-        { x: 750, y: 150 },
-        { x: 720, y: 480 },
-        { x: 250, y: 450 },
-      ]);
-    }
+  const handleClearPlot = () => {
+    setRingPts([]);
+    setSelectedNodeIdx(null);
+    setIsClickToAdd(true);
   };
-
-  const polygonPointsString = nodes.map((n) => `${n.x},${n.y}`).join(' ');
 
   return (
     <div className="w-full h-full relative select-none flex flex-col justify-between">
-      {/* Control Strip Overlay Header */}
+      {/* Top Floating Control Bar */}
       <div className="absolute top-4 left-4 right-4 z-20 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl border border-border-subtle shadow-md flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-[22px]">polyline</span>
             <span className="text-xs font-bold text-text-primary uppercase tracking-wider">
-              2D Geodesic Parcel Drawer
+              Interactive 2D Geodesic Parcel Drawer
             </span>
           </div>
 
           <span className="text-xs text-text-muted">|</span>
 
-          <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg">
+          {/* Area & Perimeter Badge */}
+          <div className={`flex items-center gap-2 text-xs px-3 py-1 rounded-lg border ${
+            isValidGeometry ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-red-50 border-red-200 text-red-900'
+          }`}>
             <span>Turf.js Geodesic Area:</span>
-            <span className="font-bold text-primary font-mono text-sm">
-              {calculatedArea.toLocaleString()} m²
+            <span className="font-bold font-mono text-sm">
+              {calculatedAreaSqm.toLocaleString()} m²
             </span>
+            <span className="text-[11px] opacity-80 font-mono">({areaHectares} ha / {areaAcres} ac)</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-surface-subtle border border-border-subtle px-2.5 py-1 rounded-lg">
+          <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-surface-subtle border border-border-subtle px-2.5 py-1 rounded-lg font-mono">
             <span>Perimeter:</span>
-            <span className="font-bold text-text-primary font-mono">{totalPerimeterMeters} m</span>
+            <span className="font-bold text-text-primary">{totalPerimeterMeters} m</span>
           </div>
         </div>
 
         {/* Action Controls & Presets */}
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setIsClickToAdd(!isClickToAdd)}
+            className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1 shadow-xs ${
+              isClickToAdd ? 'bg-emerald-600 text-white animate-pulse' : 'bg-surface-subtle border border-border-subtle text-text-primary hover:bg-slate-100'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[16px]">add_location_alt</span>
+            <span>{isClickToAdd ? 'Click Map to Add Node' : 'Add Node on Map'}</span>
+          </button>
+
+          <button
             onClick={() => setIsEditing(!isEditing)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 shadow-xs ${
+            className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1 shadow-xs ${
               isEditing ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-primary text-white hover:bg-emerald-700'
             }`}
           >
             <span className="material-symbols-outlined text-[16px]">{isEditing ? 'lock' : 'edit'}</span>
-            <span>{isEditing ? 'Lock Nodes' : 'Edit Nodes'}</span>
-          </button>
-
-          <button
-            onClick={handleAddVertex}
-            disabled={nodes.length >= 8}
-            className="text-xs px-2.5 py-1.5 rounded-lg bg-surface-subtle border border-border-subtle hover:bg-slate-100 text-text-secondary font-semibold disabled:opacity-50 transition-colors flex items-center gap-1"
-          >
-            <span className="material-symbols-outlined text-[16px]">add</span>
-            <span>Add Node ({nodes.length}/8)</span>
+            <span>{isEditing ? 'Lock Vertices' : 'Edit Vertices'}</span>
           </button>
 
           {selectedNodeIdx !== null && (
             <button
-              onClick={() => handleDeleteVertex(selectedNodeIdx)}
-              disabled={nodes.length <= 3}
+              onClick={handleRemoveSelectedNode}
+              disabled={ringPts.length <= 3}
               className="text-xs px-2.5 py-1.5 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 text-red-700 font-semibold disabled:opacity-50 transition-colors flex items-center gap-1"
             >
               <span className="material-symbols-outlined text-[16px]">delete</span>
@@ -190,14 +436,28 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
             </button>
           )}
 
+          <button
+            onClick={handleClearPlot}
+            className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 font-semibold transition-colors flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+            <span>Clear / Reset</span>
+          </button>
+
           <div className="h-4 w-px bg-border-subtle mx-1"></div>
 
           <span className="text-[11px] font-semibold text-text-muted">Presets:</span>
           <button
+            onClick={() => handleApplyPreset('SQUARE')}
+            className="text-[11px] px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-text-primary font-medium"
+          >
+            Square
+          </button>
+          <button
             onClick={() => handleApplyPreset('RECTANGLE')}
             className="text-[11px] px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-text-primary font-medium"
           >
-            Rectangle
+            Large Canopy
           </button>
           <button
             onClick={() => handleApplyPreset('L_SHAPE')}
@@ -206,106 +466,65 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
             L-Shape
           </button>
           <button
-            onClick={() => handleApplyPreset('EXPANDED')}
+            onClick={() => handleApplyPreset('CORRIDOR')}
             className="text-[11px] px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-text-primary font-medium"
           >
-            Expanded
+            Corridor
           </button>
         </div>
       </div>
 
-      {/* SVG Canvas for Interactive Geodesic Polygon Node Editing */}
-      <svg className="w-full h-full" viewBox="0 0 1000 650" fill="none">
-        <rect width="1000" height="650" fill="#f8fafc" />
+      {/* Interactive Leaflet Map Container */}
+      <div ref={mapContainerRef} className="w-full h-full bg-slate-100 z-10" />
 
-        {/* Spatial Grid Backdrop Lines */}
-        <path d="M0 100 H1000 M0 200 H1000 M0 300 H1000 M0 400 H1000 M0 500 H1000 M0 600 H1000" stroke="#e2e8f0" strokeDasharray="4 4" />
-        <path d="M100 0 V650 M250 0 V650 M400 0 V650 M550 0 V650 M700 0 V650 M850 0 V650" stroke="#e2e8f0" strokeDasharray="4 4" />
+      {/* Geometry Validation Warning Overlay */}
+      {!isValidGeometry && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30 bg-red-600 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-lg border border-red-700 flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">warning</span>
+          <span>
+            Invalid Polygon Geometry: {ringPts.length < 3 ? 'Minimum 3 vertices required.' : hasKinks ? 'Self-intersecting polygon boundary.' : 'Area must be greater than zero.'}
+          </span>
+        </div>
+      )}
 
-        {/* Site Reference Target Outline */}
-        <circle cx="500" cy="325" r="220" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="6 6" />
-
-        {/* Drawn Plot Polygon */}
-        <polygon
-          points={polygonPointsString}
-          fill="#059669"
-          fillOpacity="0.25"
-          stroke="#059669"
-          strokeWidth="3.5"
-          strokeLinejoin="round"
-        />
-
-        {/* Edge Distance Labels (Geodesic Turf Segment Lengths in meters) */}
-        {nodes.map((node, i) => {
-          const nextNode = nodes[(i + 1) % nodes.length];
-          const midX = Math.round((node.x + nextNode.x) / 2);
-          const midY = Math.round((node.y + nextNode.y) / 2);
-          const segMeters = segmentLengthsMeters[i] || 50;
-
-          return (
-            <g key={`seg_${i}`}>
-              <rect
-                x={midX - 24}
-                y={midY - 10}
-                width="48"
-                height="18"
-                rx="4"
-                fill="#ffffff"
-                stroke="#059669"
-                strokeWidth="1"
-              />
-              <text
-                x={midX}
-                y={midY + 3}
-                fill="#047857"
-                fontSize="10"
-                fontWeight="bold"
-                fontFamily="monospace"
-                textAnchor="middle"
-              >
-                {segMeters}m
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Draggable Polygon Node Handles */}
-        {nodes.map((node, idx) => (
-          <g
-            key={idx}
-            className={isEditing ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
-            onClick={() => setSelectedNodeIdx(idx)}
-          >
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={selectedNodeIdx === idx ? "12" : "9"}
-              fill={selectedNodeIdx === idx ? "#d97706" : "#059669"}
-              stroke="#ffffff"
-              strokeWidth="2.5"
-              className="transition-all shadow-md"
-            />
-            <text
-              x={node.x}
-              y={node.y + 4}
-              fill="#ffffff"
-              fontSize="9"
-              fontWeight="bold"
-              textAnchor="middle"
-            >
-              {idx + 1}
-            </text>
-          </g>
-        ))}
-      </svg>
+      {/* Layer Toggle Quick Strip */}
+      <div className="absolute bottom-16 left-4 z-20 bg-white/95 backdrop-blur-md p-2 rounded-xl border border-border-subtle shadow-md flex items-center gap-2 text-xs">
+        <span className="text-[10px] font-bold text-text-muted uppercase px-1">OSM Context Layers:</span>
+        <button
+          onClick={() => setLayersVisibility((p) => ({ ...p, roads: !p.roads }))}
+          className={`px-2 py-1 rounded font-semibold text-[11px] ${
+            layersVisibility.roads ? 'bg-sky-100 text-sky-800 border border-sky-300' : 'bg-slate-100 text-slate-500'
+          }`}
+        >
+          🛣️ Roads
+        </button>
+        <button
+          onClick={() => setLayersVisibility((p) => ({ ...p, buildings: !p.buildings }))}
+          className={`px-2 py-1 rounded font-semibold text-[11px] ${
+            layersVisibility.buildings ? 'bg-slate-200 text-slate-800 border border-slate-300' : 'bg-slate-100 text-slate-500'
+          }`}
+        >
+          🏢 Buildings
+        </button>
+        <button
+          onClick={() => setLayersVisibility((p) => ({ ...p, ev: !p.ev }))}
+          className={`px-2 py-1 rounded font-semibold text-[11px] ${
+            layersVisibility.ev ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-500'
+          }`}
+        >
+          ⚡ EV Chargers
+        </button>
+      </div>
 
       {/* Bottom Data Honesty Banner */}
-      <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-border-subtle shadow-md flex items-center justify-between text-xs text-text-secondary">
+      <div className="absolute bottom-4 left-4 right-4 z-20 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-border-subtle shadow-md flex items-center justify-between text-xs text-text-secondary">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>Target Site: <strong>{siteCode}</strong> ({siteName})</span>
           <span className="text-text-muted">|</span>
           <span>Center Lat/Lng: <strong>{siteLat.toFixed(4)}°N, {siteLng.toFixed(4)}°E</strong></span>
+          <span className="text-text-muted">|</span>
+          <span>Vertices: <strong>{ringPts.length} Points</strong></span>
         </div>
         <div className="flex items-center gap-2 font-mono text-[11px] text-text-muted">
           <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-semibold">

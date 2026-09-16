@@ -117,5 +117,6 @@ export interface Proposal {
   updatedAt: string;
   aiSummary?: string;
   author: string;
+  plotGeometry?: any;
 }
 

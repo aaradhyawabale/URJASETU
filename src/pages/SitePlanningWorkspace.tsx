@@ -13,6 +13,7 @@ export const SitePlanningWorkspace: React.FC = () => {
 
   const [site, setSite] = useState<CandidateSite | null>(null);
   const [plotAreaSqm, setPlotAreaSqm] = useState<number>(2450);
+  const [plotGeometry, setPlotGeometry] = useState<number[][][] | null>(null);
   const [selectedInfra, setSelectedInfra] = useState<InfrastructureType>('SOLAR_EV_CHARGING_HUB');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -30,14 +31,15 @@ export const SitePlanningWorkspace: React.FC = () => {
   const handleCreateProposalAndProceed = async () => {
     if (!site) return;
     setIsSaving(true);
-    await createProposal({
+    const res = await createProposal({
       siteId: site.id,
       siteCode: site.code,
       title: `${site.code} ${selectedInfra.replace(/_/g, ' ')} Proposal`,
       opportunityScore: site.opportunityScore,
       estimatedAreaSqm: plotAreaSqm,
       infrastructureType: selectedInfra,
-      aiSummary: `${site.code} parcel planning completed with ${plotAreaSqm.toLocaleString()} m² plot area and ${selectedInfra} infrastructure selection.`,
+      aiSummary: `${site.code} parcel planning completed with ${plotAreaSqm.toLocaleString()} m² drawn plot area and ${selectedInfra} infrastructure selection.`,
+      plotGeometry: plotGeometry ? { type: 'Polygon', coordinates: plotGeometry } : undefined,
     });
 
     setIsSaving(false);
@@ -46,7 +48,7 @@ export const SitePlanningWorkspace: React.FC = () => {
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
-      {/* Interactive Turf.js Plot Drawing Canvas (70% width) */}
+      {/* Interactive Turf.js & Leaflet 2D Plot Drawer (70% width) */}
       <div className="flex-1 relative bg-slate-100 h-full flex flex-col">
         <InteractivePlotDrawer
           initialAreaSqm={plotAreaSqm}
@@ -55,6 +57,7 @@ export const SitePlanningWorkspace: React.FC = () => {
           siteCode={site?.code || 'NSK-CND-001'}
           siteName={site?.name || 'Nashik Candidate Site'}
           onAreaChange={(newArea) => setPlotAreaSqm(newArea)}
+          onPolygonChange={(ringCoordinates) => setPlotGeometry(ringCoordinates)}
         />
       </div>
 
@@ -73,7 +76,7 @@ export const SitePlanningWorkspace: React.FC = () => {
             <div>
               <span className="text-xs text-text-muted">Selected Parcel</span>
               <h3 className="text-sm font-bold text-text-primary">{site.name}</h3>
-              <p className="text-xs text-text-secondary mt-0.5">{site.ward || site.wardName}</p>
+              <p className="text-xs text-text-secondary mt-0.5">{site.ward || site.wardName || 'Nashik Municipal Corporation'}</p>
             </div>
 
             {/* Infrastructure Type Selection */}
@@ -98,7 +101,7 @@ export const SitePlanningWorkspace: React.FC = () => {
                     </span>
                   </div>
                   <p className="text-[11px] text-text-secondary">
-                    Integrated 500kW rooftop/canopy solar PV + 8 DC fast charger bays.
+                    Integrated rooftop/canopy solar PV yield + DC fast charger bays + BESS buffer.
                   </p>
                 </button>
 
@@ -155,7 +158,7 @@ export const SitePlanningWorkspace: React.FC = () => {
                   </div>
 
                   <p className="text-[10px] text-text-muted italic">
-                    Calculated from Turf.js geodesic polygon area & NASA POWER 5.02 kWh/m²/day GHI.
+                    Calculated from Turf.js geodesic polygon area & NASA POWER 5.02 kWh/m²/day GHI baseline. Classified as <strong>PLANNING_HEURISTIC</strong>.
                   </p>
                 </div>
               );
@@ -170,8 +173,8 @@ export const SitePlanningWorkspace: React.FC = () => {
           <div className="p-4 bg-surface-subtle border-t border-border-subtle flex flex-col gap-2">
             <button
               onClick={handleCreateProposalAndProceed}
-              disabled={isSaving}
-              className="w-full py-2.5 px-4 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 shadow-xs"
+              disabled={isSaving || plotAreaSqm <= 0}
+              className="w-full py-2.5 px-4 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 shadow-xs"
             >
               <span className="material-symbols-outlined text-[18px]">view_in_ar</span>
               <span>{isSaving ? 'Saving Planning Payload...' : 'Launch 3D Site Planner'}</span>
