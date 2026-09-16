@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { ClimateService } from '../services/climateService.js';
 import { ElevationService } from '../services/elevationService.js';
+import { RiskService } from '../services/riskService.js';
 
 // In-memory cache for parsed GeoJSON layers to prevent redundant file parsing
 const geojsonCache: Record<string, any> = {};
@@ -126,6 +127,17 @@ export const getElevationAnalysis = (req: Request, res: Response) => {
   const lng = parseFloat(req.query.lng as string) || 73.7898;
 
   const data = ElevationService.evaluateTerrain(lat, lng);
+  return res.status(200).json({
+    success: true,
+    data,
+  });
+};
+
+export const getHydrologicalAnalysis = (req: Request, res: Response) => {
+  const lat = parseFloat(req.query.lat as string) || 19.9975;
+  const lng = parseFloat(req.query.lng as string) || 73.7898;
+
+  const data = RiskService.evaluateHydrologicalRisk(lat, lng);
   return res.status(200).json({
     success: true,
     data,

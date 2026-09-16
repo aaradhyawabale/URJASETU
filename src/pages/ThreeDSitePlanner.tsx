@@ -32,7 +32,7 @@ export const ThreeDSitePlanner: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">3D Conceptual Planner</span>
           </div>
           <span className="text-slate-600">|</span>
-          <span className="text-xs font-mono text-slate-300">CesiumJS Terrain Engine Active</span>
+          <span className="text-xs font-mono text-slate-300">Interactive 3D Visual Planning Canvas (Intermediate Conceptual Renderer)</span>
           <span className="text-slate-600">|</span>
           <span className="text-xs text-slate-300">{site ? site.code : 'NASHIK-SITE-01'} Parcel Boundary Overlay</span>
         </div>
@@ -57,8 +57,8 @@ export const ThreeDSitePlanner: React.FC = () => {
               <div className="w-64 h-36 bg-emerald-600/40 border-2 border-emerald-400 rounded-xl shadow-2xl backdrop-blur-md flex flex-col items-center justify-center relative p-3">
                 <div className="w-full h-full bg-emerald-500/20 border border-emerald-300/40 rounded-lg flex flex-col items-center justify-center gap-1">
                   <span className="material-symbols-outlined text-emerald-300 text-[36px]">solar_power</span>
-                  <span className="text-xs font-bold text-white tracking-widest uppercase">500kW Solar Array</span>
-                  <span className="text-[10px] text-emerald-200">8x DC Fast Charger Canopy</span>
+                  <span className="text-xs font-bold text-white tracking-widest uppercase">Solar Canopy Structure</span>
+                  <span className="text-[10px] text-emerald-200">DC Fast Charger Hub Concept</span>
                 </div>
               </div>
             </div>
@@ -67,7 +67,7 @@ export const ThreeDSitePlanner: React.FC = () => {
           {/* 3D Legend Overlay */}
           <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700 text-xs text-slate-300 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>3D Model: Solar-EV Charging Hub GLB</span>
+            <span>3D Model: Conceptual Solar-EV Canopy Structure</span>
             <span className="text-slate-600">|</span>
             <span>Scale: {scale.toFixed(1)}x</span>
           </div>

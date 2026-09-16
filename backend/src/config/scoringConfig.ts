@@ -58,6 +58,16 @@ export interface IScoringConfig {
       legalClassification: 'CONSERVATIVE_PROJECT_SCREENING_BUFFER';
     };
   };
+  planningHeuristics: {
+    canopyUsableAreaRatio: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
+    solarPvDensityKwpPerM2: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
+    solarPerformanceRatio: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
+    evChargerDensityAreaM2PerPort: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
+    bessStorageRatioHours: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
+    unitCapexSolarKwpInr: { value: number; unit: string; classification: 'PROJECT_MODELING_ASSUMPTION'; limitation: string };
+    unitCapexEvPortInr: { value: number; unit: string; classification: 'PROJECT_MODELING_ASSUMPTION'; limitation: string };
+    unitCapexBessKwhInr: { value: number; unit: string; classification: 'PROJECT_MODELING_ASSUMPTION'; limitation: string };
+  };
   factors: Record<string, IScoringFactorDoc>;
 }
 
@@ -121,6 +131,56 @@ export const SCORING_CONFIG: IScoringConfig = {
       blueLineSetbackMeters: 30,
       citation: 'Maharashtra Regional and Town Planning Act (MRTP Act 1966) & Nashik Municipal Corporation DCPR 2017 (Rule 11.2: Prohibited 30m Flood Margin / Blue Line along Godavari Riverbed).',
       legalClassification: 'CONSERVATIVE_PROJECT_SCREENING_BUFFER',
+    },
+  },
+  planningHeuristics: {
+    canopyUsableAreaRatio: {
+      value: 0.60,
+      unit: 'ratio',
+      classification: 'PLANNING_HEURISTIC',
+      limitation: 'Assumes 60% usable parcel footprint for solar canopy coverage. Subject to site-specific setbacks and driveway geometry.',
+    },
+    solarPvDensityKwpPerM2: {
+      value: 0.20,
+      unit: 'kWp/m²',
+      classification: 'PLANNING_HEURISTIC',
+      limitation: 'Assumes 200W/m² standard PV module panel efficiency. Does not model specific PV module tilt angle or tracker mechanics.',
+    },
+    solarPerformanceRatio: {
+      value: 0.80,
+      unit: 'ratio',
+      classification: 'PLANNING_HEURISTIC',
+      limitation: 'Assumes 80% system performance ratio accounting for temperature derating, inverter losses, and dust soiling. Not a bankable yield prediction.',
+    },
+    evChargerDensityAreaM2PerPort: {
+      value: 250,
+      unit: 'm²/port',
+      classification: 'PLANNING_HEURISTIC',
+      limitation: 'Spatial planning rule of thumb (2 ports per 250 m² area). Does NOT measure EV vehicle traffic or electrical grid capacity.',
+    },
+    bessStorageRatioHours: {
+      value: 0.50,
+      unit: 'hours',
+      classification: 'PLANNING_HEURISTIC',
+      limitation: 'Preliminary BESS sizing rule (0.50 hours storage per solar kWp). Not a detailed electrical power flow design.',
+    },
+    unitCapexSolarKwpInr: {
+      value: 45000,
+      unit: '₹/kWp',
+      classification: 'PROJECT_MODELING_ASSUMPTION',
+      limitation: 'Preliminary planning estimate (₹45,000/kWp). Excludes grid interconnection upgrades, land acquisition, GST, and legal fees.',
+    },
+    unitCapexEvPortInr: {
+      value: 800000,
+      unit: '₹/port',
+      classification: 'PROJECT_MODELING_ASSUMPTION',
+      limitation: 'Preliminary planning estimate (₹800,000/port DC fast charger). Excludes transformer substation upgrades and civil trenching.',
+    },
+    unitCapexBessKwhInr: {
+      value: 18000,
+      unit: '₹/kWh',
+      classification: 'PROJECT_MODELING_ASSUMPTION',
+      limitation: 'Preliminary planning estimate (₹18,000/kWh BESS enclosure). Excludes HVAC thermal management and fire suppression system add-ons.',
     },
   },
   factors: {

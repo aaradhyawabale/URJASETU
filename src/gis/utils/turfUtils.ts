@@ -8,6 +8,18 @@ export interface IPlotCapacityMetrics {
   evChargerPorts: number;
   bessCapacityKwh: number;
   estimatedCapexInr: number;
+  classifications: {
+    solarYield: 'PRELIMINARY_MODELED_ESTIMATE';
+    evPorts: 'SPATIAL_PLANNING_HEURISTIC';
+    bessSizing: 'PRELIMINARY_SIZING_HEURISTIC';
+    capex: 'PRELIMINARY_PLANNING_ESTIMATE';
+  };
+  disclaimers: {
+    solarYield: string;
+    evPorts: string;
+    bessSizing: string;
+    capex: string;
+  };
 }
 
 /**
@@ -37,15 +49,16 @@ export function isValidPolygon(coordinates: number[][][]): boolean {
 }
 
 /**
- * Computes engineering capacity metrics for drawn parcel area
+ * Computes preliminary spatial planning estimates for drawn parcel area.
+ * Uses explicit PLANNING_HEURISTIC and PROJECT_MODELING_ASSUMPTION parameters.
  */
 export function calculatePlotCapacityMetrics(areaSqm: number, ghiKwhM2Day: number = 5.02): IPlotCapacityMetrics {
   const safeArea = Math.max(500, areaSqm);
-  const usableCanopyAreaSqm = Math.round(safeArea * 0.60);
-  const solarCapacityKwp = Math.round(usableCanopyAreaSqm * 0.20);
-  const annualGenerationMwh = Number(((solarCapacityKwp * ghiKwhM2Day * 365 * 0.80) / 1000).toFixed(1));
-  const evChargerPorts = Math.max(2, Math.min(32, Math.floor(safeArea / 250) * 2));
-  const bessCapacityKwh = Math.round(solarCapacityKwp * 0.50);
+  const usableCanopyAreaSqm = Math.round(safeArea * 0.60); // 60% usable footprint heuristic
+  const solarCapacityKwp = Math.round(usableCanopyAreaSqm * 0.20); // 200W/m² module efficiency assumption
+  const annualGenerationMwh = Number(((solarCapacityKwp * ghiKwhM2Day * 365 * 0.80) / 1000).toFixed(1)); // 80% PR assumption
+  const evChargerPorts = Math.max(2, Math.min(32, Math.floor(safeArea / 250) * 2)); // 2 ports per 250m² spatial heuristic
+  const bessCapacityKwh = Math.round(solarCapacityKwp * 0.50); // 0.5hr storage heuristic
   const estimatedCapexInr = (solarCapacityKwp * 45000) + (evChargerPorts * 800000) + (bessCapacityKwh * 18000);
 
   return {
@@ -56,6 +69,18 @@ export function calculatePlotCapacityMetrics(areaSqm: number, ghiKwhM2Day: numbe
     evChargerPorts,
     bessCapacityKwh,
     estimatedCapexInr,
+    classifications: {
+      solarYield: 'PRELIMINARY_MODELED_ESTIMATE',
+      evPorts: 'SPATIAL_PLANNING_HEURISTIC',
+      bessSizing: 'PRELIMINARY_SIZING_HEURISTIC',
+      capex: 'PRELIMINARY_PLANNING_ESTIMATE',
+    },
+    disclaimers: {
+      solarYield: 'Preliminary modeled annual generation estimate based on 50km NASA POWER regional climatology (5.02 kWh/m²/day GHI) and 80% PR. Does NOT account for plot micro-shading, tilt/azimuth orientation, or inverter losses.',
+      evPorts: 'Preliminary spatial planning heuristic (2 ports per 250 m²). Does NOT measure EV vehicle traffic or electrical grid capacity.',
+      bessSizing: 'Preliminary sizing heuristic (0.50 hours storage per solar kWp). Not a detailed electrical power flow design.',
+      capex: 'Preliminary planning estimate (₹45k/kWp solar, ₹800k/EV fast charger, ₹18k/kWh BESS). Excludes grid connection upgrades, land acquisition, GST, and legal fees.',
+    },
   };
 }
 

@@ -14,7 +14,7 @@
 - [x] **Digital Elevation Model (DEM)** (Copernicus DEM 30m GLO-30 546-cell raster grid dataset `data/geo/nashik_copernicus_dem_30m.json` verified; bilinear sampling & 4-neighbor slope gradient calculation; classified as **`DERIVED`**)
 - [x] **Riparian Waterway Buffer** (30m Blue Line flood margin setback per MRTP Act 1966 & NMC DCPR 2017 Rule 11.2; classified as **`CONSERVATIVE_PROJECT_SCREENING_BUFFER`**)
 - [ ] **High-Resolution Local Solar Heatmap / Micro-Shading** (Deferred until plot-level LiDAR / rooftop solar CAD data acquired)
-- [ ] **HydroSHEDS Flood Inundation Surface** (Hydrological river modeling surface deferred)
+- [x] **Hydrological Riverbed Distance & Flood Screening** (Godavari riverbed spatial corridor geodesic distance proxy `DERIVED_HYDROLOGICAL_DISTANCE_PROXY` & flood hazard screening proxy `FLOOD_HAZARD_SCREENING_PROXY`; REST `/api/v1/gis/hydrology`)
 - [ ] **LULC High-Res Satellite Zoning** (ESA WorldCover 10m grid processing deferred)
 - [ ] **Administrative Ward GeoJSON Extents** (NMC 30-ward polygon boundaries deferred)
 
