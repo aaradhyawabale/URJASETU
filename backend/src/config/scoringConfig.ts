@@ -58,6 +58,15 @@ export interface IScoringConfig {
       legalClassification: 'CONSERVATIVE_PROJECT_SCREENING_BUFFER';
     };
   };
+  landCoverModel: {
+    sourceGuidance: {
+      datasetName: string;
+      classification: 'DERIVED_LAND_COVER_PROXY';
+      legalZoningStatus: 'UNVERIFIED_STATUTORY_ZONING';
+      limitations: string;
+    };
+    categoryScores: Record<string, number>;
+  };
   planningHeuristics: {
     canopyUsableAreaRatio: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
     solarPvDensityKwpPerM2: { value: number; unit: string; classification: 'PLANNING_HEURISTIC'; limitation: string };
@@ -131,6 +140,34 @@ export const SCORING_CONFIG: IScoringConfig = {
       blueLineSetbackMeters: 30,
       citation: 'Maharashtra Regional and Town Planning Act (MRTP Act 1966) & Nashik Municipal Corporation DCPR 2017 (Rule 11.2: Prohibited 30m Flood Margin / Blue Line along Godavari Riverbed).',
       legalClassification: 'CONSERVATIVE_PROJECT_SCREENING_BUFFER',
+    },
+  },
+  landCoverModel: {
+    sourceGuidance: {
+      datasetName: 'OpenStreetMap Nashik Land Use Polygons (645 Features)',
+      classification: 'DERIVED_LAND_COVER_PROXY',
+      legalZoningStatus: 'UNVERIFIED_STATUTORY_ZONING',
+      limitations: 'Physical land cover derived from OpenStreetMap landuse polygons. Does NOT constitute statutory legal zoning under the Maharashtra Regional and Town Planning Act (MRTP Act 1966) or Nashik Municipal Corporation Development Control and Promotion Regulations (NMC DCPR 2017). Legal zoning requires municipal DP cadastral verification.',
+    },
+    categoryScores: {
+      industrial: 100,
+      commercial: 100,
+      retail: 100,
+      residential: 70,
+      farmyard: 70,
+      construction: 70,
+      farmland: 40,
+      grass: 40,
+      greenfield: 40,
+      orchard: 40,
+      meadow: 40,
+      recreation_ground: 40,
+      quarry: 20,
+      military: 20,
+      landfill: 20,
+      cemetery: 20,
+      reservoir: 0,
+      forest: 0,
     },
   },
   planningHeuristics: {

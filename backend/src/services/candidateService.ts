@@ -35,12 +35,16 @@ export interface ICandidateSite {
   nearestEVChargerMeters: number;
   nearestParkingMeters: number;
   nearbyPoiCount500m: number;
+  landCoverCategory: string;
+  landCoverClassification: 'DERIVED_LAND_COVER_PROXY';
+  statutoryLegalZoning: 'UNVERIFIED_STATUTORY_ZONING';
   factors: Record<string, IFactorDecomposition>;
   provenance: {
     datasetName: string;
     solarSource: string;
     elevationSource: string;
     osmSource: string;
+    landCoverSource: string;
     generationMethod: string;
     candidateSpacing: string;
   };
@@ -117,6 +121,7 @@ export class CandidateService {
     const evData = loadGeoJsonLayer('ev');
     const parkingData = loadGeoJsonLayer('parking');
     const poisData = loadGeoJsonLayer('pois');
+    const landuseData = loadGeoJsonLayer('landuse');
 
     // Extract point arrays for fast distance querying
     const roadPoints: Array<[number, number]> = [];
@@ -239,6 +244,8 @@ export class CandidateService {
         const candidateCode = `NSK-CND-${String(candidateIndex).padStart(3, '0')}`;
         const candidateName = `Candidate Site ${candidateCode} (${roundedLat.toFixed(3)}, ${roundedLng.toFixed(3)})`;
 
+        const landCoverCategory = detectLandCoverCategory(roundedLat, roundedLng, landuseData);
+
         candidates.push({
           id: `cnd_${candidateIndex}`,
           code: candidateCode,
@@ -256,6 +263,9 @@ export class CandidateService {
           nearestEVChargerMeters,
           nearestParkingMeters,
           nearbyPoiCount500m,
+          landCoverCategory,
+          landCoverClassification: 'DERIVED_LAND_COVER_PROXY',
+          statutoryLegalZoning: 'UNVERIFIED_STATUTORY_ZONING',
           factors: {
             solarPhotovoltaic: {
               factorId: 'solarPhotovoltaic',
@@ -325,6 +335,7 @@ export class CandidateService {
             solarSource: 'NASA POWER 30-Year Solar Climatology (0.5° Grid)',
             elevationSource: 'Copernicus DEM GLO-30 DSM (546-Cell Grid Extract)',
             osmSource: 'OpenStreetMap Nashik Spatial Extracted Layers',
+            landCoverSource: 'OpenStreetMap Nashik Land Use Polygons (645 Features)',
             generationMethod: `Regular spatial grid sampling at ${spacing}° (~${Math.round(spacing * 111000)}m spacing)`,
             candidateSpacing: `${spacing}°`,
           },
@@ -332,7 +343,8 @@ export class CandidateService {
             'NASA POWER solar irradiation is a 50km regional climatology mean and does not account for plot-level shading.',
             'EV infrastructure gap is a distance-based proxy for unserved coverage and does not measure actual EV traffic demand.',
             'Terrain slope is evaluated from Copernicus DEM GLO-30 Digital Surface Model (DSM) at 0.01° grid resolution.',
-            'Land acquisition feasibility, parcel ownership, and electrical grid connection capacity require secondary field verification.',
+            'Physical land cover is derived from OSM landuse polygons (DERIVED_LAND_COVER_PROXY). Does NOT constitute statutory legal zoning under MRTP Act 1966 or NMC DCPR 2017.',
+            'Statutory legal zoning is currently UNVERIFIED and requires official municipal DP cadastral verification.',
           ],
         });
 
@@ -419,6 +431,35 @@ function isInsideBuildingFootprint(lat: number, lng: number, buildingsData: any)
     }
   }
   return false;
+}
+
+function detectLandCoverCategory(lat: number, lng: number, landuseData: any): string {
+  if (!landuseData || !landuseData.features) return 'unclassified';
+
+  for (const f of landuseData.features) {
+    if (f.geometry && f.geometry.coordinates) {
+      const type = f.properties?.landuse || f.properties?.type || 'unclassified';
+      let polygon: number[][] | null = null;
+      if (f.geometry.type === 'Polygon') polygon = f.geometry.coordinates[0];
+      else if (f.geometry.type === 'MultiPolygon' && f.geometry.coordinates[0]) polygon = f.geometry.coordinates[0][0];
+
+      if (polygon) {
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        polygon.forEach(([pLng, pLat]: number[]) => {
+          if (pLng < minX) minX = pLng;
+          if (pLng > maxX) maxX = pLng;
+          if (pLat < minY) minY = pLat;
+          if (pLat > maxY) maxY = pLat;
+        });
+
+        if (lng >= minX && lng <= maxX && lat >= minY && lat <= maxY) {
+          return type;
+        }
+      }
+    }
+  }
+
+  return 'mixed_built_up';
 }
 
 function calculateHaversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {

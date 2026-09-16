@@ -15,7 +15,7 @@
 - [x] **Riparian Waterway Buffer** (30m Blue Line flood margin setback per MRTP Act 1966 & NMC DCPR 2017 Rule 11.2; classified as **`CONSERVATIVE_PROJECT_SCREENING_BUFFER`**)
 - [ ] **High-Resolution Local Solar Heatmap / Micro-Shading** (Deferred until plot-level LiDAR / rooftop solar CAD data acquired)
 - [x] **Hydrological Riverbed Distance & Flood Screening** (Godavari riverbed spatial corridor geodesic distance proxy `DERIVED_HYDROLOGICAL_DISTANCE_PROXY` & flood hazard screening proxy `FLOOD_HAZARD_SCREENING_PROXY`; REST `/api/v1/gis/hydrology`)
-- [ ] **LULC High-Res Satellite Zoning** (ESA WorldCover 10m grid processing deferred)
+- [x] **LULC Physical Land-Use & Statutory Legal Zoning Status** (OSM 645 landuse polygons point-in-polygon proxy `DERIVED_LAND_COVER_PROXY` & statutory legal zoning status `UNVERIFIED_STATUTORY_ZONING`)
 - [ ] **Administrative Ward GeoJSON Extents** (NMC 30-ward polygon boundaries deferred)
 
 ### GIS ENGINE
