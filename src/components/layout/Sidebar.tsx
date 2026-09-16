@@ -26,6 +26,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
       description: 'Multi-criteria Shortlist',
     },
     {
+      label: 'Site Comparison',
+      path: '/sites/compare',
+      icon: 'compare_arrows',
+      description: 'Side-by-side Trade-off Matrix',
+    },
+    {
       label: 'Planning Workspace',
       path: '/planning/nashik-site-01',
       icon: 'design_services',

@@ -87,10 +87,18 @@ export const RankedSites: React.FC = () => {
             </select>
           </div>
 
+          <button
+            onClick={() => navigate('/sites/compare')}
+            className="px-3.5 py-2 bg-surface-subtle text-text-primary border border-border-subtle hover:bg-slate-100 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shrink-0 self-end"
+          >
+            <span className="material-symbols-outlined text-[16px]">compare_arrows</span>
+            <span>Compare Sites</span>
+          </button>
+
           {filteredSites.length > 0 && (
             <button
               onClick={() => navigate(`/planning/${filteredSites[0].id}`)}
-              className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-xs shrink-0 self-end"
+              className="px-4 py-2 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-xs shrink-0 self-end"
             >
               Plan Top Site ({filteredSites[0].code}) →
             </button>
