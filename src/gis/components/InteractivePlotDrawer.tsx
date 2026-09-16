@@ -634,6 +634,8 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
         lat={siteLat}
         lng={siteLng}
         title={`Nashik Street-Level Inspection — ${siteCode}`}
+        placedComponents={placedComponents}
+        plotGeometry={geoJsonRing}
       />
     </div>
   );

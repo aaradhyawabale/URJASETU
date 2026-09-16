@@ -828,7 +828,9 @@ export const ThreeDSitePlanner: React.FC = () => {
         onClose={() => setIsStreetViewOpen(false)}
         lat={site?.latitude || site?.lat || 19.9975}
         lng={site?.longitude || site?.lng || 73.7898}
-        title={`Nashik Street View — ${site?.code || 'NSK-CND-001'}`}
+        title={`Nashik Synchronous Street View — ${site?.code || 'NSK-CND-001'}`}
+        placedComponents={activeComponents}
+        plotGeometry={planningDesign?.plotGeometry}
       />
     </div>
   );
