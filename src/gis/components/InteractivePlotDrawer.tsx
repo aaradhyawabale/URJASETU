@@ -7,6 +7,7 @@ import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
 import { calculatePolygonAreaSqm } from '../utils/turfUtils';
 
 import { IPlacedComponent } from '../../types/site';
+import { MapillaryStreetViewModal } from './MapillaryStreetViewModal';
 
 interface InteractivePlotDrawerProps {
   initialAreaSqm: number;
@@ -64,6 +65,7 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
   const [isEditing, setIsEditing] = useState<boolean>(true);
   const [isClickToAdd, setIsClickToAdd] = useState<boolean>(false);
   const [selectedNodeIdx, setSelectedNodeIdx] = useState<number | null>(null);
+  const [isStreetViewOpen, setIsStreetViewOpen] = useState<boolean>(false);
   const [layersVisibility, setLayersVisibility] = useState({
     roads: true,
     buildings: true,
@@ -611,13 +613,28 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
           <span className="text-text-muted">|</span>
           <span>Vertices: <strong>{ringPts.length} Points</strong></span>
         </div>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-text-muted">
-          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
+        <div className="flex items-center gap-2 font-mono text-[11px]">
+          <button
+            onClick={() => setIsStreetViewOpen(true)}
+            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs transition-colors"
+          >
+            <span>📸</span>
+            <span>Street View (Mapillary)</span>
+          </button>
+          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-semibold text-text-muted">
             TURF_GEODESIC_AREA_CALCULATION
           </span>
-          <span>WGS84 EPSG:4326</span>
         </div>
       </div>
+
+      {/* Mapillary Nashik Street View Modal */}
+      <MapillaryStreetViewModal
+        isOpen={isStreetViewOpen}
+        onClose={() => setIsStreetViewOpen(false)}
+        lat={siteLat}
+        lng={siteLng}
+        title={`Nashik Street-Level Inspection — ${siteCode}`}
+      />
     </div>
   );
 };

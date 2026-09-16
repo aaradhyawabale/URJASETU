@@ -377,6 +377,72 @@ const TransformerMesh: React.FC<{
   );
 };
 
+// Procedural 3D Mesh: Hospital & Healthcare Complex
+const HospitalMesh: React.FC<{
+  comp: IPlacedComponent;
+  isSelected: boolean;
+  onSelect?: () => void;
+}> = ({ comp, isSelected, onSelect }) => {
+  const width = Math.max(8, comp.widthMeters || 18);
+  const length = Math.max(8, comp.lengthMeters || 14);
+  const height = 9.0;
+  const rotRad = ((comp.rotationDegrees || 0) * Math.PI) / 180;
+
+  return (
+    <group
+      position={[comp.xMeters, 0, -comp.yMeters]}
+      rotation={[0, rotRad, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
+    >
+      {/* Main Hospital Building Block */}
+      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width, height, length]} />
+        <meshStandardMaterial
+          color={isSelected ? '#f59e0b' : '#f8fafc'}
+          metalness={0.2}
+          roughness={0.3}
+        />
+      </mesh>
+
+      {/* Emergency Entrance Canopy */}
+      <mesh position={[0, 1.8, length / 2 + 1.5]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.5, 0.4, 3.0]} />
+        <meshStandardMaterial color="#0284c7" metalness={0.5} roughness={0.2} />
+      </mesh>
+      <mesh position={[-width * 0.2, 0.9, length / 2 + 2.8]} castShadow>
+        <cylinderGeometry args={[0.12, 0.12, 1.8, 8]} />
+        <meshStandardMaterial color="#334155" metalness={0.7} />
+      </mesh>
+      <mesh position={[width * 0.2, 0.9, length / 2 + 2.8]} castShadow>
+        <cylinderGeometry args={[0.12, 0.12, 1.8, 8]} />
+        <meshStandardMaterial color="#334155" metalness={0.7} />
+      </mesh>
+
+      {/* Rooftop Solar Array */}
+      <mesh position={[0, height + 0.15, 0]} rotation={[0.08, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.8, 0.15, length * 0.6]} />
+        <meshStandardMaterial color="#0369a1" metalness={0.9} roughness={0.1} />
+      </mesh>
+
+      {/* Floating 3D Hospital Badge */}
+      <Html position={[0, height + 2.5, 0]} center distanceFactor={25}>
+        <div
+          className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono shadow-md border pointer-events-none whitespace-nowrap transition-transform ${
+            isSelected
+              ? 'bg-amber-500 text-white border-amber-300 scale-110'
+              : 'bg-emerald-950/90 text-emerald-300 border-emerald-400/50'
+          }`}
+        >
+          🏥 {comp.name || 'Hospital Facility'} ({comp.widthMeters}m × {comp.lengthMeters}m)
+        </div>
+      </Html>
+    </group>
+  );
+};
+
 export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
   components,
   plotAreaSqm,
@@ -501,6 +567,14 @@ export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
 
               {comp.type === 'TRANSFORMER' && (
                 <TransformerMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {(comp.type === 'HOSPITAL_BUILDING' || comp.type === 'HOSPITAL') && (
+                <HospitalMesh
                   comp={comp}
                   isSelected={isSelected}
                   onSelect={handleSelect}

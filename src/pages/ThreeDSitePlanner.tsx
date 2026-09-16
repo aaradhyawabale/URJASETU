@@ -9,6 +9,7 @@ import { CandidateSite, Proposal, IPlacedComponent, PlanningDesign } from '../ty
 import { ScoreBadge } from '../components/ui/ScoreBadge';
 import { getPlanningDesign, savePlanningDesign } from '../services/planningStateService';
 import { ThreeDSceneCanvas } from '../components/3d/ThreeDSceneCanvas';
+import { MapillaryStreetViewModal } from '../gis/components/MapillaryStreetViewModal';
 
 interface OSMBuildingFeature {
   id: string;
@@ -112,7 +113,9 @@ export const ThreeDSitePlanner: React.FC = () => {
     savePlanningDesign(nextDesign);
   };
 
-  const handleAddComponent = (type: 'SOLAR_CANOPY' | 'EV_CHARGER' | 'BESS_CONTAINER' | 'TRANSFORMER') => {
+  const [isStreetViewOpen, setIsStreetViewOpen] = useState<boolean>(false);
+
+  const handleAddComponent = (type: 'SOLAR_CANOPY' | 'EV_CHARGER' | 'BESS_CONTAINER' | 'TRANSFORMER' | 'HOSPITAL_BUILDING') => {
     if (!planningDesign) return;
     const count = planningDesign.components.filter((c) => c.type === type).length + 1;
     const names = {
@@ -120,12 +123,14 @@ export const ThreeDSitePlanner: React.FC = () => {
       EV_CHARGER: `DC Fast Charger Bay ${count}`,
       BESS_CONTAINER: `BESS Storage Unit ${count}`,
       TRANSFORMER: `Substation Kiosk ${count}`,
+      HOSPITAL_BUILDING: `Hospital Facility Complex ${count}`,
     };
     const defaultDims = {
       SOLAR_CANOPY: { width: 14, length: 8, specs: { capacityKwp: 28, moduleCount: 70 } },
       EV_CHARGER: { width: 4, length: 2, specs: { ports: 2, powerKw: 120 } },
       BESS_CONTAINER: { width: 6, length: 2.5, specs: { capacityKwh: 300 } },
       TRANSFORMER: { width: 3, length: 3, specs: { ratingKva: 500 } },
+      HOSPITAL_BUILDING: { width: 22, length: 16, specs: { beds: 50, solarRoofKwp: 45 } },
     };
     const dim = defaultDims[type];
     const newComp: IPlacedComponent = {
@@ -221,6 +226,13 @@ export const ThreeDSitePlanner: React.FC = () => {
     setSolarElevation(45);
   };
 
+  const handleBirdsEyeCamera = () => {
+    setRotation(30);
+    setPitch(65);
+    setScale(1.4);
+    setSolarElevation(55);
+  };
+
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden select-none">
       {/* 3D Visual Viewport (75% width) */}
@@ -249,6 +261,22 @@ export const ThreeDSitePlanner: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 text-xs">
+            <button
+              onClick={handleBirdsEyeCamera}
+              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <span>🦅</span>
+              <span>Bird's-Eye View</span>
+            </button>
+
+            <button
+              onClick={() => setIsStreetViewOpen(true)}
+              className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <span>📸</span>
+              <span>Street View (Mapillary)</span>
+            </button>
+
             <button
               onClick={() => navigate(`/planning/${siteId}`)}
               className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 font-semibold transition-colors flex items-center gap-1.5"
@@ -371,6 +399,13 @@ export const ThreeDSitePlanner: React.FC = () => {
                   <span className="text-base">🔌</span>
                   <span>+ Transformer</span>
                 </button>
+                <button
+                  onClick={() => handleAddComponent('HOSPITAL_BUILDING')}
+                  className="col-span-2 px-2.5 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <span className="text-base">🏥</span>
+                  <span>+ Hospital Facility Complex</span>
+                </button>
               </div>
             </div>
 
@@ -389,6 +424,8 @@ export const ThreeDSitePlanner: React.FC = () => {
                     CHARGING_BAY: '⚡',
                     BESS_CONTAINER: '🔋',
                     TRANSFORMER: '🔌',
+                    HOSPITAL_BUILDING: '🏥',
+                    HOSPITAL: '🏥',
                   };
                   return (
                     <button
@@ -725,6 +762,15 @@ export const ThreeDSitePlanner: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Mapillary Nashik Street View Modal */}
+      <MapillaryStreetViewModal
+        isOpen={isStreetViewOpen}
+        onClose={() => setIsStreetViewOpen(false)}
+        lat={site?.latitude || site?.lat || 19.9975}
+        lng={site?.longitude || site?.lng || 73.7898}
+        title={`Nashik Street View — ${site?.code || 'NSK-CND-001'}`}
+      />
     </div>
   );
 };

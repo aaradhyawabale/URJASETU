@@ -19,7 +19,9 @@ export type ComponentType =
   | 'EV_CHARGER'
   | 'CHARGING_BAY'
   | 'BESS_CONTAINER'
-  | 'TRANSFORMER';
+  | 'TRANSFORMER'
+  | 'HOSPITAL_BUILDING'
+  | 'HOSPITAL';
 
 export interface IPlacedComponent {
   id: string;
