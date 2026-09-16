@@ -6,6 +6,7 @@ import { SensitivityService } from '../services/sensitivityService.js';
 import { ElevationService } from '../services/elevationService.js';
 import { ClimateService } from '../services/climateService.js';
 import { RiskService } from '../services/riskService.js';
+import { AIService } from '../services/aiService.js';
 
 async function runEndToEndIntegrationTests() {
   console.log('=== RUNNING URJASETU END-TO-END SYSTEM INTEGRATION TESTS ===');
@@ -73,6 +74,41 @@ async function runEndToEndIntegrationTests() {
     throw new Error('FAILED Test 7: Out-of-bounds candidate should be excluded with OUTSIDE_STUDY_AREA');
   }
   console.log('✅ Test 7 PASSED: Edge-case out-of-bounds coordinates correctly excluded.');
+
+  // 8. 7-Step User Journey & AI Proposal Review Integration Test
+  const aiReviewResponse = await AIService.generateReview({
+    siteCode: sample.code,
+    siteName: sample.name,
+    opportunityScore: sample.opportunityScore,
+    solarSuitability: (sample as any).metrics?.solarSuitability || 84,
+    evDemandProxy: (sample as any).metrics?.evDemandProxy || 72,
+    roadAccessibility: (sample as any).metrics?.roadAccessibility || 90,
+    floodRisk: 'LOW',
+    landConflict: 'NONE',
+    estimatedAreaSqm: 2450,
+    infrastructureType: 'SOLAR_EV_CHARGING_HUB',
+    placedComponents: [
+      { id: 'c1', type: 'SOLAR_CANOPY', name: 'Solar Array 1', xMeters: -5, yMeters: 5, widthMeters: 10, lengthMeters: 5, rotationDegrees: 0, specs: { capacityKwp: 48 } },
+      { id: 'c2', type: 'EV_CHARGER', name: 'Fast Charger 1', xMeters: 5, yMeters: -5, widthMeters: 3, lengthMeters: 2, rotationDegrees: 0, specs: { ports: 4 } },
+      { id: 'c3', type: 'BESS_CONTAINER', name: 'BESS 1', xMeters: 8, yMeters: 6, widthMeters: 6, lengthMeters: 2.5, rotationDegrees: 0, specs: { capacityKwh: 300 } },
+    ],
+  });
+
+  if (!aiReviewResponse.technicalCapacity || aiReviewResponse.technicalCapacity.solarCapacityKwp !== 48) {
+    throw new Error(`FAILED Test 8: Placed components solar capacity miscalculated: ${aiReviewResponse.technicalCapacity?.solarCapacityKwp}`);
+  }
+  if (aiReviewResponse.technicalCapacity.evChargerPorts !== 4) {
+    throw new Error(`FAILED Test 8: Placed components EV ports miscalculated: ${aiReviewResponse.technicalCapacity?.evChargerPorts}`);
+  }
+  if (aiReviewResponse.provenanceAudit.dataHonestyCompliance !== '100% VERIFIED_HONEST') {
+    throw new Error(`FAILED Test 8: Provenance audit compliance failed`);
+  }
+  console.log('✅ Test 8 PASSED: 7-Step User Journey AI Proposal Review correctly integrated 3 placed components:');
+  console.log(`   - Modeled Solar Yield: ${aiReviewResponse.technicalCapacity.solarCapacityKwp} kWp`);
+  console.log(`   - EV Charger Bays: ${aiReviewResponse.technicalCapacity.evChargerPorts} Ports`);
+  console.log(`   - BESS Buffer: ${aiReviewResponse.technicalCapacity.bessCapacityKwh} kWh`);
+  console.log(`   - Capex Estimate: ₹${(aiReviewResponse.technicalCapacity.estimatedCapexInr / 100000).toFixed(2)} Lakhs`);
+  console.log(`   - Provenance Compliance: ${aiReviewResponse.provenanceAudit.dataHonestyCompliance}`);
 
   console.log('\n================================================================');
   console.log('🎉 ALL URJASETU END-TO-END SYSTEM INTEGRATION TESTS PASSED CLEANLY!');
