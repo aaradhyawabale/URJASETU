@@ -5,6 +5,7 @@ import { getProposalById } from '../services/api/proposals';
 import { getSiteById } from '../services/api/sites';
 import { CandidateSite, Proposal } from '../types/site';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
+import { getPlanningDesign } from '../services/planningStateService';
 
 export const AIProposalReview: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,14 +23,19 @@ export const AIProposalReview: React.FC = () => {
       const propRes = await getProposalById(id || 'prop-nashik-01');
       setProposal(propRes.proposal);
 
-      const siteRes = await getSiteById(propRes.proposal.siteId || 'nashik-site-01');
+      const targetSiteId = propRes.proposal.siteId || 'nashik-site-01';
+      const siteRes = await getSiteById(targetSiteId);
       setSite(siteRes.site);
+
+      const design = getPlanningDesign(targetSiteId, siteRes.site);
+      const effectiveArea = design.plotAreaSqm || propRes.proposal.estimatedAreaSqm;
+      const effectiveComponents = design.components.length > 0 ? design.components : (propRes.proposal.placedComponents || []);
 
       const aiRes = await postAIReview({
         siteId: siteRes.site.id,
-        estimatedAreaSqm: propRes.proposal.estimatedAreaSqm,
+        estimatedAreaSqm: effectiveArea,
         infrastructureType: propRes.proposal.infrastructureType,
-        placedComponents: propRes.proposal.placedComponents || [],
+        placedComponents: effectiveComponents,
       });
 
       setAiReview(aiRes.review);

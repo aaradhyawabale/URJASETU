@@ -6,6 +6,7 @@ import { CandidateSite, InfrastructureType, IPlacedComponent, ComponentType } fr
 import { InteractivePlotDrawer } from '../gis/components/InteractivePlotDrawer';
 import { calculatePlotCapacityMetrics } from '../gis/utils/turfUtils';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
+import { getPlanningDesign, savePlanningDesign } from '../services/planningStateService';
 
 export const SitePlanningWorkspace: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
@@ -23,53 +24,47 @@ export const SitePlanningWorkspace: React.FC = () => {
   const [selectedInfra, setSelectedInfra] = useState<InfrastructureType>('SOLAR_EV_CHARGING_HUB');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Stage 7: 2D Placed Components State
-  const [placedComponents, setPlacedComponents] = useState<IPlacedComponent[]>([
-    {
-      id: 'comp-solar-01',
-      type: 'SOLAR_CANOPY',
-      name: 'Solar Carport Array A',
-      xMeters: -10,
-      yMeters: 6,
-      widthMeters: 15,
-      lengthMeters: 8,
-      rotationDegrees: 0,
-      specs: { capacityKwp: 24, moduleCount: 60 },
-    },
-    {
-      id: 'comp-ev-01',
-      type: 'EV_CHARGER',
-      name: 'DC Fast Charger Bay 1',
-      xMeters: 10,
-      yMeters: -6,
-      widthMeters: 4,
-      lengthMeters: 2,
-      rotationDegrees: 0,
-      specs: { ports: 2, powerKw: 120 },
-    },
-    {
-      id: 'comp-bess-01',
-      type: 'BESS_CONTAINER',
-      name: 'BESS Storage Unit 1',
-      xMeters: 12,
-      yMeters: 8,
-      widthMeters: 6,
-      lengthMeters: 2.5,
-      rotationDegrees: 0,
-      specs: { capacityKwh: 250 },
-    },
-    {
-      id: 'comp-trans-01',
-      type: 'TRANSFORMER',
-      name: 'Interconnect Kiosk',
-      xMeters: -12,
-      yMeters: -8,
-      widthMeters: 3,
-      lengthMeters: 3,
-      rotationDegrees: 0,
-      specs: { ratingKva: 500 },
-    },
-  ]);
+  // Stage 7: 2D Placed Components State synced with Canonical PlanningDesign State
+  const [placedComponents, setPlacedComponents] = useState<IPlacedComponent[]>([]);
+
+  // Initialize/Load Canonical Design State
+  useEffect(() => {
+    async function loadSiteAndDesign() {
+      if (siteId) {
+        const res = await getSiteById(siteId);
+        setSite(res.site);
+
+        const design = getPlanningDesign(siteId, res.site, customArea);
+        setPlacedComponents(design.components);
+        setSelectedInfra(design.infrastructureType || 'SOLAR_EV_CHARGING_HUB');
+        if (design.plotAreaSqm) setPlotAreaSqm(design.plotAreaSqm);
+        if (design.plotGeometry) setPlotGeometry(design.plotGeometry);
+      }
+    }
+    loadSiteAndDesign();
+  }, [siteId, customArea]);
+
+  // Sync back to canonical state whenever components, plotArea, or plotGeometry change
+  const syncToCanonicalState = (
+    updatedComponents: IPlacedComponent[],
+    updatedArea: number,
+    updatedGeometry: number[][][] | null,
+    updatedInfra: InfrastructureType
+  ) => {
+    if (!siteId) return;
+    savePlanningDesign({
+      siteId,
+      plotGeometry: updatedGeometry,
+      plotAreaSqm: updatedArea,
+      infrastructureType: updatedInfra,
+      components: updatedComponents,
+      provenance: {
+        plotGeometry: isAcquired ? 'DERIVED_CANDIDATE_PLOT_GEOMETRY' : 'GEODESIC_DRAWN_PLOT_GEOMETRY',
+        components: 'CANONICAL_PLANNING_STATE',
+      },
+      updatedAt: new Date().toISOString(),
+    });
+  };
 
   const handleAddComponent = (type: ComponentType) => {
     const id = `comp-${type.toLowerCase()}-${Date.now()}`;
@@ -126,27 +121,32 @@ export const SitePlanningWorkspace: React.FC = () => {
       };
     }
 
-    setPlacedComponents((prev) => [...prev, newComp]);
+    const nextComponents = [...placedComponents, newComp];
+    setPlacedComponents(nextComponents);
+    syncToCanonicalState(nextComponents, plotAreaSqm, plotGeometry, selectedInfra);
   };
 
   const handleRemoveComponent = (id: string) => {
-    setPlacedComponents((prev) => prev.filter((c) => c.id !== id));
+    const nextComponents = placedComponents.filter((c) => c.id !== id);
+    setPlacedComponents(nextComponents);
+    syncToCanonicalState(nextComponents, plotAreaSqm, plotGeometry, selectedInfra);
   };
 
-  useEffect(() => {
-    async function loadSite() {
-      if (siteId) {
-        const res = await getSiteById(siteId);
-        setSite(res.site);
-        if (res.site.areaSqm && !customArea) setPlotAreaSqm(res.site.areaSqm);
-      }
-    }
-    loadSite();
-  }, [siteId, customArea]);
+  const handleAreaChange = (newArea: number) => {
+    setPlotAreaSqm(newArea);
+    syncToCanonicalState(placedComponents, newArea, plotGeometry, selectedInfra);
+  };
+
+  const handlePolygonChange = (ringCoordinates: number[][][]) => {
+    setPlotGeometry(ringCoordinates);
+    syncToCanonicalState(placedComponents, plotAreaSqm, ringCoordinates, selectedInfra);
+  };
 
   const handleCreateProposalAndProceed = async () => {
     if (!site) return;
     setIsSaving(true);
+    syncToCanonicalState(placedComponents, plotAreaSqm, plotGeometry, selectedInfra);
+
     const res = await createProposal({
       siteId: site.id,
       siteCode: site.code,
@@ -156,6 +156,7 @@ export const SitePlanningWorkspace: React.FC = () => {
       infrastructureType: selectedInfra,
       aiSummary: `${site.code} parcel planning completed with ${plotAreaSqm.toLocaleString()} m² drawn plot area and ${selectedInfra} infrastructure selection.`,
       plotGeometry: plotGeometry ? { type: 'Polygon', coordinates: plotGeometry } : undefined,
+      placedComponents,
     });
 
     setIsSaving(false);

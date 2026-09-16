@@ -7,6 +7,8 @@ import { fetchOsmLayer } from '../gis/services/osmService';
 import { calculatePlotCapacityMetrics } from '../gis/utils/turfUtils';
 import { CandidateSite, Proposal, IPlacedComponent } from '../types/site';
 import { ScoreBadge } from '../components/ui/ScoreBadge';
+import { getPlanningDesign, savePlanningDesign } from '../services/planningStateService';
+import { PlanningDesign } from '../types/site';
 
 interface OSMBuildingFeature {
   id: string;
@@ -22,6 +24,7 @@ export const ThreeDSitePlanner: React.FC = () => {
 
   const [site, setSite] = useState<CandidateSite | null>(null);
   const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [planningDesign, setPlanningDesign] = useState<PlanningDesign | null>(null);
   const [surroundingBuildings, setSurroundingBuildings] = useState<OSMBuildingFeature[]>([]);
   
   // 3D Viewport Controls
@@ -40,11 +43,15 @@ export const ThreeDSitePlanner: React.FC = () => {
       const siteRes = await getSiteById(siteId);
       setSite(siteRes.site);
 
+      // 2. Load Canonical PlanningDesign State
+      const design = getPlanningDesign(siteId, siteRes.site);
+      setPlanningDesign(design);
+
       const lat = siteRes.site.latitude || siteRes.site.lat || 19.9975;
       const lng = siteRes.site.longitude || siteRes.site.lng || 73.7898;
       const centerPt = turf.point([lng, lat]);
 
-      // 2. Fetch Latest Proposal for this siteId (to extract 2D drawn plot geometry)
+      // 3. Fetch Proposal for site
       const propRes = await getProposals();
       const match = propRes.proposals.find((p) => p.siteId === siteId) || propRes.proposals[0];
       setProposal(match);
@@ -90,8 +97,8 @@ export const ThreeDSitePlanner: React.FC = () => {
     loadSiteAndProposal();
   }, [siteId]);
 
-  // Derived 3D Plot Area & Geometry
-  const plotAreaSqm = proposal?.estimatedAreaSqm || site?.areaSqm || 2450;
+  // Derived 3D Plot Area & Geometry from Canonical State
+  const plotAreaSqm = planningDesign?.plotAreaSqm || proposal?.estimatedAreaSqm || site?.areaSqm || 2450;
   const capacityMetrics = calculatePlotCapacityMetrics(plotAreaSqm);
 
   // Derived 3D Micro-Shading Screening Proxy Calculations
@@ -223,7 +230,7 @@ export const ThreeDSitePlanner: React.FC = () => {
                     <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:12px_12px] opacity-20"></div>
 
                     {/* Render Individual 3D Placed Infrastructure Component Blocks (Procedural 3D Primitives) */}
-                    {(proposal?.placedComponents || [
+                    {(planningDesign?.components || proposal?.placedComponents || [
                       { id: 'c1', type: 'SOLAR_CANOPY', name: 'Solar Carport Array A', xMeters: -8, yMeters: 6, widthMeters: 15, lengthMeters: 8, rotationDegrees: 0, specs: {} },
                       { id: 'c2', type: 'EV_CHARGER', name: 'DC Fast Charger Bay 1', xMeters: 8, yMeters: -6, widthMeters: 4, lengthMeters: 2, rotationDegrees: 0, specs: {} },
                       { id: 'c3', type: 'BESS_CONTAINER', name: 'BESS Storage Unit 1', xMeters: 10, yMeters: 7, widthMeters: 6, lengthMeters: 2.5, rotationDegrees: 0, specs: {} },

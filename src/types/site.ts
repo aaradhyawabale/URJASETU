@@ -140,3 +140,13 @@ export interface Proposal {
   placedComponents?: IPlacedComponent[];
 }
 
+export interface PlanningDesign {
+  siteId: string;
+  plotGeometry: number[][][] | null;
+  plotAreaSqm: number;
+  infrastructureType: InfrastructureType;
+  components: IPlacedComponent[];
+  provenance: Record<string, string>;
+  updatedAt: string;
+}
+
