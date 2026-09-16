@@ -212,7 +212,7 @@ export const SiteIntelligence: React.FC = () => {
       </div>
 
       {/* Selected Site Details Side Panel (30% width) */}
-      <div className="w-[400px] bg-white border-l border-border-subtle h-full flex flex-col justify-between overflow-y-auto shadow-md">
+      <div className="w-[410px] bg-white border-l border-border-subtle h-full flex flex-col justify-between overflow-y-auto shadow-md select-text">
         {selectedSite ? (
           <div className="p-6 flex flex-col gap-5">
             {/* Header */}
@@ -239,28 +239,34 @@ export const SiteIntelligence: React.FC = () => {
               {selectedSite.description}
             </p>
 
-            {/* Provenance & Authoritative Data Cards */}
+            {/* Authoritative Regional Solar Data Card */}
             {solarData && (
-              <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 flex flex-col gap-1.5 text-xs">
+              <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 flex flex-col gap-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-emerald-900 flex items-center gap-1">
-                    ☀️ Solar Resource (GHI)
+                    ☀️ Regional Solar Climatology
                   </span>
                   <span className="text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-300">
                     {solarData.classification}
                   </span>
                 </div>
                 <div className="flex justify-between text-emerald-950 font-medium mt-0.5">
-                  <span>Optimal Solar Surface GHI:</span>
+                  <span>Optimal Tilt GHI (20° S):</span>
                   <span className="font-bold">{solarData.metrics.annualGhiOptimalTilt} kWh/m²/day</span>
                 </div>
-                <div className="text-[10px] text-emerald-700 flex justify-between">
-                  <span>Source: NASA POWER Project</span>
-                  <span>Optimal Tilt: {solarData.metrics.optimalTiltAngleDegrees}° S</span>
+                <div className="text-[10px] text-emerald-700 flex flex-col gap-0.5 border-t border-emerald-200/60 pt-1 mt-0.5">
+                  <div className="flex justify-between">
+                    <span>Source: NASA POWER Climatology</span>
+                    <span>Resolution: 0.5° Grid (~50km)</span>
+                  </div>
+                  <div className="text-[9px] text-emerald-800 italic leading-tight mt-0.5">
+                    Note: 30-year regional climatology mean. Does not measure plot-level micro-shading from trees/buildings.
+                  </div>
                 </div>
               </div>
             )}
 
+            {/* Copernicus DEM Elevation & Slope Card */}
             {terrainData && (
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-1.5 text-xs">
                 <div className="flex items-center justify-between">
@@ -275,8 +281,8 @@ export const SiteIntelligence: React.FC = () => {
                   <span>Elevation: <strong>{terrainData.elevationMeters}m MSL</strong></span>
                   <span>Slope: <strong>{terrainData.slopePercent}% ({terrainData.slopeCategory})</strong></span>
                 </div>
-                <div className="text-[10px] text-slate-500">
-                  Source: {terrainData.source}
+                <div className="text-[10px] text-slate-500 border-t border-slate-200/60 pt-1 mt-0.5 leading-tight">
+                  Method: IDW spatial interpolation from Copernicus DEM 30m reference nodes.
                 </div>
               </div>
             )}
@@ -285,10 +291,10 @@ export const SiteIntelligence: React.FC = () => {
             <div className="flex flex-col gap-3">
               <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center justify-between">
                 <span>Decomposable Suitability Tree</span>
-                <span className="text-[10px] font-normal text-text-muted lowercase">(weighted criteria)</span>
+                <span className="text-[10px] font-normal text-text-muted lowercase">(computed criteria)</span>
               </h4>
               
-              <div className="flex flex-col gap-2 bg-surface-subtle p-3 rounded-xl border border-border-subtle">
+              <div className="flex flex-col gap-2.5 bg-surface-subtle p-3.5 rounded-xl border border-border-subtle">
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between text-xs font-medium">
                     <span className="text-text-secondary">☀️ Solar Photovoltaic Factor</span>
@@ -318,20 +324,34 @@ export const SiteIntelligence: React.FC = () => {
                     <div className="bg-emerald-500 h-full" style={{ width: `${selectedSite.metrics.roadAccessibility}%` }}></div>
                   </div>
                 </div>
+
+                {terrainData && (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between text-xs font-medium">
+                      <span className="text-text-secondary">⛰️ Terrain Slope Score</span>
+                      <span className="font-bold text-slate-700">{terrainData.terrainScore}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-slate-600 h-full" style={{ width: `${terrainData.terrainScore}%` }}></div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Risk & Conflict Screening */}
+            {/* Environmental & Waterway Setback Screening */}
             <div className="flex flex-col gap-2 pt-2 border-t border-border-subtle">
-              <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider">Environmental Screening</h4>
+              <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider">Environmental & Legal Screening</h4>
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
-                  <span className="text-[10px] text-text-muted font-semibold uppercase">Riparian Buffer</span>
+                  <span className="text-[10px] text-text-muted font-semibold uppercase">Riparian Setback</span>
                   <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics.floodRisk} RISK</span>
+                  <span className="text-[9px] text-text-muted mt-0.5">30m MRTP Blue Line</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted font-semibold uppercase">Land Conflict</span>
                   <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics.landConflict}</span>
+                  <span className="text-[9px] text-text-muted mt-0.5">NMC Zoning Check</span>
                 </div>
               </div>
             </div>

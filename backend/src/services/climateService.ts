@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+import { SCORING_CONFIG } from '../config/scoringConfig.js';
 
 export interface ISolarClimatology {
   source: string;
@@ -7,8 +6,13 @@ export interface ISolarClimatology {
   acquisitionDate: string;
   classification: 'OPEN';
   region: string;
-  latitude: number;
-  longitude: number;
+  referenceCoordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  spatialResolution: string;
+  datasetNature: string;
+  limitations: string;
   units: {
     ghi: string;
     temperature: string;
@@ -25,15 +29,20 @@ export interface ISolarClimatology {
   };
 }
 
-// Authoritative NASA POWER Solar & Climate Dataset for Nashik (lat: 19.9975, lon: 73.7898)
+// NASA POWER Solar & Climate Climatology Dataset for Nashik (lat: 19.9975, lon: 73.7898)
 const NASHIK_SOLAR_CLIMATOLOGY: ISolarClimatology = {
   source: 'NASA Prediction Of Worldwide Energy Resources (POWER) Project',
   url: 'https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=SI_EF_TILTED_SURFACE,ALLSKY_KT,T2M,PRECTOTCORR&community=RE&longitude=73.7898&latitude=19.9975&format=JSON',
   acquisitionDate: '2026-09-16',
   classification: 'OPEN',
-  region: 'Nashik, Maharashtra, India',
-  latitude: 19.9975,
-  longitude: 73.7898,
+  region: 'Nashik Regional Climatology Grid, Maharashtra, India',
+  referenceCoordinates: {
+    latitude: 19.9975,
+    longitude: 73.7898,
+  },
+  spatialResolution: SCORING_CONFIG.solarModel.sourceConstraints.datasetResolution,
+  datasetNature: '30-year NASA POWER regional solar climatology mean',
+  limitations: SCORING_CONFIG.solarModel.sourceConstraints.limitations,
   units: {
     ghi: 'kWh/m²/day',
     temperature: '°C',
@@ -65,7 +74,6 @@ const NASHIK_SOLAR_CLIMATOLOGY: ISolarClimatology = {
 
 export class ClimateService {
   public static async getNashikSolarClimatology(): Promise<ISolarClimatology> {
-    // Attempt live fetch with 3s timeout, fall back to cached NASA dataset
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
@@ -82,13 +90,18 @@ export class ClimateService {
           const opt = tilted.SI_TILTED_AVG_OPTIMAL || {};
 
           return {
-            source: 'NASA POWER Project (Live API)',
+            source: 'NASA POWER Project (Live Climatology API)',
             url,
             acquisitionDate: new Date().toISOString().split('T')[0],
             classification: 'OPEN',
-            region: 'Nashik, Maharashtra, India',
-            latitude: 19.9975,
-            longitude: 73.7898,
+            region: 'Nashik Regional Climatology Grid, Maharashtra, India',
+            referenceCoordinates: {
+              latitude: 19.9975,
+              longitude: 73.7898,
+            },
+            spatialResolution: SCORING_CONFIG.solarModel.sourceConstraints.datasetResolution,
+            datasetNature: '30-year NASA POWER regional solar climatology mean',
+            limitations: SCORING_CONFIG.solarModel.sourceConstraints.limitations,
             units: {
               ghi: 'kWh/m²/day',
               temperature: '°C',

@@ -1,6 +1,6 @@
 # UrjaSetu — Data Sources & Provenance Catalog
 
-## 1. OpenStreetMap (OSM) Dataset
+## 1. OpenStreetMap (OSM) Vector Datasets
 
 * **Source**: OpenStreetMap (OSM)
 * **Geographic Coverage**: Nashik Urban Study Extent, Maharashtra, India
@@ -9,6 +9,7 @@
 * **Extraction Date**: 2026-09-15
 * **Coordinate Reference System (CRS)**: WGS84 / `EPSG:4326`
 * **Attribution**: © OpenStreetMap contributors
+* **Classification**: **`OPEN`**
 
 ### Layer Summary & Feature Counts
 
@@ -26,7 +27,50 @@ OSM coverage is community-generated and may be incomplete or outdated in rapidly
 
 ---
 
-## 2. Municipal Utility & Raster Data Proxies
+## 2. Solar Resource Climatology (NASA POWER API)
 
-* **MSEDCL Substation Grid Feeders**: 33kV utility feeder polylines digitized for Nashik industrial zones.
-* **Godavari River Basin Floodways**: Open DEM (30m resolution) elevation slope screening vectors for riparian flood screening.
+* **Source**: NASA Prediction Of Worldwide Energy Resources (POWER) Project / NASA Langley Research Center
+* **API Endpoint**: `https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=SI_EF_TILTED_SURFACE,ALLSKY_KT,T2M,PRECTOTCORR&community=RE&longitude=73.7898&latitude=19.9975&format=JSON`
+* **Dataset Type**: Point Climatology (JSON)
+* **Geographic Coverage**: Nashik Regional Climatology Grid, Maharashtra, India (`19.9975°N, 73.7898°E`)
+* **Spatial Resolution**: 0.5° × 0.5° Grid (~50 km regional grid cell)
+* **Dataset Nature**: 30-year NASA POWER regional solar climatology mean
+* **Native CRS**: WGS84 (`EPSG:4326`)
+* **License & Attribution**: Public Domain / NASA Open Data Policy (`NASA POWER Project`)
+* **Acquisition Method**: Live HTTP REST API call with cached local fallback (`backend/src/services/climateService.ts`)
+* **Classification**: **`OPEN`**
+* **Validated Measurements for Nashik**:
+  * Global Horizontal Irradiance (GHI): **4.80 kWh/m²/day** (Annual Mean)
+  * Optimal Tilt Solar Surface Irradiance: **5.02 kWh/m²/day** (Annual Mean)
+  * Optimal PV Panel Tilt Angle: **20.0° South**
+  * Clearness Index (`ALLSKY_KT`): **0.55** (Annual Mean), Peak **0.68** (April)
+* **Limitations**:
+  * Regional climatology mean. Does NOT measure plot-level micro-shading from adjacent trees, utility poles, or buildings.
+
+---
+
+## 3. Terrain Elevation & Slope Analysis (Copernicus DEM 30m)
+
+* **Source**: Copernicus Space Component / ESA Copernicus DEM GLO-30 & SRTM 1-ArcSecond Grid
+* **API Endpoint / Grid Reference**: OpenTopography / Copernicus DEM 30m Reference Grid Nodes
+* **Dataset Type**: Raster GeoTIFF Grid Nodes
+* **Geographic Coverage**: Nashik Urban Extent (`19.90°N, 73.70°E` to `20.10°N, 73.95°E`)
+* **Spatial Resolution**: 1 arc-second (~30 meters)
+* **Native CRS**: WGS84 (`EPSG:4326`) / EGM96 Vertical Datum
+* **License & Attribution**: Open Access Data / Copernicus Sentinel License / Public Domain
+* **Methodology**: Inverse Distance Weighted (IDW) spatial interpolation from Copernicus DEM 30m reference nodes for Nashik municipal wards (`backend/src/services/elevationService.ts`).
+* **Classification**: **`OPEN`** (Raw DEM Grid Nodes), **`DERIVED`** (IDW Interpolated Elevation & Slope Calculation)
+* **Validated Measurements for Nashik**:
+  * Elevation Range: **540m MSL** (Godavari River Basin) to **720m MSL** (Satpur Ridge)
+  * Govardhan Site Slope: **2.5%** (`FLAT_OPTIMAL`, Slope ≤ 5.0%)
+* **Source-Backed Engineering Rationale**:
+  * Slope steepness > 15.0% restricts heavy electric bus/truck turning maneuvers and structural foundation stability per **Indian Roads Congress IRC:73-1980 & IRC:86-1983** urban road geometric design standards.
+
+---
+
+## 4. Environmental & Waterway Setback Screening
+
+* **Source**: Maharashtra Regional and Town Planning Act (MRTP Act 1966) & NMC DCPR 2017 Regulations
+* **Dataset Type**: Vector Buffer Exclusion Zone
+* **Methodology**: 30-meter Blue Line setback exclusion buffer generated along Godavari river banks and natural drainage channels.
+* **Classification**: **`DERIVED`**
