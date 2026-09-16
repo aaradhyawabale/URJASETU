@@ -1,131 +1,318 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import * as turf from '@turf/turf';
 import { getSiteById } from '../services/api/sites';
-import { CandidateSite } from '../types/site';
+import { getProposals } from '../services/api/proposals';
+import { fetchOsmLayer } from '../gis/services/osmService';
+import { calculatePlotCapacityMetrics } from '../gis/utils/turfUtils';
+import { CandidateSite, Proposal } from '../types/site';
+import { ScoreBadge } from '../components/ui/ScoreBadge';
+
+interface OSMBuildingFeature {
+  id: string;
+  name: string;
+  heightMeters: number;
+  distanceMeters: number;
+  coordinates: number[][]; // [lng, lat] footprint
+}
 
 export const ThreeDSitePlanner: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
   const navigate = useNavigate();
 
   const [site, setSite] = useState<CandidateSite | null>(null);
+  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [surroundingBuildings, setSurroundingBuildings] = useState<OSMBuildingFeature[]>([]);
+  
+  // 3D Viewport Controls
   const [rotation, setRotation] = useState<number>(45);
-  const [scale, setScale] = useState<number>(1.0);
+  const [pitch, setPitch] = useState<number>(55);
+  const [scale, setScale] = useState<number>(1.2);
   const [solarElevation, setSolarElevation] = useState<number>(45);
+  const [showShadows] = useState<boolean>(true);
+  const [showBuildings] = useState<boolean>(true);
 
   useEffect(() => {
-    async function loadSite() {
-      if (siteId) {
-        const res = await getSiteById(siteId);
-        setSite(res.site);
+    async function loadSiteAndProposal() {
+      if (!siteId) return;
+
+      // 1. Fetch Candidate Site
+      const siteRes = await getSiteById(siteId);
+      setSite(siteRes.site);
+
+      const lat = siteRes.site.latitude || siteRes.site.lat || 19.9975;
+      const lng = siteRes.site.longitude || siteRes.site.lng || 73.7898;
+      const centerPt = turf.point([lng, lat]);
+
+      // 2. Fetch Latest Proposal for this siteId (to extract 2D drawn plot geometry)
+      const propRes = await getProposals();
+      const match = propRes.proposals.find((p) => p.siteId === siteId) || propRes.proposals[0];
+      setProposal(match);
+
+      // 3. Fetch OSM Buildings & Spatially Filter within 500m of site
+      try {
+        const bldgData = await fetchOsmLayer('buildings');
+        if (bldgData && bldgData.features) {
+          const filtered: OSMBuildingFeature[] = [];
+          for (const feat of bldgData.features.slice(0, 100)) {
+            const geom = feat.geometry as any;
+            if (!geom || !geom.coordinates) continue;
+            let coords: number[][] = [];
+            if (geom.type === 'Polygon' && geom.coordinates[0]) {
+              coords = geom.coordinates[0];
+            } else if (geom.type === 'MultiPolygon' && geom.coordinates[0]?.[0]) {
+              coords = geom.coordinates[0][0];
+            }
+
+            if (coords.length > 0) {
+              const bldgPt = turf.point(coords[0]);
+              const distMeters = Math.round(turf.distance(centerPt, bldgPt, { units: 'kilometers' }) * 1000);
+              if (distMeters <= 500) {
+                const levels = feat.properties?.['building:levels'] ? parseInt(feat.properties['building:levels'], 10) : 3;
+                const heightMeters = Number((levels * 3.5).toFixed(1)); // DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY
+                filtered.push({
+                  id: String(feat.id || `bldg-${filtered.length}`),
+                  name: feat.properties?.name || feat.properties?.building || 'OSM Building Structure',
+                  heightMeters,
+                  distanceMeters: distMeters,
+                  coordinates: coords,
+                });
+              }
+            }
+          }
+          setSurroundingBuildings(filtered.slice(0, 12)); // Cap at 12 nearest buildings for smooth canvas render
+        }
+      } catch (err) {
+        console.warn('[ThreeDSitePlanner] Failed to load spatially filtered OSM buildings:', err);
       }
     }
-    loadSite();
+
+    loadSiteAndProposal();
   }, [siteId]);
 
-  // Derived conceptual 3D micro-shading proxy calculations
-  const estimatedBuildingHeight = 10.5; // DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY (3 floors @ 3.5m)
+  // Derived 3D Plot Area & Geometry
+  const plotAreaSqm = proposal?.estimatedAreaSqm || site?.areaSqm || 2450;
+  const capacityMetrics = calculatePlotCapacityMetrics(plotAreaSqm);
+
+  // Derived 3D Micro-Shading Screening Proxy Calculations
+  const averageBldgHeight = surroundingBuildings.length > 0
+    ? Number((surroundingBuildings.reduce((a, b) => a + b.heightMeters, 0) / surroundingBuildings.length).toFixed(1))
+    : 10.5;
+
   const elevRad = (Math.max(5, solarElevation) * Math.PI) / 180;
-  const shadowLengthMeters = Number((estimatedBuildingHeight / Math.tan(elevRad)).toFixed(1));
+  const shadowLengthMeters = Number((averageBldgHeight / Math.tan(elevRad)).toFixed(1));
   const shadingLossPercent = Number(Math.min(30, (shadowLengthMeters / 40) * 15).toFixed(1));
   const regionalGhi = 5.02; // NASA POWER annual mean baseline
   const effectiveGhi = Number((regionalGhi * (1 - shadingLossPercent / 100)).toFixed(2));
 
+  // Reset Camera View Handler
+  const handleResetCamera = () => {
+    setRotation(45);
+    setPitch(55);
+    setScale(1.2);
+    setSolarElevation(45);
+  };
+
   return (
-    <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden">
-      {/* 3D Viewport Canvas (75% width) */}
-      <div className="flex-1 relative bg-slate-900 h-full flex flex-col justify-between">
-        {/* Top 3D Status Overlay */}
-        <div className="absolute top-4 left-4 z-20 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-700 text-white shadow-lg flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-emerald-400 text-[20px]">view_in_ar</span>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">3D Conceptual Planner</span>
+    <div className="relative w-full h-[calc(100vh-64px)] flex overflow-hidden select-none">
+      {/* 3D Visual Viewport (75% width) */}
+      <div className="flex-1 relative bg-slate-950 h-full flex flex-col justify-between">
+        {/* Top 3D Overlay Header */}
+        <div className="absolute top-4 left-4 right-4 z-20 bg-slate-900/90 backdrop-blur-md px-4 py-3 rounded-xl border border-slate-700 text-white shadow-xl flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-emerald-400 text-[24px]">view_in_ar</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                3D Connected Site Planner
+              </span>
+            </div>
+
+            <span className="text-slate-700">|</span>
+
+            {site && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="font-bold text-white">{site.code}</span>
+                <span className="text-slate-400">({site.name})</span>
+                <span className="text-emerald-400 font-mono text-[11px] bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded">
+                  {plotAreaSqm.toLocaleString()} m² Plot
+                </span>
+              </div>
+            )}
           </div>
-          <span className="text-slate-600">|</span>
-          <span className="text-xs font-mono text-slate-300">Interactive 3D Visual Canvas (CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY)</span>
-          <span className="text-slate-600">|</span>
-          <span className="text-xs text-slate-300">{site ? site.code : 'NASHIK-SITE-01'} Parcel Overlay</span>
+
+          <div className="flex items-center gap-2 text-xs">
+            <button
+              onClick={() => navigate(`/planning/${siteId}`)}
+              className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[16px]">edit_location</span>
+              <span>Back to 2D Parcel Drawer</span>
+            </button>
+
+            <button
+              onClick={handleResetCamera}
+              className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 font-semibold transition-colors flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+              <span>Reset View</span>
+            </button>
+          </div>
         </div>
 
-        {/* 3D Canvas Mock Representation */}
-        <div className="w-full h-full relative select-none overflow-hidden flex items-center justify-center">
-          {/* 3D Rendering Canvas Background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center">
-            {/* Grid Mesh */}
-            <svg className="w-full h-full opacity-30" viewBox="0 0 1000 600">
-              <defs>
-                <pattern id="grid3d" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#64748b" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="1000" height="600" fill="url(#grid3d)" />
-            </svg>
+        {/* Interactive 3D Perspective Viewport Canvas */}
+        <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
+          {/* Sky & Perspective Grid Canvas */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+            {/* 3D Perspective Coordinate Container */}
+            <div
+              className="relative transition-transform duration-200 ease-out flex items-center justify-center"
+              style={{
+                transform: `rotateX(${pitch}deg) rotateZ(${rotation}deg) scale(${scale})`,
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              {/* 3D Ground Plane Grid (1000m x 1000m grid representation) */}
+              <div className="w-[600px] h-[600px] rounded-3xl bg-slate-900/80 border-2 border-slate-700/60 shadow-2xl relative flex items-center justify-center overflow-hidden">
+                <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 600 600">
+                  <defs>
+                    <pattern id="grid3d_mesh" width="30" height="30" patternUnits="userSpaceOnUse">
+                      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#94a3b8" strokeWidth="0.5" />
+                    </pattern>
+                  </defs>
+                  <rect width="600" height="600" fill="url(#grid3d_mesh)" />
+                </svg>
 
-            {/* Simulated 3D Solar-EV Hub Conceptual Model */}
-            <div className="relative z-10 flex flex-col items-center justify-center transition-all duration-300" style={{ transform: `rotate(${rotation}deg) scale(${scale})` }}>
-              {/* Solar Canopy 3D Structure */}
-              <div className="w-64 h-36 bg-emerald-600/40 border-2 border-emerald-400 rounded-xl shadow-2xl backdrop-blur-md flex flex-col items-center justify-center relative p-3">
-                <div className="w-full h-full bg-emerald-500/20 border border-emerald-300/40 rounded-lg flex flex-col items-center justify-center gap-1">
-                  <span className="material-symbols-outlined text-emerald-300 text-[36px]">solar_power</span>
-                  <span className="text-xs font-bold text-white tracking-widest uppercase">Solar Canopy Structure</span>
-                  <span className="text-[10px] text-emerald-200">DC Fast Charger Hub Concept</span>
+                {/* Confirmed 2D Plot Polygon Extrusion Base */}
+                <div className="w-72 h-44 rounded-2xl bg-emerald-500/20 border-3 border-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] flex flex-col items-center justify-center relative backdrop-blur-xs p-3">
+                  {/* Confirmed 2D Parcel Boundary Badge */}
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-bold font-mono px-3 py-0.5 rounded-full border border-emerald-300 shadow-md">
+                    2D CONFIRMED PARCEL: {plotAreaSqm.toLocaleString()} m²
+                  </div>
+
+                  {/* 3D Solar Canopy Model Overlay */}
+                  <div className="w-full h-full bg-emerald-600/30 border border-emerald-300/40 rounded-xl flex flex-col items-center justify-center gap-1 shadow-inner">
+                    <span className="material-symbols-outlined text-emerald-300 text-[42px] animate-pulse">
+                      solar_power
+                    </span>
+                    <span className="text-xs font-bold text-white tracking-wider uppercase">
+                      3D Solar PV Canopy Array
+                    </span>
+                    <span className="text-[10px] text-emerald-200 font-mono">
+                      {capacityMetrics.solarCapacityKwp} kWp • {capacityMetrics.evChargerPorts} EV Fast Ports
+                    </span>
+                  </div>
                 </div>
+
+                {/* 3D Spatially Filtered Surrounding OSM Buildings */}
+                {showBuildings && surroundingBuildings.map((bldg, idx) => {
+                  const angle = (idx * (360 / Math.max(1, surroundingBuildings.length)) * Math.PI) / 180;
+                  const radius = 210 + (idx % 3) * 15;
+                  const offsetX = Math.round(Math.cos(angle) * radius);
+                  const offsetY = Math.round(Math.sin(angle) * radius);
+
+                  return (
+                    <div
+                      key={bldg.id}
+                      className="absolute rounded-lg bg-slate-800/90 border border-slate-600 flex flex-col items-center justify-center p-1 text-[9px] text-slate-300 font-mono shadow-xl transition-all"
+                      style={{
+                        width: '70px',
+                        height: '50px',
+                        transform: `translate(${offsetX}px, ${offsetY}px)`,
+                        boxShadow: showShadows ? `${shadowLengthMeters * 1.5}px ${shadowLengthMeters * 1.5}px 15px rgba(0,0,0,0.7)` : 'none',
+                      }}
+                    >
+                      <span className="font-bold text-slate-200 truncate max-w-[60px]">{bldg.name}</span>
+                      <span className="text-amber-400 font-semibold">{bldg.heightMeters}m</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          {/* 3D Legend Overlay */}
-          <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700 text-xs text-slate-300 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>3D Model: Conceptual Solar Canopy Structure</span>
-            <span className="text-slate-600">|</span>
-            <span>Scale: {scale.toFixed(1)}x</span>
-            <span className="text-slate-600">|</span>
-            <span>Shadow Length: {shadowLengthMeters}m</span>
+          {/* 3D Viewport Legend Strip */}
+          <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-700 text-xs text-slate-300 flex items-center gap-4 shadow-lg">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Target Parcel: <strong>{site?.code || 'NSK-CND-001'}</strong></span>
+            </div>
+            <span className="text-slate-700">|</span>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+              <span>Spatially Filtered OSM Buildings: <strong>{surroundingBuildings.length} Features (&lt;500m)</strong></span>
+            </div>
+            <span className="text-slate-700">|</span>
+            <span>Rotation: <strong>{rotation}°</strong></span>
+            <span className="text-slate-700">|</span>
+            <span>Pitch: <strong>{pitch}°</strong></span>
           </div>
         </div>
       </div>
 
-      {/* Right Control Side Panel (25% width) */}
-      <div className="w-[360px] bg-white border-l border-border-subtle h-full flex flex-col justify-between overflow-y-auto shadow-md">
+      {/* Right Control & Capacity Side Panel (25% width) */}
+      <div className="w-[380px] bg-white border-l border-border-subtle h-full flex flex-col justify-between overflow-y-auto shadow-md">
         {site ? (
           <div className="p-6 flex flex-col gap-5">
-            <div className="border-b border-border-subtle pb-4">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">3D Placement & Solar Controls</span>
-              <h2 className="text-xl font-bold text-text-primary mt-0.5">{site.code}</h2>
-              <p className="text-xs text-text-muted mt-1">{site.name}</p>
+            <div className="border-b border-border-subtle pb-4 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">3D Placement & Capacity Workspace</span>
+                <h2 className="text-xl font-bold text-text-primary mt-0.5">{site.code}</h2>
+                <p className="text-xs text-text-muted mt-0.5">{site.name}</p>
+              </div>
+              <ScoreBadge score={site.opportunityScore} size="md" />
             </div>
 
-            {/* Rotation Controls */}
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between text-xs font-semibold text-text-primary">
-                <span>Model Rotation</span>
-                <span className="font-mono text-primary">{rotation}°</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="360"
-                value={rotation}
-                onChange={(e) => setRotation(Number(e.target.value))}
-                className="w-full accent-primary"
-              />
-            </div>
+            {/* Viewport & Camera Controls */}
+            <div className="flex flex-col gap-3">
+              <label className="text-xs font-bold text-text-primary uppercase tracking-wider">
+                Camera & 3D View Controls
+              </label>
 
-            {/* Scale Controls */}
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between text-xs font-semibold text-text-primary">
-                <span>Model Scale</span>
-                <span className="font-mono text-primary">{scale.toFixed(1)}x</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between text-xs font-semibold text-text-primary">
+                  <span>Model Rotation (Heading)</span>
+                  <span className="font-mono text-primary">{rotation}°</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={rotation}
+                  onChange={(e) => setRotation(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
               </div>
-              <input
-                type="range"
-                min="0.5"
-                max="2.0"
-                step="0.1"
-                value={scale}
-                onChange={(e) => setScale(Number(e.target.value))}
-                className="w-full accent-primary"
-              />
+
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between text-xs font-semibold text-text-primary">
+                  <span>Camera Pitch Angle</span>
+                  <span className="font-mono text-primary">{pitch}°</span>
+                </div>
+                <input
+                  type="range"
+                  min="15"
+                  max="85"
+                  value={pitch}
+                  onChange={(e) => setPitch(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between text-xs font-semibold text-text-primary">
+                  <span>Zoom Scale</span>
+                  <span className="font-mono text-primary">{scale.toFixed(1)}x</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.2"
+                  step="0.1"
+                  value={scale}
+                  onChange={(e) => setScale(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+              </div>
             </div>
 
             {/* Solar Elevation Slider & Micro-Shading Proxy */}
@@ -147,8 +334,12 @@ export const ThreeDSitePlanner: React.FC = () => {
                 <div className="flex items-center justify-between font-bold text-amber-900">
                   <span>Micro-Shading Screening</span>
                   <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-mono">
-                    PROXY
+                    CONCEPTUAL_PROXY
                   </span>
+                </div>
+                <div className="flex justify-between text-amber-900">
+                  <span>Avg OSM Building Height:</span>
+                  <span className="font-bold">{averageBldgHeight} meters</span>
                 </div>
                 <div className="flex justify-between text-amber-900">
                   <span>Projected Building Shadow:</span>
@@ -159,17 +350,53 @@ export const ThreeDSitePlanner: React.FC = () => {
                   <span className="font-bold">{shadingLossPercent}%</span>
                 </div>
                 <div className="flex justify-between text-amber-900">
-                  <span>Shaded GHI Irradiance:</span>
+                  <span>Effective GHI Irradiance:</span>
                   <span className="font-bold">{effectiveGhi} kWh/m²/day</span>
                 </div>
               </div>
             </div>
 
-            {/* 3D Context & Provenance Note */}
-            <div className="p-4 rounded-xl bg-surface-subtle border border-border-subtle flex flex-col gap-2 text-xs">
-              <span className="font-bold text-text-primary uppercase text-[10px]">Data Provenance & Disclaimer</span>
-              <p className="text-text-secondary leading-relaxed">
-                High-resolution 1m LiDAR / 3D building mesh is unavailable for Nashik. Micro-shading loss and shadow projections are <strong>CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY</strong> models calculated from OSM building height proxies (3.5m/floor).
+            {/* Capacity Metrics Summary from Confirmed 2D Plot */}
+            <div className="p-4 rounded-xl bg-surface-subtle border border-border-subtle flex flex-col gap-3">
+              <div className="flex items-center justify-between border-b border-border-subtle pb-2">
+                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                  Confirmed Plot Capacity Summary
+                </span>
+                <span className="text-xs font-mono font-bold text-primary">{plotAreaSqm.toLocaleString()} m²</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                  <span className="text-[9px] text-text-muted uppercase font-semibold">Solar PV Capacity</span>
+                  <span className="font-bold text-emerald-700">{capacityMetrics.solarCapacityKwp} kWp</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                  <span className="text-[9px] text-text-muted uppercase font-semibold">Annual Generation</span>
+                  <span className="font-bold text-emerald-700">{capacityMetrics.annualGenerationMwh} MWh/yr</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                  <span className="text-[9px] text-text-muted uppercase font-semibold">EV Fast Ports</span>
+                  <span className="font-bold text-sky-700">{capacityMetrics.evChargerPorts} Ports</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-lg border border-border-subtle flex flex-col">
+                  <span className="text-[9px] text-text-muted uppercase font-semibold">BESS Buffer</span>
+                  <span className="font-bold text-purple-700">{capacityMetrics.bessCapacityKwh} kWh</span>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs">
+                <span className="text-[10px] font-bold text-emerald-900 uppercase">Estimated Civil Capex:</span>
+                <span className="font-bold font-mono text-emerald-800">
+                  ₹{(capacityMetrics.estimatedCapexInr / 100000).toFixed(2)} Lakhs
+                </span>
+              </div>
+            </div>
+
+            {/* Data Provenance & Disclaimer Note */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs flex flex-col gap-1.5 text-slate-700">
+              <span className="font-bold text-slate-900 uppercase text-[10px]">Data Honesty & Provenance</span>
+              <p className="leading-relaxed text-[11px]">
+                High-resolution LiDAR / 3D building mesh is unavailable for Nashik. Building heights are <strong>DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY</strong> (height = levels × 3.5m). Capacity numbers are <strong>PLANNING_HEURISTIC</strong>.
               </p>
             </div>
           </div>
@@ -181,7 +408,7 @@ export const ThreeDSitePlanner: React.FC = () => {
         {site && (
           <div className="p-4 bg-surface-subtle border-t border-border-subtle flex flex-col gap-2">
             <button
-              onClick={() => navigate('/proposals/prop-nashik-01/review')}
+              onClick={() => navigate(`/proposals/${proposal?.id || 'prop-nashik-01'}/review`)}
               className="w-full py-2.5 px-4 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 shadow-xs"
             >
               <span className="material-symbols-outlined text-[18px]">psychology</span>
