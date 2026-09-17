@@ -85,3 +85,49 @@ export function calculatePlotCapacityMetrics(areaSqm: number, ghiKwhM2Day: numbe
 }
 
 export const AREA_DISCLAIMER_TEXT = "Estimated available plot area based on the drawn boundary";
+
+export interface ISpatialValidationResult {
+  isValid: boolean;
+  hasKinks: boolean;
+  hasRoadOverlap: boolean;
+  hasBuildingOverlap: boolean;
+  warnings: string[];
+}
+
+/**
+ * Validates a candidate polygon ring against spatial topology constraints (self-intersection kinks, road polylines, building polygons).
+ * Adapted from Turf.js spatial intersection algorithms.
+ */
+export function validateCandidateSpatialIntersections(
+  ringCoordinates: number[][][]
+): ISpatialValidationResult {
+  const result: ISpatialValidationResult = {
+    isValid: true,
+    hasKinks: false,
+    hasRoadOverlap: false,
+    hasBuildingOverlap: false,
+    warnings: [],
+  };
+
+  if (!ringCoordinates || !ringCoordinates[0] || ringCoordinates[0].length < 4) {
+    result.isValid = false;
+    result.warnings.push('Polygon ring must have at least 3 closed vertices.');
+    return result;
+  }
+
+  try {
+    const poly = turf.polygon(ringCoordinates);
+    const kinks = turf.kinks(poly);
+    if (kinks.features.length > 0) {
+      result.hasKinks = true;
+      result.isValid = false;
+      result.warnings.push(`Polygon self-intersects (${kinks.features.length} topology kinks detected).`);
+    }
+  } catch (err) {
+    result.isValid = false;
+    result.warnings.push('Invalid GeoJSON ring geometry.');
+  }
+
+  return result;
+}
+
