@@ -28,11 +28,13 @@ export const AppRoutes: React.FC = () => {
           <Route path="/sites/ranked" element={<RankedSites />} />
           <Route path="/sites/compare" element={<SiteComparison />} />
 
-          {/* Screen 4: Site Planning Workspace */}
+          {/* Screen 4: Site Planning Workspace & Alias */}
           <Route path="/planning/:siteId" element={<SitePlanningWorkspace />} />
+          <Route path="/sites/:siteId/plan" element={<SitePlanningWorkspace />} />
 
-          {/* Screen 5: 3D Site Planner */}
+          {/* Screen 5: 3D Site Planner & Alias */}
           <Route path="/planning/:siteId/3d" element={<ThreeDSitePlanner />} />
+          <Route path="/sites/:siteId/3d" element={<ThreeDSitePlanner />} />
 
           {/* Screen 6: AI Proposal Review */}
           <Route path="/proposals/:id/review" element={<AIProposalReview />} />
