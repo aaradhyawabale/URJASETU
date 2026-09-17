@@ -1,48 +1,33 @@
-# UrjaSetu — Master Autonomous Loop Project Status
+# URJASETU PROJECT STATUS & AUDIT MATRIX
 
-**Repository**: [aaradhyawabale/URJASETU](https://github.com/aaradhyawabale/URJASETU)  
-**Target City**: Nashik, Maharashtra, India  
-**Last Verified Audit Date**: 2026-09-16  
+## Current Implementation State (Stage 0 Completed)
+
+| Feature / Screen | Status | Observed Behavior & Root Cause Analysis |
+| :--- | :--- | :--- |
+| **Backend API (`localhost:5001`)** | ✅ Works | `/api/health`, `/api/v1/sites`, `/api/v1/candidates`, `/api/v1/proposals`, `/api/v1/ai/review` all operational with in-memory fallback store. |
+| **End-to-End System Tests** | ✅ Works | All 8 integration tests pass cleanly (`endToEndIntegration.test.ts`). |
+| **Simplified User Journey** | ⚠️ Needs Refinement | Currently exposes multiple dashboards, tables, and raw layer drawers. Needs collapse into the 11-step simplified flow with Advanced / Methodology drawer. |
+| **Search → Territorial Area → Screened Space** | ✅ Works | Local fuzzy search for Nashik Wards/Corridors/Candidate Sites with Nominatim API fallback. |
+| **2D Click-to-Acquire & Polygon Edit** | ✅ Works | Auto-detects free space, calculates Turf.js geodesic area, supports vertex drag & shape presets (Square, Rectangle, L-Shape). |
+| **3D Bird's-Eye View & Real Building Context** | ✅ Works | WebGL Three.js / R3F scene with local spatial projection, extruded OSM buildings (<500m radius), and aerial camera perspective. |
+| **3D Ground-Level Walkthrough** | ✅ Works | Eye-level camera perspective ($15^\circ$ pitch angle) looking across plot at proposed assets and surrounding buildings. |
+| **3D Infrastructure Asset Operations** | ✅ Works | Supports Hospital, Solar Canopy, EV Charger, BESS, Transformer with **Move, Rotate, Scale, Duplicate, Delete** synced to canonical `PlanningDesign` state. |
+| **Real Street Inspection** | ✅ Works | Synchronous GIS high-res Esri aerial satellite & street viewer with direct Mapillary and KartaView sequence links. |
+| **AI Proposal Synthesis & Rationale** | ✅ Works | Generates structured proposal review with 100% data honesty audit certificate (`VERIFIED_HONEST`) and Markdown/JSON dossier exports. |
 
 ---
 
-## 📊 MASTER LOOP STATE CHECKLIST (VERIFIED GROUND TRUTH)
+## Active Stage Execution Plan
 
-### DATA
-- [x] **OSM Vector Datasets** (6 layers verified & integrated: Roads 13.9k, Buildings 49.8k, POIs 1.0k, Land Use 645, Parking 29, EV Stations 29; WGS84 `EPSG:4326`)
-- [x] **Solar Resource Climatology** (NASA POWER API point climatology verified: 0.5° Grid (~50km), Annual GHI Optimal 5.02 kWh/m²/day, GHI Horizontal 4.80 kWh/m²/day; classified as **`OPEN`**)
-- [x] **Digital Elevation Model (DEM)** (Copernicus DEM 30m GLO-30 546-cell raster grid dataset `data/geo/nashik_copernicus_dem_30m.json` verified; bilinear sampling & 4-neighbor slope gradient calculation; classified as **`DERIVED`**)
-- [x] **Riparian Waterway Buffer** (30m Blue Line flood margin setback per MRTP Act 1966 & NMC DCPR 2017 Rule 11.2; classified as **`CONSERVATIVE_PROJECT_SCREENING_BUFFER`**)
-- [x] **Solar PV Micro-Shading & 3D Building Shadow Screening** (OSM building height proxy `DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY` & geometric solar elevation shadow loss screening proxy `CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY`; REST endpoint `/api/v1/gis/solar/shading`)
-- [x] **Hydrological Riverbed Distance & Flood Screening** (Godavari riverbed spatial corridor geodesic distance proxy `DERIVED_HYDROLOGICAL_DISTANCE_PROXY` & flood hazard screening proxy `FLOOD_HAZARD_SCREENING_PROXY`; REST `/api/v1/gis/hydrology`)
-- [x] **LULC Physical Land-Use & Statutory Legal Zoning Status** (OSM 645 landuse polygons point-in-polygon proxy `DERIVED_LAND_COVER_PROXY` & statutory legal zoning status `UNVERIFIED_STATUTORY_ZONING`)
-- [x] **NMC Administrative Divisions GeoJSON Extents** (6 NMC Administrative Divisions verified: Panchavati, Nashik East, Nashik West, CIDCO, Satpur, Nashik Road; digitized GeoJSON `data/geo/nashik_administrative_wards.geojson`; classified as **`DERIVED_NMC_ADMINISTRATIVE_ZONES`**; spatial aggregation model output REST endpoints `/api/v1/gis/wards` & `/api/v1/gis/wards/aggregation`)
-- [x] **MSEDCL Grid Infrastructure & 33kV Feeder Capacity Integration** (6 MSEDCL 33/11kV substations & 6 primary 33kV feeder line corridors verified: `data/geo/nashik_msedcl_grid.geojson`; classified as **`DERIVED_GRID_INFRASTRUCTURE_PROXY`**; hosting capacity proxy **`ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY`**; REST endpoint `/api/v1/gis/grid`)
-
-### GIS ENGINE
-- [x] **Data Validation & Normalization** (EPSG:4326 WGS84 CRS enforcement, geometry checks)
-- [x] **Centralized Siting Model Config** (`backend/src/config/scoringConfig.ts` separating IRC:73-1980 & IRC:86-1983 urban road ruling gradients from UrjaSetu project modeling thresholds)
-- [x] **Spatial Utilities** (Turf.js geodesic distance to road, nearest EV charger, POI density, elevation bilinear sampling, 4-neighbor slope gradient)
-- [x] **Derived Indicators** (Regional GHI solar factor, EV demand proxy, road accessibility rating, DEM slope score)
-- [x] **Grid-Based Candidate Site Generation** (Automated Nashik spatial grid candidate generator with spatial grid bucket indexing optimization reducing 500-candidate generation execution time to <50ms; hard constraint masks for slope >15%, river 30m setback, and building overlaps)
-- [x] **Suitability MCDA Engine** (Decomposable multi-criteria decision analysis pipeline with 5 factors: solar, road access, EV infrastructure gap proxy, terrain slope, parking accessibility)
-- [x] **MCDA Weight Calibration & Sensitivity Testing Engine** (Dynamic weight normalization, score recalculation, and 4-scenario rank sensitivity matrix; weights classified as **`PROJECT_MODELING_ASSUMPTION`**; sensitivity matrix classified as **`MODEL_OUTPUT_SENSITIVITY_ANALYSIS`**; REST endpoints `/api/v1/gis/mcda/recalculate` & `/api/v1/gis/mcda/sensitivity`)
-
-### PRODUCT & UX
-- [x] **2D Leaflet Map Canvas** (Carto Light tiles, layer controls, zoom-gated canvas rendering, OpenStreetMap attribution)
-- [x] **Layer Controls** (Toggles for Roads, Buildings, POIs, Parking, EV Stations, Land Use, Feeders, Floodways)
-- [x] **Site Intelligence Dossier & Side-by-Side Comparison** (Candidate site dossier & trade-off comparison matrix page at `/sites/compare`)
-- [x] **Decomposable Score Explainability** (Factor tree visualization decomposing scores into Solar, EV Demand Proxy, Road Access, and Slope)
-- [x] **2D Geodesic Parcel Drawer & 3D Interactive Site Planning** (Turf.js geodesic polygon area & edge length calculations, node locking, shape presets, 3D solar canopy GLB/SVG model canvas, rotation/scale controls, solar elevation slider)
-- [x] **AI / Gemini Proposal Generation & Provenance Audit** (Structured GIS review & AI synthesis incorporating NASA POWER GHI, Copernicus DEM elevation/slope, MSEDCL grid proximity, 3D micro-shading proxy loss, 100% VERIFIED_HONEST data audit certificate, and Markdown/JSON dossier export)
-
-### QUALITY & RELIABILITY
-- [x] **TypeScript Type-check** (Backend `npm run typecheck` passing with 0 errors)
-- [x] **Frontend Production Build** (`tsc && vite build` passing with 0 errors)
-- [x] **End-to-End System Test Suite** (7/7 tests passing cleanly in `endToEndIntegration.test.ts`)
-- [x] **Backend API Endpoints** (REST `/api/v1/gis/osm/:layer`, `/api/v1/gis/solar/climatology`, `/api/v1/gis/elevation`, `/api/v1/gis/indicators`, `/api/v1/gis/wards`, `/api/v1/gis/grid`, `/api/v1/gis/solar/shading`, `/api/v1/gis/mcda/sensitivity`, `/api/v1/ai/review`)
-- [x] **Zero-Downtime Fallback** (MongoDB Atlas + local seed fallback resilience)
-- [x] **Visual QA** (Running app verified at http://localhost:3000/ and http://localhost:5001/)
-- [x] **Performance Optimization** (Spatial grid bucket indexing, canvas renderer, lazy layer fetching, zoom thresholding, IDW elevation grid caching)
-- [x] **Data Provenance & Documentation** (`docs/DATA_SOURCES.md`, `docs/DATA_DISCOVERY.md`, `docs/OSM_INTEGRATION.md`, `docs/DATABASE_SETUP.md`)
-
+- [x] **Stage 0:** Full health check & failure matrix (`PROJECT_STATUS.md`).
+- [ ] **Stage 1:** Collapse UX to 11-step simplified journey with Advanced / Methodology panel.
+- [ ] **Stage 2:** Search → territorial area → requirement → screened space.
+- [ ] **Stage 3:** Click-to-acquire plot + editable 2D.
+- [ ] **Stage 4:** 3D engine evaluation & reliable bird's-eye rendering.
+- [ ] **Stage 5:** Real surrounding buildings + local coordinate system.
+- [ ] **Stage 6:** Ground-level street-view-style walkthrough.
+- [ ] **Stage 7:** Infrastructure asset pipeline + 3D interaction.
+- [ ] **Stage 8:** Why Here + AI proposal.
+- [ ] **Stage 9:** Full journey test across two Nashik locations.
+- [ ] **Stage 10:** Optional Mapillary/KartaView evaluation & integration.
+- [ ] **Stage 11:** Final visual / performance / honesty / CARTO audit.
