@@ -443,6 +443,236 @@ const HospitalMesh: React.FC<{
   );
 };
 
+// Procedural 3D Mesh: Telecom & 5G Network Lattice Tower
+const TelecomTowerMesh: React.FC<{
+  comp: IPlacedComponent;
+  isSelected: boolean;
+  onSelect?: () => void;
+}> = ({ comp, isSelected, onSelect }) => {
+  const rotRad = ((comp.rotationDegrees || 0) * Math.PI) / 180;
+  const height = 18.0;
+
+  return (
+    <group
+      position={[comp.xMeters, 0, -comp.yMeters]}
+      rotation={[0, rotRad, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
+    >
+      {/* Base Concrete Foundation */}
+      <mesh position={[0, 0.2, 0]} castShadow>
+        <boxGeometry args={[3.2, 0.4, 3.2]} />
+        <meshStandardMaterial color="#475569" roughness={0.6} />
+      </mesh>
+
+      {/* Main Lattice Tower Mast */}
+      <mesh position={[0, height / 2 + 0.4, 0]} castShadow>
+        <cylinderGeometry args={[0.3, 1.2, height, 4]} />
+        <meshStandardMaterial
+          color={isSelected ? '#f59e0b' : '#94a3b8'}
+          metalness={0.8}
+          roughness={0.2}
+          wireframe
+        />
+      </mesh>
+
+      {/* Antenna Dishes */}
+      <mesh position={[0, height - 2, 0.6]} rotation={[0.4, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.6, 0.6, 0.15, 16]} />
+        <meshStandardMaterial color="#e2e8f0" metalness={0.5} />
+      </mesh>
+      <mesh position={[-0.5, height - 4, 0]} rotation={[0, 0, -0.4]} castShadow>
+        <cylinderGeometry args={[0.5, 0.5, 0.15, 16]} />
+        <meshStandardMaterial color="#e2e8f0" metalness={0.5} />
+      </mesh>
+
+      {/* Red Beacon Aviation Light */}
+      <mesh position={[0, height + 0.6, 0]}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={2.0} />
+      </mesh>
+
+      {/* Floating 3D Badge */}
+      <Html position={[0, height + 2.0, 0]} center distanceFactor={25}>
+        <div
+          className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono shadow-md border pointer-events-none whitespace-nowrap transition-transform ${
+            isSelected
+              ? 'bg-amber-500 text-white border-amber-300 scale-110'
+              : 'bg-indigo-950/90 text-indigo-300 border-indigo-400/50'
+          }`}
+        >
+          📶 Telecom Tower ({height}m Mast)
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Procedural 3D Mesh: Public Hygiene Kiosk / Toilet
+const PublicToiletMesh: React.FC<{
+  comp: IPlacedComponent;
+  isSelected: boolean;
+  onSelect?: () => void;
+}> = ({ comp, isSelected, onSelect }) => {
+  const rotRad = ((comp.rotationDegrees || 0) * Math.PI) / 180;
+
+  return (
+    <group
+      position={[comp.xMeters, 0, -comp.yMeters]}
+      rotation={[0, rotRad, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
+    >
+      {/* Base & Kiosk Structure */}
+      <mesh position={[0, 1.3, 0]} castShadow receiveShadow>
+        <boxGeometry args={[4.0, 2.6, 2.5]} />
+        <meshStandardMaterial
+          color={isSelected ? '#f59e0b' : '#0d9488'}
+          metalness={0.3}
+          roughness={0.4}
+        />
+      </mesh>
+      {/* Roof Canopy */}
+      <mesh position={[0, 2.7, 0]} castShadow>
+        <boxGeometry args={[4.4, 0.2, 2.9]} />
+        <meshStandardMaterial color="#115e59" metalness={0.6} />
+      </mesh>
+      {/* Floating 3D Badge */}
+      <Html position={[0, 3.4, 0]} center distanceFactor={25}>
+        <div
+          className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono shadow-md border pointer-events-none whitespace-nowrap transition-transform ${
+            isSelected
+              ? 'bg-amber-500 text-white border-amber-300 scale-110'
+              : 'bg-teal-950/90 text-teal-300 border-teal-400/50'
+          }`}
+        >
+          🚻 Public Toilet Kiosk
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Procedural 3D Mesh: Elevated Municipal Water Tank
+const WaterTankMesh: React.FC<{
+  comp: IPlacedComponent;
+  isSelected: boolean;
+  onSelect?: () => void;
+}> = ({ comp, isSelected, onSelect }) => {
+  const rotRad = ((comp.rotationDegrees || 0) * Math.PI) / 180;
+  const height = 12.0;
+
+  return (
+    <group
+      position={[comp.xMeters, 0, -comp.yMeters]}
+      rotation={[0, rotRad, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
+    >
+      {/* Support Legs */}
+      <mesh position={[-1.2, height / 2, -1.2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, height, 8]} />
+        <meshStandardMaterial color="#475569" metalness={0.6} />
+      </mesh>
+      <mesh position={[1.2, height / 2, -1.2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, height, 8]} />
+        <meshStandardMaterial color="#475569" metalness={0.6} />
+      </mesh>
+      <mesh position={[-1.2, height / 2, 1.2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, height, 8]} />
+        <meshStandardMaterial color="#475569" metalness={0.6} />
+      </mesh>
+      <mesh position={[1.2, height / 2, 1.2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, height, 8]} />
+        <meshStandardMaterial color="#475569" metalness={0.6} />
+      </mesh>
+
+      {/* Cylindrical Storage Tank Reservoir */}
+      <mesh position={[0, height + 1.8, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[2.5, 2.5, 3.6, 24]} />
+        <meshStandardMaterial
+          color={isSelected ? '#f59e0b' : '#0284c7'}
+          metalness={0.4}
+          roughness={0.3}
+        />
+      </mesh>
+
+      {/* Floating 3D Badge */}
+      <Html position={[0, height + 4.2, 0]} center distanceFactor={25}>
+        <div
+          className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono shadow-md border pointer-events-none whitespace-nowrap transition-transform ${
+            isSelected
+              ? 'bg-amber-500 text-white border-amber-300 scale-110'
+              : 'bg-sky-950/90 text-sky-300 border-sky-400/50'
+          }`}
+        >
+          💧 Water Storage Tank ({height}m Elevated)
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Procedural 3D Mesh: Urban Green Park / Tree Belt
+const GreenParkMesh: React.FC<{
+  comp: IPlacedComponent;
+  isSelected: boolean;
+  onSelect?: () => void;
+}> = ({ comp, isSelected, onSelect }) => {
+  const width = Math.max(6, comp.widthMeters || 12);
+  const length = Math.max(6, comp.lengthMeters || 10);
+  const rotRad = ((comp.rotationDegrees || 0) * Math.PI) / 180;
+
+  return (
+    <group
+      position={[comp.xMeters, 0, -comp.yMeters]}
+      rotation={[0, rotRad, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
+    >
+      {/* Grass Base Lawn Plane */}
+      <mesh position={[0, 0.08, 0]} receiveShadow>
+        <boxGeometry args={[width, 0.16, length]} />
+        <meshStandardMaterial
+          color={isSelected ? '#f59e0b' : '#15803d'}
+          roughness={0.8}
+        />
+      </mesh>
+
+      {/* 3D Procedural Trees */}
+      <mesh position={[-width / 3, 2.0, -length / 4]} castShadow>
+        <coneGeometry args={[1.2, 3.5, 8]} />
+        <meshStandardMaterial color="#166534" roughness={0.7} />
+      </mesh>
+      <mesh position={[width / 3, 1.8, length / 4]} castShadow>
+        <coneGeometry args={[1.0, 3.0, 8]} />
+        <meshStandardMaterial color="#15803d" roughness={0.7} />
+      </mesh>
+
+      {/* Floating 3D Badge */}
+      <Html position={[0, 3.8, 0]} center distanceFactor={25}>
+        <div
+          className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono shadow-md border pointer-events-none whitespace-nowrap transition-transform ${
+            isSelected
+              ? 'bg-amber-500 text-white border-amber-300 scale-110'
+              : 'bg-emerald-950/90 text-emerald-300 border-emerald-400/50'
+          }`}
+        >
+          🌳 Green Park & Tree Belt ({width}m × {length}m)
+        </div>
+      </Html>
+    </group>
+  );
+};
+
 export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
   components,
   plotAreaSqm,
@@ -573,8 +803,40 @@ export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
                 />
               )}
 
-              {(comp.type === 'HOSPITAL_BUILDING' || comp.type === 'HOSPITAL') && (
+              {(comp.type === 'HOSPITAL_BUILDING' || comp.type === 'HOSPITAL' || comp.type === 'SCHOOL_BUILDING') && (
                 <HospitalMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {comp.type === 'TELECOM_TOWER' && (
+                <TelecomTowerMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {comp.type === 'PUBLIC_TOILET' && (
+                <PublicToiletMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {comp.type === 'WATER_TANK' && (
+                <WaterTankMesh
+                  comp={comp}
+                  isSelected={isSelected}
+                  onSelect={handleSelect}
+                />
+              )}
+
+              {comp.type === 'GREEN_PARK' && (
+                <GreenParkMesh
                   comp={comp}
                   isSelected={isSelected}
                   onSelect={handleSelect}

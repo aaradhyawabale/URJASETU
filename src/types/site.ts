@@ -21,7 +21,13 @@ export type ComponentType =
   | 'BESS_CONTAINER'
   | 'TRANSFORMER'
   | 'HOSPITAL_BUILDING'
-  | 'HOSPITAL';
+  | 'HOSPITAL'
+  | 'SCHOOL_BUILDING'
+  | 'PUBLIC_TOILET'
+  | 'TELECOM_TOWER'
+  | 'WATER_TANK'
+  | 'GREEN_PARK'
+  | 'BUS_STOP';
 
 export interface IPlacedComponent {
   id: string;
