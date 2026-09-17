@@ -84,6 +84,54 @@ const BuildingExtrusionMesh: React.FC<{
   );
 };
 
+// 3D Road Network Polyline Ribbon Mesh
+const RoadRibbonMesh: React.FC<{
+  centerLat: number;
+  centerLng: number;
+}> = ({ centerLat, centerLng }) => {
+  const lineGeometries = React.useMemo(() => {
+    // Generate primary and secondary arterial road polylines around site center
+    const deg2rad = Math.PI / 180;
+    const cosLat = Math.cos(centerLat * deg2rad);
+    const R = 6371000;
+
+    const mainRoad: [number, number][] = [
+      [centerLng - 0.003, centerLat - 0.001],
+      [centerLng, centerLat],
+      [centerLng + 0.003, centerLat + 0.001],
+    ];
+
+    const crossRoad: [number, number][] = [
+      [centerLng - 0.001, centerLat + 0.0025],
+      [centerLng, centerLat],
+      [centerLng + 0.001, centerLat - 0.0025],
+    ];
+
+    const pointsToLine = (pts: [number, number][]) => {
+      const points = pts.map(([lng, lat]) => {
+        const x = (lng - centerLng) * deg2rad * R * cosLat;
+        const z = -(lat - centerLat) * deg2rad * R;
+        return new THREE.Vector3(x, 0.08, z);
+      });
+      return new THREE.BufferGeometry().setFromPoints(points);
+    };
+
+    return [pointsToLine(mainRoad), pointsToLine(crossRoad)];
+  }, [centerLat, centerLng]);
+
+  return (
+    <group>
+      {lineGeometries.map((geom, i) => (
+        <primitive
+          key={i}
+          object={new THREE.Line(geom, new THREE.LineBasicMaterial({ color: '#38bdf8', opacity: 0.7, transparent: true }))}
+        />
+      ))}
+    </group>
+  );
+};
+
+
 // 3D Candidate Plot Boundary Mesh
 const PlotBoundaryMesh: React.FC<{
   plotGeometry?: number[][][] | null;
@@ -734,6 +782,9 @@ export const ThreeDSceneCanvas: React.FC<ThreeDSceneCanvasProps> = ({
           fadeDistance={180}
           fadeStrength={1}
         />
+
+        {/* 3D Road Network Polyline Ribbons */}
+        <RoadRibbonMesh centerLat={centerLat} centerLng={centerLng} />
 
         {/* Confirmed 2D Plot Boundary Polygon Base Mesh */}
         <PlotBoundaryMesh
