@@ -17,9 +17,9 @@ export const AppRoutes: React.FC = () => {
     <BrowserRouter>
       <AppShell>
         <Routes>
-          {/* Screen 1: Overview / Municipal Dashboard */}
-          <Route path="/" element={<OverviewDashboard />} />
-          <Route path="/dashboard" element={<OverviewDashboard />} />
+          {/* Simplified 11-Step Journey Default Route: Clean Nashik Map Screen */}
+          <Route path="/" element={<Navigate to="/sites" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/sites" replace />} />
 
           {/* Screen 2: Site Intelligence / 2D GIS Map */}
           <Route path="/sites" element={<SiteIntelligence />} />
