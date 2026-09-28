@@ -70,11 +70,11 @@ export const RankedSites: React.FC = () => {
                 STEP 2: WHAT'S NEEDED?
               </span>
               <span className="text-[10px] font-mono text-text-secondary bg-surface-subtle border border-border-subtle px-2 py-0.5 rounded">
-                AGGREGATE_MODEL_OUTPUT • DERIVED_NMC_ADMINISTRATIVE_ZONES
+                AGGREGATE_MODEL_OUTPUT • DERIVED_PMC_ADMINISTRATIVE_ZONES
               </span>
             </div>
             <h2 className="text-xl font-bold text-text-primary mt-1">
-              NMC Divisional Requirement & Infrastructure Priority Matrix
+              Divisional Requirement & Infrastructure Priority Matrix (DEMO — Not Verified for PMC)
             </h2>
           </div>
           <span className="text-xs text-text-muted">6 Administrative Divisions</span>

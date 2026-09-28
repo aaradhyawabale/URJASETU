@@ -578,7 +578,7 @@ export const SiteIntelligence: React.FC = () => {
                 <div className="p-2.5 rounded-lg bg-surface-subtle border border-border-subtle flex flex-col">
                   <span className="text-[10px] text-text-muted font-semibold uppercase">Land Conflict</span>
                   <span className="text-xs font-bold text-emerald-700">{selectedSite.metrics?.landConflict || 'NONE'}</span>
-                  <span className="text-[9px] text-text-muted mt-0.5">NMC Zoning Check</span>
+                  <span className="text-[9px] text-text-muted mt-0.5">Zoning Compliance (DEMO — Not Verified for PMC)</span>
                 </div>
               </div>
             </div>

@@ -5,11 +5,11 @@ import { SCORING_CONFIG } from '../config/scoringConfig.js';
 export interface ITerrainAnalysis {
   datasetName: string;
   provider: string;
-  classification: 'OPEN' | 'DERIVED';
+  classification: 'OPEN' | 'DERIVED' | 'UNAVAILABLE';
   latitude: number;
   longitude: number;
-  elevationMeters: number;
-  slopePercent: number;
+  elevationMeters: number | string;
+  slopePercent: number | string;
   slopeCategory: string;
   terrainScore: number; // 0 - 100
   rationale: string;
@@ -65,38 +65,50 @@ export class ElevationService {
   public static evaluateTerrain(lat: number, lng: number): ITerrainAnalysis {
     const dem = loadDemDataset();
 
-    let elevationMeters = 560; // Default fallback elevation if dataset unavailable for Pune
-    let slopePercent = 2.5;
-
-    if (dem && dem.gridData && dem.gridData.length > 0) {
-      // 1. Bilinear sampling from nearest 4 DEM grid cells
-      elevationMeters = sampleBilinearElevation(lat, lng, dem.gridData);
-
-      // 2. Compute 4-neighbor spatial slope gradient (|dz / dd| * 100)
-      const offset = 0.005; // ~550m sampling distance for macro slope
-      const eleNorth = sampleBilinearElevation(lat + offset, lng, dem.gridData);
-      const eleSouth = sampleBilinearElevation(lat - offset, lng, dem.gridData);
-      const eleEast = sampleBilinearElevation(lat, lng + offset, dem.gridData);
-      const eleWest = sampleBilinearElevation(lat, lng - offset, dem.gridData);
-
-      const dzLat = Math.abs(eleNorth - eleSouth);
-      const ddLat = calculateDistanceMeters(lat - offset, lng, lat + offset, lng);
-      const slopeLat = (dzLat / ddLat) * 100;
-
-      const dzLng = Math.abs(eleEast - eleWest);
-      const ddLng = calculateDistanceMeters(lat, lng - offset, lat, lng + offset);
-      const slopeLng = (dzLng / ddLng) * 100;
-
-      slopePercent = Number(Math.max(slopeLat, slopeLng).toFixed(1));
+    if (!dem || !dem.gridData || dem.gridData.length === 0) {
+      return {
+        datasetName: 'Copernicus DEM GLO-30 (DSM) Pune Grid',
+        provider: 'European Space Agency (ESA) Copernicus / OpenTopography',
+        classification: 'UNAVAILABLE',
+        latitude: lat,
+        longitude: lng,
+        elevationMeters: 'UNAVAILABLE',
+        slopePercent: 'UNAVAILABLE',
+        slopeCategory: 'UNAVAILABLE — Dataset Not Loaded',
+        terrainScore: 50,
+        rationale: 'Copernicus DEM grid dataset unavailable or point out of bounds. Elevation data unverified for this point.',
+        methodology: 'Dataset offline — no hardcoded elevation returned.',
+        citation: SCORING_CONFIG.slopeModel.sourceGuidance.citation,
+      };
     }
+
+    // 1. Bilinear sampling from nearest 4 DEM grid cells
+    const elevationMeters = sampleBilinearElevation(lat, lng, dem.gridData);
+
+    // 2. Compute 4-neighbor spatial slope gradient (|dz / dd| * 100)
+    const offset = 0.005; // ~550m sampling distance for macro slope
+    const eleNorth = sampleBilinearElevation(lat + offset, lng, dem.gridData);
+    const eleSouth = sampleBilinearElevation(lat - offset, lng, dem.gridData);
+    const eleEast = sampleBilinearElevation(lat, lng + offset, dem.gridData);
+    const eleWest = sampleBilinearElevation(lat, lng - offset, dem.gridData);
+
+    const dzLat = Math.abs(eleNorth - eleSouth);
+    const ddLat = calculateDistanceMeters(lat - offset, lng, lat + offset, lng);
+    const slopeLat = (dzLat / ddLat) * 100;
+
+    const dzLng = Math.abs(eleEast - eleWest);
+    const ddLng = calculateDistanceMeters(lat, lng - offset, lat, lng + offset);
+    const slopeLng = (dzLng / ddLng) * 100;
+
+    const slopePercent = Number(Math.max(slopeLat, slopeLng).toFixed(1));
 
     // 3. Evaluate slope against centralized SCORING_CONFIG thresholds
     const tiers = SCORING_CONFIG.slopeModel.scoringTiers;
     const tier = tiers.find((t) => slopePercent <= t.maxSlope) || tiers[tiers.length - 1];
 
     return {
-      datasetName: dem?.datasetName || 'Copernicus DEM GLO-30 (DSM) Pune Grid',
-      provider: dem?.provider || 'European Space Agency (ESA) Copernicus / OpenTopography',
+      datasetName: dem.datasetName || 'Copernicus DEM GLO-30 (DSM) Pune Grid',
+      provider: dem.provider || 'European Space Agency (ESA) Copernicus / OpenTopography',
       classification: 'DERIVED',
       latitude: lat,
       longitude: lng,
@@ -112,8 +124,6 @@ export class ElevationService {
 }
 
 function sampleBilinearElevation(lat: number, lng: number, grid: IDemGridCell[]): number {
-  let minDistance = Infinity;
-  let nearestEle = 585;
   let totalWeight = 0;
   let weightedEle = 0;
 

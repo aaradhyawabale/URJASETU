@@ -17,14 +17,37 @@ export const AIProposalReview: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
+  const [notFound, setNotFound] = useState<boolean>(false);
+
   useEffect(() => {
     async function loadData() {
+      if (!id) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
-      const propRes = await getProposalById(id || 'prop-nashik-01');
+      const propRes = await getProposalById(id);
+      if (!propRes.proposal) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
       setProposal(propRes.proposal);
 
-      const targetSiteId = propRes.proposal.siteId || 'nashik-site-01';
+      const targetSiteId = propRes.proposal.siteId;
+      if (!targetSiteId) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
       const siteRes = await getSiteById(targetSiteId);
+      if (!siteRes.site) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
       setSite(siteRes.site);
 
       const design = getPlanningDesign(targetSiteId, siteRes.site);
@@ -155,6 +178,32 @@ ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-sm text-text-muted">
+        Evaluating AI proposal technical review dossier...
+      </div>
+    );
+  }
+
+  if (notFound || !proposal || !site) {
+    return (
+      <div className="p-8 max-w-xl mx-auto my-12 bg-white rounded-xl border border-border-subtle shadow-xs text-center flex flex-col items-center gap-4">
+        <span className="material-symbols-outlined text-amber-500 text-4xl">folder_off</span>
+        <h2 className="text-xl font-bold text-text-primary">Proposal Review Not Found</h2>
+        <p className="text-xs text-text-secondary leading-relaxed">
+          The requested proposal ID <code className="font-mono bg-surface-subtle px-1.5 py-0.5 rounded text-amber-900">{id || 'EMPTY'}</code> could not be found.
+        </p>
+        <button
+          onClick={() => navigate('/proposals')}
+          className="mt-2 px-4 py-2 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-xs"
+        >
+          Return to Proposal Library
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 xl:p-8 flex flex-col gap-6 max-w-6xl mx-auto">
@@ -406,12 +455,12 @@ ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1">
-                    Raw: <strong>&gt;150m clearance</strong> from Godavari riverbed. Compliant with MRTP Act.
+                    Raw: <strong>&gt;150m clearance</strong> from Mula-Mutha riverbed. Compliant with environmental buffer (DEMO).
                   </p>
                 </div>
                 <div className="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-500 font-mono">
                   <span>Weight: 10%</span>
-                  <span>Source: NMC Hydrology Buffer</span>
+                  <span>Source: Hydrology Buffer Screening (DEMO)</span>
                 </div>
               </div>
             </div>

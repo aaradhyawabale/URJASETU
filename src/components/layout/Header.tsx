@@ -1,4 +1,5 @@
 import React from 'react';
+import { CITY_CONFIG } from '../../config/cityConfig';
 
 export const Header: React.FC = () => {
   return (
@@ -9,9 +10,9 @@ export const Header: React.FC = () => {
           <div className="flex items-center bg-surface-subtle border border-border-subtle px-3 py-1.5 rounded-full cursor-pointer hover:bg-slate-100 transition-colors gap-2">
             <span className="material-symbols-outlined text-primary text-[18px]">location_city</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold text-text-primary">Pune, Maharashtra</span>
+              <span className="text-sm font-semibold text-text-primary">{CITY_CONFIG.cityName}, {CITY_CONFIG.stateName}</span>
               <span className="text-[10px] font-semibold bg-emerald-50 text-primary border border-emerald-200 px-1.5 py-0.5 rounded">
-                Municipal Corp
+                {CITY_CONFIG.ulbCode}
               </span>
             </div>
             <span className="material-symbols-outlined text-text-muted text-[16px]">keyboard_arrow_down</span>
@@ -36,13 +37,13 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-1.5 bg-surface-subtle border border-border-subtle px-3 py-1 rounded-full text-[11px] font-medium text-text-secondary">
             <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Demo Data • Pune City Seed</span>
+            <span>Demo Data • {CITY_CONFIG.cityName} Seed</span>
           </div>
 
           <div className="flex items-center gap-2 pl-2">
             <div className="flex flex-col text-right hidden lg:flex">
               <span className="text-xs font-semibold text-text-primary leading-tight">R. Deshmukh</span>
-              <span className="text-[10px] text-text-secondary">Town Planning Dept</span>
+              <span className="text-[10px] text-text-secondary">PMC Town Planning Cell</span>
             </div>
             <div className="w-8 h-8 rounded-full bg-emerald-100 text-primary flex items-center justify-center font-semibold border border-emerald-200 shadow-xs">
               <span className="material-symbols-outlined text-[18px]">person</span>

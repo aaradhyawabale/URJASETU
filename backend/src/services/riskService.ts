@@ -4,7 +4,7 @@ export interface IHydrologicalRiskAssessment {
   latitude: number;
   longitude: number;
   distanceToRiverMeters: number;
-  elevationMeters: number;
+  elevationMeters: number | string;
   floodRiskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL_SETBACK_EXCLUSION';
   overallRiskLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'DISQUALIFIED';
   classification: 'FLOOD_HAZARD_SCREENING_PROXY';

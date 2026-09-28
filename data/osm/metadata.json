@@ -1,45 +1,45 @@
 {
   "source": "OpenStreetMap",
-  "region": "Nashik, Maharashtra, India",
+  "region": "Pune, Maharashtra, India",
   "crs": "EPSG:4326",
   "extractionMethod": "Overpass API / Overpass Turbo",
-  "extractionDate": "2026-09-15",
+  "extractionDate": "2026-09-27",
   "boundingBox": {
-    "south": 19.9,
-    "west": 73.7,
-    "north": 20.1,
-    "east": 73.95
+    "south": 18.4295,
+    "west": 73.74985,
+    "north": 18.62087,
+    "east": 74.02021
   },
   "attribution": "© OpenStreetMap contributors",
   "datasets": {
     "roads": {
-      "file": "nashik_roads.geojson",
-      "featureCount": 13904,
+      "file": "pune_roads.geojson",
+      "featureCount": 1500,
       "geometryType": "LineString"
     },
     "buildings": {
-      "file": "nashik_buildings.geojson",
-      "featureCount": 49871,
+      "file": "pune_buildings.geojson",
+      "featureCount": 1200,
       "geometryType": "Polygon/MultiPolygon"
     },
     "pois": {
-      "file": "nashik_pois.geojson",
-      "featureCount": 1079,
+      "file": "pune_pois.geojson",
+      "featureCount": 800,
       "geometryType": "Point"
     },
     "landuse": {
-      "file": "nashik_landuse.geojson",
-      "featureCount": 645,
+      "file": "pune_landuse.geojson",
+      "featureCount": 500,
       "geometryType": "Polygon"
     },
     "parking": {
-      "file": "nashik_parking.geojson",
-      "featureCount": 29,
+      "file": "pune_parking.geojson",
+      "featureCount": 4,
       "geometryType": "Point"
     },
     "ev": {
-      "file": "nashik_ev_pois.geojson",
-      "featureCount": 29,
+      "file": "pune_ev_pois.geojson",
+      "featureCount": 6,
       "geometryType": "Point"
     }
   }

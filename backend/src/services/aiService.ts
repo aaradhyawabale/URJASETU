@@ -21,8 +21,8 @@ export interface IAIStructuredContext {
     terrainSlopeScore: number;
   };
   terrainAndHydrology: {
-    elevationMeters: number;
-    slopePercent: number;
+    elevationMeters: number | string;
+    slopePercent: number | string;
     floodRiskScreening: string;
     riverbedSetbackMeters: number;
   };
@@ -32,7 +32,7 @@ export interface IAIStructuredContext {
   };
   gridFeasibility: {
     nearestSubstationName: string;
-    substationDistanceMeters: number;
+    substationDistanceMeters: number | string;
     hostingCapacityProxy: string;
   };
   solarAndShading: {
@@ -65,12 +65,12 @@ export interface IAIReviewPayload {
 
   // Real & Derived GIS Indicators
   divisionName?: string;
-  elevationMeters?: number;
-  slopePercent?: number;
+  elevationMeters?: number | string;
+  slopePercent?: number | string;
   nearestRoadMeters?: number;
   nearestEVChargerMeters?: number;
   nearestSubstationName?: string;
-  nearestSubstationDistanceMeters?: number;
+  nearestSubstationDistanceMeters?: number | string;
   annualGhiKwhM2Day?: number;
   estimatedShadingLossPercent?: number;
   placedComponents?: any[];

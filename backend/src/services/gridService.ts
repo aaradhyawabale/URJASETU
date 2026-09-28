@@ -4,13 +4,13 @@ import path from 'path';
 export interface IGridProximityResult {
   nearestSubstationName: string;
   nearestSubstationCode: string;
-  nearestSubstationDistanceMeters: number;
+  nearestSubstationDistanceMeters: number | string;
   nearestFeederLineName: string;
-  nearestFeederDistanceMeters: number;
-  estimatedFeederHostingCapacityMw: number;
-  gridInterconnectionCapexTier: 'OPTIMAL_LOW_CAPEX' | 'MODERATE_CAPEX' | 'HIGH_CAPEX';
-  classification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY';
-  capacityStatus: 'ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY';
+  nearestFeederDistanceMeters: number | string;
+  estimatedFeederHostingCapacityMw: number | string;
+  gridInterconnectionCapexTier: 'OPTIMAL_LOW_CAPEX' | 'MODERATE_CAPEX' | 'HIGH_CAPEX' | 'UNAVAILABLE';
+  classification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY' | 'UNAVAILABLE';
+  capacityStatus: 'ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY' | 'UNAVAILABLE';
   disclaimer: string;
 }
 
@@ -41,18 +41,18 @@ export class GridService {
 
   public static evaluateGridProximity(lat: number, lng: number): IGridProximityResult {
     const geojson = this.getMsedclGridGeoJson();
-    if (!geojson || !geojson.features) {
+    if (!geojson || !geojson.features || geojson.features.length === 0) {
       return {
-        nearestSubstationName: 'MSEDCL Shivajinagar 132/33kV EHV Substation',
-        nearestSubstationCode: 'PUN-SUB-SHIV',
-        nearestSubstationDistanceMeters: 1200,
-        nearestFeederLineName: 'Shivajinagar 33kV Feeder Line',
-        nearestFeederDistanceMeters: 450,
-        estimatedFeederHostingCapacityMw: 6.5,
-        gridInterconnectionCapexTier: 'OPTIMAL_LOW_CAPEX',
-        classification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY',
-        capacityStatus: 'ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY',
-        disclaimer: 'Feeder proximity and hosting capacity estimates are DERIVED PROXIES based on digitized MSEDCL grid corridors. They do NOT reflect real-time SCADA transformer loading or official MSEDCL grid NOC interconnection approval.',
+        nearestSubstationName: 'UNAVAILABLE — Grid Layer Offline',
+        nearestSubstationCode: 'UNAVAILABLE',
+        nearestSubstationDistanceMeters: 'UNAVAILABLE',
+        nearestFeederLineName: 'UNAVAILABLE — Feeder Layer Offline',
+        nearestFeederDistanceMeters: 'UNAVAILABLE',
+        estimatedFeederHostingCapacityMw: 'UNAVAILABLE',
+        gridInterconnectionCapexTier: 'UNAVAILABLE',
+        classification: 'UNAVAILABLE',
+        capacityStatus: 'UNAVAILABLE',
+        disclaimer: 'MSEDCL grid layer is offline or unavailable. No hardcoded substation or feeder proximity estimates returned.',
       };
     }
 
@@ -84,23 +84,27 @@ export class GridService {
       }
     });
 
-    const nearestSubDist = minSubDistance !== Infinity ? Math.round(minSubDistance) : 1200;
-    const nearestFeederDist = minFeederDistance !== Infinity ? Math.round(minFeederDistance) : (minSubDistance !== Infinity ? Math.round(minSubDistance * 0.4) : 450);
+    const nearestSubDist = minSubDistance !== Infinity ? Math.round(minSubDistance) : 'UNAVAILABLE';
+    const nearestFeederDist = minFeederDistance !== Infinity ? Math.round(minFeederDistance) : (minSubDistance !== Infinity ? Math.round(minSubDistance * 0.4) : 'UNAVAILABLE');
 
     let capexTier: IGridProximityResult['gridInterconnectionCapexTier'] = 'OPTIMAL_LOW_CAPEX';
-    if (nearestFeederDist > 1500) capexTier = 'HIGH_CAPEX';
-    else if (nearestFeederDist > 500) capexTier = 'MODERATE_CAPEX';
+    if (typeof nearestFeederDist === 'number') {
+      if (nearestFeederDist > 1500) capexTier = 'HIGH_CAPEX';
+      else if (nearestFeederDist > 500) capexTier = 'MODERATE_CAPEX';
+    } else {
+      capexTier = 'UNAVAILABLE';
+    }
 
     const subProps = nearestSubFeature?.properties || {};
     const feederProps = nearestFeederFeature?.properties || {};
 
     return {
-      nearestSubstationName: subProps.name || 'MSEDCL Shivajinagar 132/33kV EHV Substation',
-      nearestSubstationCode: subProps.substation_id || subProps.code || 'PUN-SUB-01',
+      nearestSubstationName: subProps.name || 'UNAVAILABLE',
+      nearestSubstationCode: subProps.substation_id || subProps.code || 'UNAVAILABLE',
       nearestSubstationDistanceMeters: nearestSubDist,
-      nearestFeederLineName: feederProps.name || `${subProps.name ? subProps.name.split(' ')[1] || 'Shivajinagar' : 'Shivajinagar'} 33kV Feeder Line`,
+      nearestFeederLineName: feederProps.name || (subProps.name ? `${subProps.name} Feeder Line` : 'UNAVAILABLE'),
       nearestFeederDistanceMeters: nearestFeederDist,
-      estimatedFeederHostingCapacityMw: subProps.capacity_mva ? Number((subProps.capacity_mva * 0.15).toFixed(1)) : (subProps.estimatedAvailableCapacityMw || 6.5),
+      estimatedFeederHostingCapacityMw: subProps.capacity_mva ? Number((subProps.capacity_mva * 0.15).toFixed(1)) : (subProps.estimatedAvailableCapacityMw || 'UNAVAILABLE'),
       gridInterconnectionCapexTier: capexTier,
       classification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY',
       capacityStatus: 'ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY',

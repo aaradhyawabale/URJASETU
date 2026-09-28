@@ -41,6 +41,7 @@ export const ThreeDSitePlanner: React.FC = () => {
 
       // 1. Fetch Candidate Site
       const siteRes = await getSiteById(siteId);
+      if (!siteRes.site) return;
       setSite(siteRes.site);
 
       // 2. Load Canonical PlanningDesign State
@@ -50,8 +51,8 @@ export const ThreeDSitePlanner: React.FC = () => {
         setSelectedComponentId(design.components[0].id);
       }
 
-      const lat = siteRes.site.latitude || siteRes.site.lat || 19.9975;
-      const lng = siteRes.site.longitude || siteRes.site.lng || 73.7898;
+      const lat = siteRes.site.latitude || siteRes.site.lat || 18.5252;
+      const lng = siteRes.site.longitude || siteRes.site.lng || 73.8850;
       const centerPt = turf.point([lng, lat]);
 
       // 3. Fetch Proposal for site

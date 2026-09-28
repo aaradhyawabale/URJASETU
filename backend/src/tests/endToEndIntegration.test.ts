@@ -25,7 +25,7 @@ async function runEndToEndIntegrationTests() {
   const retained = candidates.filter((c) => c.isRetained);
   const sample = retained[0];
 
-  if (!sample.divisionClassification || sample.divisionClassification !== 'DERIVED_NMC_ADMINISTRATIVE_ZONES') {
+  if (!sample.divisionClassification || sample.divisionClassification !== 'DERIVED_PMC_ADMINISTRATIVE_ZONES') {
     throw new Error(`FAILED Test 2: Invalid division classification: ${sample.divisionClassification}`);
   }
   if (!sample.landCoverClassification || sample.landCoverClassification !== 'DERIVED_LAND_COVER_PROXY') {

@@ -191,8 +191,8 @@ export const SiteComparison: React.FC = () => {
               {/* Environmental Riparian Buffer */}
               <tr>
                 <td className="p-4 font-bold text-text-primary bg-slate-50/50">
-                  Godavari Riparian Blue Line Setback
-                  <span className="block text-[10px] text-text-muted font-normal">MRTP Act 1966 & NMC DCPR 2017</span>
+                  Riparian Blue Line Setback (DEMO)
+                  <span className="block text-[10px] text-text-muted font-normal">MRTP Act 1966 & Planning Guidelines (DEMO — Not Verified for PMC)</span>
                 </td>
                 {comparedSites.map((s) => (
                   <td key={s.id} className="p-4 text-emerald-600 font-bold">

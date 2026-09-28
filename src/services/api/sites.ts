@@ -1,11 +1,11 @@
 import { fetchApi } from './client';
 import { CandidateSite } from '../../types/site';
-import { NASHIK_DEMO_SITES } from '../../data/nashikDemoData';
+import { PUNE_DEMO_SITES } from '../../data/puneDemoData';
 
 export async function getSites(): Promise<{ sites: CandidateSite[]; isFallback: boolean }> {
   const result = await fetchApi<CandidateSite[]>('/sites');
   if (result.isFallback || !result.data) {
-    return { sites: NASHIK_DEMO_SITES, isFallback: true };
+    return { sites: PUNE_DEMO_SITES, isFallback: true };
   }
   return { sites: result.data, isFallback: false };
 }
@@ -13,16 +13,19 @@ export async function getSites(): Promise<{ sites: CandidateSite[]; isFallback: 
 export async function getRankedSites(): Promise<{ sites: CandidateSite[]; isFallback: boolean }> {
   const result = await fetchApi<CandidateSite[]>('/sites/ranked');
   if (result.isFallback || !result.data) {
-    const ranked = [...NASHIK_DEMO_SITES].sort((a, b) => b.opportunityScore - a.opportunityScore);
+    const ranked = [...PUNE_DEMO_SITES].sort((a, b) => b.opportunityScore - a.opportunityScore);
     return { sites: ranked, isFallback: true };
   }
   return { sites: result.data, isFallback: false };
 }
 
-export async function getSiteById(siteId: string): Promise<{ site: CandidateSite; isFallback: boolean }> {
+export async function getSiteById(siteId: string): Promise<{ site: CandidateSite | null; isFallback: boolean }> {
   const result = await fetchApi<CandidateSite>(`/sites/${siteId}`);
   if (result.isFallback || !result.data) {
-    const fallbackSite = NASHIK_DEMO_SITES.find((s) => s.id === siteId || s.code === siteId) || NASHIK_DEMO_SITES[0];
+    const fallbackSite = PUNE_DEMO_SITES.find((s) => s.id === siteId || s.code === siteId);
+    if (!fallbackSite) {
+      return { site: null, isFallback: result.isFallback };
+    }
     return { site: fallbackSite, isFallback: true };
   }
   return { site: result.data, isFallback: false };
@@ -31,7 +34,7 @@ export async function getSiteById(siteId: string): Promise<{ site: CandidateSite
 export async function getSiteScores(siteId: string): Promise<{ scores: any; isFallback: boolean }> {
   const result = await fetchApi<any>(`/sites/${siteId}/scores`);
   if (result.isFallback || !result.data) {
-    const site = NASHIK_DEMO_SITES.find((s) => s.id === siteId || s.code === siteId) || NASHIK_DEMO_SITES[0];
+    const site = PUNE_DEMO_SITES.find((s) => s.id === siteId || s.code === siteId) || PUNE_DEMO_SITES[0];
     return {
       scores: {
         siteId: site.id,
@@ -50,7 +53,7 @@ export async function getSiteScores(siteId: string): Promise<{ scores: any; isFa
 export async function getSiteRisk(siteId: string): Promise<{ risk: any; isFallback: boolean }> {
   const result = await fetchApi<any>(`/sites/${siteId}/risk`);
   if (result.isFallback || !result.data) {
-    const site = NASHIK_DEMO_SITES.find((s) => s.id === siteId || s.code === siteId) || NASHIK_DEMO_SITES[0];
+    const site = PUNE_DEMO_SITES.find((s) => s.id === siteId || s.code === siteId) || PUNE_DEMO_SITES[0];
     return {
       risk: {
         siteId: site.id,
@@ -58,7 +61,7 @@ export async function getSiteRisk(siteId: string): Promise<{ risk: any; isFallba
         floodScreening: `Flood risk screening status: ${site.metrics?.floodRisk || 'LOW'}`,
         landConflictScreening: `Land conflict status: ${site.metrics?.landConflict || 'NONE'}`,
         verificationsRequired: [
-          'ULB Revenue & Cadastral land-use title verification required',
+          'PMC Revenue & Cadastral land-use title verification required',
           'MSEDCL 33kV Substation feeder grid interconnect capacity check',
         ],
       },

@@ -8,7 +8,7 @@ import { WardService } from './wardService.js';
 export interface IFactorDecomposition {
   factorId: string;
   name: string;
-  rawMeasurement: number;
+  rawMeasurement: number | string;
   inputUnit: string;
   normalizedScore: number; // 0 - 100
   weightPercent: number; // e.g. 25
@@ -30,8 +30,8 @@ export interface ICandidateSite {
   latitude: number;
   longitude: number;
   opportunityScore: number; // 0 - 100
-  elevationMeters: number;
-  slopePercent: number;
+  elevationMeters: number | string;
+  slopePercent: number | string;
   nearestRoadMeters: number;
   nearestEVChargerMeters: number;
   nearestParkingMeters: number;
@@ -42,7 +42,7 @@ export interface ICandidateSite {
   divisionId?: string;
   divisionName?: string;
   divisionCode?: string;
-  divisionClassification?: 'DERIVED_NMC_ADMINISTRATIVE_ZONES';
+  divisionClassification?: 'DERIVED_PMC_ADMINISTRATIVE_ZONES';
   factors: Record<string, IFactorDecomposition>;
   provenance: {
     datasetName: string;
@@ -191,11 +191,12 @@ export class CandidateService {
         let exclusionReason: string | null = null;
         let exclusionCode: ICandidateSite['exclusionCode'] = null;
 
+        const numericSlope = typeof terrain.slopePercent === 'number' ? terrain.slopePercent : 0;
         if (roundedLat < this.studyAreaBounds.minLat || roundedLat > this.studyAreaBounds.maxLat ||
             roundedLng < this.studyAreaBounds.minLng || roundedLng > this.studyAreaBounds.maxLng) {
           exclusionCode = 'OUTSIDE_STUDY_AREA';
           exclusionReason = 'Coordinate is outside the Pune study area extent (18.43°N - 18.62°N, 73.75°E - 74.02°E).';
-        } else if (terrain.slopePercent > 15.0) {
+        } else if (numericSlope > 15.0) {
           exclusionCode = 'EXCESSIVE_SLOPE';
           exclusionReason = `Terrain slope (${terrain.slopePercent}%) exceeds project screening exclusion threshold of 15.0%. Excluded due to heavy vehicle maneuverability limits and excessive earthworks capex.`;
         } else if (isWithinRiparianBuffer(roundedLat, roundedLng)) {
@@ -275,7 +276,7 @@ export class CandidateService {
           divisionId: adminDivision?.divisionId,
           divisionName: adminDivision?.divisionName,
           divisionCode: adminDivision?.divisionCode,
-          divisionClassification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+          divisionClassification: 'DERIVED_PMC_ADMINISTRATIVE_ZONES',
           factors: {
             solarPhotovoltaic: {
               factorId: 'solarPhotovoltaic',
