@@ -53,7 +53,7 @@ export interface CandidateSite {
   id: string;
   name: string;
   code: string; // e.g. NASHIK-SITE-01 or NSK-CND-001
-  city?: string; // Nashik
+  city?: string; // Pune
   cityName?: string;
   ward?: string;
   wardName?: string;

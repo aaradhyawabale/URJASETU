@@ -9,9 +9,9 @@ export const Header: React.FC = () => {
           <div className="flex items-center bg-surface-subtle border border-border-subtle px-3 py-1.5 rounded-full cursor-pointer hover:bg-slate-100 transition-colors gap-2">
             <span className="material-symbols-outlined text-primary text-[18px]">location_city</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold text-text-primary">Nashik, Maharashtra</span>
+              <span className="text-sm font-semibold text-text-primary">Pune, Maharashtra</span>
               <span className="text-[10px] font-semibold bg-emerald-50 text-primary border border-emerald-200 px-1.5 py-0.5 rounded">
-                Tier-2 ULB
+                Municipal Corp
               </span>
             </div>
             <span className="material-symbols-outlined text-text-muted text-[16px]">keyboard_arrow_down</span>
@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-1.5 bg-surface-subtle border border-border-subtle px-3 py-1 rounded-full text-[11px] font-medium text-text-secondary">
             <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Demo Data • Nashik City Seed</span>
+            <span>Demo Data • Pune City Seed</span>
           </div>
 
           <div className="flex items-center gap-2 pl-2">

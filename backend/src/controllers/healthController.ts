@@ -9,7 +9,7 @@ export const getHealth = (_req: Request, res: Response) => {
     service: 'urjasetu-api',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    demoCity: 'Nashik, Maharashtra, India',
+    demoCity: 'Pune, Maharashtra, India',
     database: dbInfo.state,
     databaseConnected: dbInfo.connected,
     ...(dbInfo.host ? { databaseHost: dbInfo.host } : {}),

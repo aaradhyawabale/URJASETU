@@ -28,13 +28,13 @@ export const RankedSites: React.FC = () => {
   }, []);
 
   const divisions = [
-    { id: 'ALL', name: 'All NMC Administrative Divisions (6 Divisions)' },
-    { id: 'nmc_div_01', name: 'Panchavati Division (NMC-DIV-01)' },
-    { id: 'nmc_div_02', name: 'Nashik East Division (NMC-DIV-02)' },
-    { id: 'nmc_div_03', name: 'Nashik West Division (NMC-DIV-03)' },
-    { id: 'nmc_div_04', name: 'CIDCO Division (NMC-DIV-04)' },
-    { id: 'nmc_div_05', name: 'Satpur Division (NMC-DIV-05)' },
-    { id: 'nmc_div_06', name: 'Nashik Road Division (NMC-DIV-06)' },
+    { id: 'ALL', name: 'All PMC Administrative Divisions (6 Divisions)' },
+    { id: 'pmc_div_01', name: 'Aundh - Baner Division (PMC-DIV-01)' },
+    { id: 'pmc_div_02', name: 'Shivajinagar - Ghole Road Division (PMC-DIV-02)' },
+    { id: 'pmc_div_03', name: 'Yerwada - Kalas - Dhanori Division (PMC-DIV-03)' },
+    { id: 'pmc_div_04', name: 'Nagar Road - Vadgaon Sheri Division (PMC-DIV-04)' },
+    { id: 'pmc_div_05', name: 'Kondhwa - Wanwadi - Hadapsar Division (PMC-DIV-05)' },
+    { id: 'pmc_div_06', name: 'Dhankawadi - Sahakarnagar - Karvenagar Division (PMC-DIV-06)' },
   ];
 
   const filteredSites = sites.filter((s) => {
@@ -53,7 +53,7 @@ export const RankedSites: React.FC = () => {
         <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2 font-medium">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            <span>Live API connection offline — displaying Nashik candidate site ranking & divisional aggregation dataset.</span>
+            <span>Live API connection offline — displaying Pune candidate site ranking & divisional aggregation dataset.</span>
           </div>
           <span className="font-mono text-[10px] bg-white border border-amber-200 px-2 py-0.5 rounded text-amber-900 font-semibold">
             DEMO DATA MODE

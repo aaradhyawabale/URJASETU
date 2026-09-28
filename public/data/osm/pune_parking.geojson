@@ -1,0 +1,69 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_pk_1",
+        "name": "FC Road Multilevel Parking",
+        "capacity": 450,
+        "fclass": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8415,
+          18.5221
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_pk_2",
+        "name": "JM Road Public Parking Lot",
+        "capacity": 300,
+        "fclass": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8488,
+          18.5265
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_pk_3",
+        "name": "Swargate Bus Terminal Parking",
+        "capacity": 600,
+        "fclass": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.858,
+          18.5025
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_pk_4",
+        "name": "Phoenix Marketcity Parking Hub",
+        "capacity": 1200,
+        "fclass": "parking"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.9168,
+          18.562
+        ]
+      }
+    }
+  ]
+}

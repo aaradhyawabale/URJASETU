@@ -42,8 +42,8 @@ const loadDemDataset = (): IDemDataset | null => {
   if (demCache) return demCache;
 
   const cwd = process.cwd();
-  const path1 = path.join(cwd, 'data', 'geo', 'nashik_copernicus_dem_30m.json');
-  const path2 = path.join(cwd, '..', 'data', 'geo', 'nashik_copernicus_dem_30m.json');
+  const path1 = path.join(cwd, 'data', 'geo', 'pune_copernicus_dem_30m.json');
+  const path2 = path.join(cwd, '..', 'data', 'geo', 'pune_copernicus_dem_30m.json');
   const targetPath = fs.existsSync(path1) ? path1 : fs.existsSync(path2) ? path2 : null;
 
   if (!targetPath) {
@@ -65,7 +65,7 @@ export class ElevationService {
   public static evaluateTerrain(lat: number, lng: number): ITerrainAnalysis {
     const dem = loadDemDataset();
 
-    let elevationMeters = 585; // Default fallback elevation if dataset unavailable
+    let elevationMeters = 560; // Default fallback elevation if dataset unavailable for Pune
     let slopePercent = 2.5;
 
     if (dem && dem.gridData && dem.gridData.length > 0) {
@@ -95,7 +95,7 @@ export class ElevationService {
     const tier = tiers.find((t) => slopePercent <= t.maxSlope) || tiers[tiers.length - 1];
 
     return {
-      datasetName: dem?.datasetName || 'Copernicus DEM GLO-30 (DSM) Nashik Grid',
+      datasetName: dem?.datasetName || 'Copernicus DEM GLO-30 (DSM) Pune Grid',
       provider: dem?.provider || 'European Space Agency (ESA) Copernicus / OpenTopography',
       classification: 'DERIVED',
       latitude: lat,

@@ -63,7 +63,7 @@ export const AIProposalReview: React.FC = () => {
     const mdContent = `# UrjaSetu AI Technical Proposal Review Dossier
 
 **Site Code:** ${site.code} (${site.name})  
-**Administrative Division:** ${site.ward || site.wardName || 'NMC Nashik'}  
+**Administrative Division:** ${site.ward || site.wardName || 'PMC Pune'}  
 **Infrastructure Category:** ${proposal.infrastructureType}  
 **MCDA Opportunity Score:** ${site.opportunityScore}/100  
 **Proven Data Honesty Compliance:** ${aiReview.provenanceAudit?.dataHonestyCompliance || '100% VERIFIED_HONEST'}  
@@ -228,7 +228,7 @@ ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
                   </span>
                 </div>
                 <span className="text-lg font-bold text-text-primary mt-0.5">{site.code} — {site.name}</span>
-                <span className="text-xs text-text-muted">{site.ward || site.wardName || 'Nashik Municipal Corporation'} • Parcel Area: {site.areaSqm?.toLocaleString() || (proposal?.estimatedAreaSqm ? proposal.estimatedAreaSqm.toLocaleString() : '6,000')} m²</span>
+                <span className="text-xs text-text-muted">{site.ward || site.wardName || 'Pune Municipal Corporation'} • Parcel Area: {site.areaSqm?.toLocaleString() || (proposal?.estimatedAreaSqm ? proposal.estimatedAreaSqm.toLocaleString() : '6,000')} m²</span>
               </div>
               <ScoreBadge score={site.opportunityScore} size="lg" />
             </div>

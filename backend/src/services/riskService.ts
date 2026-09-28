@@ -18,22 +18,22 @@ export interface IHydrologicalRiskAssessment {
   verificationsRequired: string[];
 }
 
-// Key riverbed coordinates along Godavari river corridor in Nashik
-const GODAVARI_RIVERBED_POINTS: Array<[number, number]> = [
-  [73.7200, 19.9900],
-  [73.7400, 19.9930],
-  [73.7600, 19.9960],
-  [73.7800, 20.0020],
-  [73.8000, 20.0070],
-  [73.8200, 20.0110],
-  [73.8500, 20.0150],
+// Key riverbed coordinates along Mula-Mutha river corridor in Pune
+const MULA_MUTHA_RIVERBED_POINTS: Array<[number, number]> = [
+  [73.8200, 18.5250],
+  [73.8400, 18.5280],
+  [73.8500, 18.5300],
+  [73.8700, 18.5350],
+  [73.8800, 18.5400],
+  [73.9000, 18.5450],
+  [73.9200, 18.5500],
 ];
 
 export class RiskService {
   public static evaluateHydrologicalRisk(lat: number, lng: number): IHydrologicalRiskAssessment {
     // 1. Geodesic distance to nearest riverbed point
     let minDistanceMeters = Infinity;
-    GODAVARI_RIVERBED_POINTS.forEach(([rLng, rLat]) => {
+    MULA_MUTHA_RIVERBED_POINTS.forEach(([rLng, rLat]) => {
       const d = calculateHaversineMeters(lat, lng, rLat, rLng);
       if (d < minDistanceMeters) minDistanceMeters = d;
     });
@@ -60,7 +60,7 @@ export class RiskService {
 
     const verificationsRequired: string[] = [
       'Maharashtra Water Resources Department (WRD) official flood line map verification',
-      'Nashik Municipal Corporation (NMC) 30m Blue Line flood margin setback check (MRTP Act 1966)',
+      'Pune Municipal Corporation (PMC) 30m Blue Line flood margin setback check (MRTP Act 1966)',
     ];
 
     if (floodRiskLevel === 'HIGH' || floodRiskLevel === 'CRITICAL_SETBACK_EXCLUSION') {
@@ -77,11 +77,11 @@ export class RiskService {
       classification: 'FLOOD_HAZARD_SCREENING_PROXY',
       hydrologicalDistanceClassification: 'DERIVED_HYDROLOGICAL_DISTANCE_PROXY',
       provenance: {
-        riverDataset: 'Godavari Riverbed Spatial Corridor Extract (OSM & NMC DCPR 2017)',
-        elevationDataset: 'Copernicus DEM GLO-30 DSM (546-cell grid)',
-        citation: 'MRTP Act 1966 & NMC DCPR 2017 Rule 11.2 (30m Prohibited Flood Margin)',
+        riverDataset: 'Mula-Mutha Riverbed Spatial Corridor Extract (OSM & PMC DCPR 2017)',
+        elevationDataset: 'Copernicus DEM GLO-30 DSM (560m mean grid)',
+        citation: 'MRTP Act 1966 & PMC DCPR 2017 Rule 11.2 (30m Prohibited Flood Margin)',
       },
-      disclaimer: 'This is a preliminary flood hazard screening proxy based on riverbed spatial proximity and surface elevation. It is NOT an official statutory flood hazard map issued by the Maharashtra Water Resources Department (WRD) or Nashik Municipal Corporation.',
+      disclaimer: 'This is a preliminary flood hazard screening proxy based on riverbed spatial proximity and surface elevation. It is NOT an official statutory flood hazard map issued by the Maharashtra Water Resources Department (WRD) or Pune Municipal Corporation.',
       verificationsRequired,
     };
   }

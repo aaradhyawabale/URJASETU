@@ -1,6 +1,6 @@
-import { NashikSpatialDataset } from '../types/gis';
+import { PuneSpatialDataset } from '../types/gis';
 
-export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
+export const PUNE_GEOJSON_DATASET: PuneSpatialDataset = {
   candidateSites: {
     type: 'FeatureCollection',
     features: [
@@ -8,12 +8,12 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [73.7898, 19.9975], // [lng, lat]
+          coordinates: [73.8078, 18.5582], // [lng, lat]
         },
         properties: {
-          id: 'nashik-site-01',
-          code: 'NASHIK-SITE-01',
-          name: 'Govardhan Bus Depot Substation Parcel',
+          id: 'pune-site-01',
+          code: 'PUNE-SITE-01',
+          name: 'Aundh ITI Road Substation Parcel',
           opportunityScore: 84,
           status: 'RECOMMENDED',
           solarSuitability: 88,
@@ -28,12 +28,12 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [73.7421, 19.9882],
+          coordinates: [73.8512, 18.5304],
         },
         properties: {
-          id: 'nashik-site-02',
-          code: 'NASHIK-SITE-02',
-          name: 'Satpur Industrial Area Cluster B',
+          id: 'pune-site-02',
+          code: 'PUNE-SITE-02',
+          name: 'Shivajinagar Bus Hub Open Parcel',
           opportunityScore: 78,
           status: 'RECOMMENDED',
           solarSuitability: 85,
@@ -48,40 +48,40 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [73.7610, 19.9450],
+          coordinates: [73.9521, 18.5512],
         },
         properties: {
-          id: 'nashik-site-03',
-          code: 'NASHIK-SITE-03',
-          name: 'Ambad Commercial Ring Junction',
-          opportunityScore: 72,
-          status: 'UNDER_REVIEW',
-          solarSuitability: 76,
-          evDemandProxy: 84,
+          id: 'pune-site-03',
+          code: 'PUNE-SITE-03',
+          name: 'Kharadi EON IT Park Junction Parcel',
+          opportunityScore: 88,
+          status: 'RECOMMENDED',
+          solarSuitability: 90,
+          evDemandProxy: 92,
           roadAccessibility: 89,
-          floodRisk: 'MEDIUM',
-          landConflict: 'MINOR',
-          areaSqm: 1850,
+          floodRisk: 'LOW',
+          landConflict: 'NONE',
+          areaSqm: 3600,
         },
       },
       {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [73.7954, 20.0089],
+          coordinates: [73.8182, 18.5074],
         },
         properties: {
-          id: 'nashik-site-04',
-          code: 'NASHIK-SITE-04',
-          name: 'Panchavati Municipal Market Buffer Plot',
+          id: 'pune-site-04',
+          code: 'PUNE-SITE-04',
+          name: 'Kothrud Karve Road Commercial Buffer',
           opportunityScore: 59,
           status: 'SCREENING',
           solarSuitability: 62,
           evDemandProxy: 88,
           roadAccessibility: 71,
-          floodRisk: 'HIGH',
+          floodRisk: 'MEDIUM',
           landConflict: 'HIGH',
-          areaSqm: 1200,
+          areaSqm: 1850,
         },
       },
     ],
@@ -94,10 +94,10 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
         geometry: {
           type: 'LineString',
           coordinates: [
-            [73.7200, 19.9900],
-            [73.7500, 19.9950],
-            [73.7800, 20.0020],
-            [73.8100, 20.0080],
+            [73.8200, 18.5250],
+            [73.8500, 18.5300],
+            [73.8800, 18.5400],
+            [73.9200, 18.5500],
           ],
         },
         properties: {},
@@ -112,12 +112,12 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
         geometry: {
           type: 'LineString',
           coordinates: [
-            [73.7400, 19.9800],
-            [73.7898, 19.9975],
-            [73.8200, 20.0100],
+            [73.8000, 18.5200],
+            [73.8420, 18.5220],
+            [73.8800, 18.5350],
           ],
         },
-        properties: { name: 'Trimbak Road Axis', type: 'arterial' },
+        properties: { name: 'FC Road / JM Road Axis', type: 'arterial' },
       },
     ],
   },
@@ -129,12 +129,12 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
         geometry: {
           type: 'LineString',
           coordinates: [
-            [73.7800, 19.9900],
-            [73.7898, 19.9975],
-            [73.8000, 20.0050],
+            [73.8400, 18.5250],
+            [73.8512, 18.5304],
+            [73.8600, 18.5380],
           ],
         },
-        properties: { lineName: '33kV Govardhan Feeder', voltageKv: 33 },
+        properties: { lineName: '33kV Shivajinagar Feeder', voltageKv: 33 },
       },
     ],
   },
@@ -147,16 +147,18 @@ export const NASHIK_GEOJSON_DATASET: NashikSpatialDataset = {
           type: 'Polygon',
           coordinates: [
             [
-              [73.7900, 20.0050],
-              [73.8000, 20.0050],
-              [73.8000, 20.0120],
-              [73.7900, 20.0120],
-              [73.7900, 20.0050],
+              [73.8450, 18.5280],
+              [73.8550, 18.5280],
+              [73.8550, 18.5340],
+              [73.8450, 18.5340],
+              [73.8450, 18.5280],
             ],
           ],
         },
-        properties: { riskLevel: 'HIGH', zoneName: 'Panchavati Riparian Basin' },
+        properties: { riskLevel: 'HIGH', zoneName: 'Mula-Mutha Riparian Basin' },
       },
     ],
   },
 };
+
+export const NASHIK_GEOJSON_DATASET = PUNE_GEOJSON_DATASET;

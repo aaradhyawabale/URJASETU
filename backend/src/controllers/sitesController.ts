@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { NASHIK_SEED_SITES, ISite } from '../seed/seedData.js';
+import { PUNE_SEED_SITES, ISite } from '../seed/seedData.js';
 import { isDbConnected } from '../config/db.js';
 import { SiteModel } from '../models/Site.js';
 import { ScoringService } from '../services/scoringService.js';
@@ -32,7 +32,7 @@ const fetchAllSites = async (): Promise<ISite[]> => {
       console.warn('[sitesController] DB query failed, falling back to seed sites:', (err as Error).message);
     }
   }
-  return NASHIK_SEED_SITES;
+  return PUNE_SEED_SITES;
 };
 
 const fetchSiteById = async (siteId: string): Promise<ISite | undefined> => {

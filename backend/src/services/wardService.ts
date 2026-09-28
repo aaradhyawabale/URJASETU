@@ -36,9 +36,9 @@ let divisionLayerCache: any = null;
 
 const getGeoJsonFilePath = (): string => {
   const cwd = process.cwd();
-  const path1 = path.join(cwd, 'data', 'geo', 'nashik_administrative_wards.geojson');
+  const path1 = path.join(cwd, 'data', 'geo', 'pune_administrative_wards.geojson');
   if (fs.existsSync(path1)) return path1;
-  const path2 = path.join(cwd, '..', 'data', 'geo', 'nashik_administrative_wards.geojson');
+  const path2 = path.join(cwd, '..', 'data', 'geo', 'pune_administrative_wards.geojson');
   if (fs.existsSync(path2)) return path2;
   return path1;
 };
@@ -66,15 +66,15 @@ export class WardService {
         const ring = feature.geometry.coordinates[0]; // array of [lng, lat]
         if (isPointInRing([lng, lat], ring)) {
           return {
-            divisionId: feature.properties.divisionId,
-            divisionCode: feature.properties.divisionCode,
-            divisionName: feature.properties.divisionName,
-            marathiName: feature.properties.marathiName || feature.properties.divisionName,
-            ulbCode: feature.properties.ulbCode || 'NMC',
-            population2021: feature.properties.population2021 || 'UNKNOWN',
-            ulbRevenueCategory: feature.properties.ulbRevenueCategory || 'PROJECT_MODELING_ASSUMPTION',
-            revenueCalculationStatus: feature.properties.revenueCalculationStatus || 'NOT_MODELED',
-            classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+            divisionId: feature.properties.divisionId || feature.properties.ward_id,
+            divisionCode: feature.properties.divisionCode || feature.properties.ward_id,
+            divisionName: feature.properties.divisionName || feature.properties.ward_name,
+            marathiName: feature.properties.marathiName || feature.properties.ward_name,
+            ulbCode: 'PMC',
+            population2021: String(feature.properties.population_proxy || '300000'),
+            ulbRevenueCategory: 'PROJECT_MODELING_ASSUMPTION',
+            revenueCalculationStatus: 'NOT_MODELED',
+            classification: 'DERIVED_PMC_ADMINISTRATIVE_ZONES',
             keyLandmarks: feature.properties.keyLandmarks || [],
           };
         }
@@ -87,20 +87,20 @@ export class WardService {
     const geojson = this.getAdministrativeDivisionsGeoJson();
     if (!geojson || !geojson.features) return [];
 
-    // Area estimates per division in sq km (approximate bounding area)
+    // Area estimates per division in sq km (approximate bounding area for PMC 6 zones)
     const divisionAreaSqKm: Record<string, number> = {
-      nmc_div_01: 54.0, // Panchavati
-      nmc_div_02: 32.0, // Nashik East
-      nmc_div_03: 15.0, // Nashik West
-      nmc_div_04: 35.0, // CIDCO
-      nmc_div_05: 45.0, // Satpur
-      nmc_div_06: 40.0, // Nashik Road
+      PMC_ZONE_01: 45.0, // Aundh - Baner
+      PMC_ZONE_02: 30.0, // Shivajinagar - Ghole Road
+      PMC_ZONE_03: 38.0, // Yerwada - Kalas - Dhanori
+      PMC_ZONE_04: 55.0, // Nagar Road - Vadgaon Sheri
+      PMC_ZONE_05: 65.0, // Kondhwa - Wanwadi - Hadapsar
+      PMC_ZONE_06: 50.0, // Dhankawadi - Sahakarnagar - Karvenagar
     };
 
     return geojson.features.map((feature: any) => {
       const divProps = feature.properties;
-      const divId = divProps.divisionId;
-      const area = divisionAreaSqKm[divId] || 30.0;
+      const divId = divProps.divisionId || divProps.ward_id;
+      const area = divisionAreaSqKm[divId] || 40.0;
 
       // Filter candidates falling within this division
       const divCandidates = candidates.filter((c) => {
@@ -116,7 +116,6 @@ export class WardService {
       const candidatesPerKm2 = Number((retainedCount / area).toFixed(2));
 
       // Calculate aggregate modeled solar capacity (MWp) & EV chargers (ports)
-      // Assuming planning heuristic: ~500 kWp per site (0.5 MWp) & 4 chargers per retained site
       const aggregateModeledSolarCapacityMwp = Number((retainedCount * 0.50).toFixed(2));
       const aggregateModeledEvChargerPorts = retainedCount * 4;
 
@@ -125,17 +124,17 @@ export class WardService {
 
       return {
         divisionId: divId,
-        divisionCode: divProps.divisionCode,
-        divisionName: divProps.divisionName,
-        ulbCode: 'NMC',
-        classification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+        divisionCode: divProps.divisionCode || divId,
+        divisionName: divProps.divisionName || divProps.ward_name,
+        ulbCode: 'PMC',
+        classification: 'DERIVED_PMC_ADMINISTRATIVE_ZONES',
         totalCandidates,
         retainedCandidates: retainedCount,
         candidatesPerKm2,
         aggregateModeledSolarCapacityMwp,
         aggregateModeledEvChargerPorts,
         meanOpportunityScore,
-        populationStatus: 'UNKNOWN',
+        populationStatus: 'MODELLED_PROXY',
         revenueStatus: 'NOT_MODELED',
         metricClassification: 'AGGREGATE_MODEL_OUTPUT',
         disclaimer: 'Spatial aggregation metrics are aggregate MODEL OUTPUTS derived from UrjaSetu candidate grid evaluation. They do NOT represent official municipal revenue forecasts, approved utility interconnection capacities, or statutory zoning limits.',

@@ -84,12 +84,12 @@ const loadGeoJsonLayer = (layerName: string): any | null => {
 
   const osmDir = getOsmDir();
   const layerMap: Record<string, string> = {
-    roads: path.join(osmDir, 'nashik_roads.geojson'),
-    buildings: path.join(osmDir, 'nashik_buildings.geojson'),
-    pois: path.join(osmDir, 'nashik_pois.geojson'),
-    landuse: path.join(osmDir, 'nashik_landuse.geojson'),
-    parking: path.join(osmDir, 'nashik_parking.geojson'),
-    ev: path.join(osmDir, 'nashik_ev_pois.geojson'),
+    roads: path.join(osmDir, 'pune_roads.geojson'),
+    buildings: path.join(osmDir, 'pune_buildings.geojson'),
+    pois: path.join(osmDir, 'pune_pois.geojson'),
+    landuse: path.join(osmDir, 'pune_landuse.geojson'),
+    parking: path.join(osmDir, 'pune_parking.geojson'),
+    ev: path.join(osmDir, 'pune_ev_pois.geojson'),
   };
 
   const filePath = layerMap[layerName.toLowerCase()];
@@ -107,10 +107,10 @@ const loadGeoJsonLayer = (layerName: string): any | null => {
 
 export class CandidateService {
   private static studyAreaBounds = {
-    minLat: 19.90,
-    maxLat: 20.10,
-    minLng: 73.70,
-    maxLng: 73.95,
+    minLat: 18.4295,
+    maxLat: 18.6209,
+    minLng: 73.7498,
+    maxLng: 74.0202,
   };
 
   public static async generateCandidates(params?: ICandidateGenerationParams): Promise<ICandidateSite[]> {
@@ -168,7 +168,7 @@ export class CandidateService {
 
     // Load Solar Climatology
     const solarClimatology = await ClimateService.getNashikSolarClimatology();
-    const annualGhi = solarClimatology.metrics.annualGhiOptimalTilt; // 5.02 kWh/m²/day
+    const annualGhi = solarClimatology.metrics.annualGhiOptimalTilt; // 5.12 kWh/m²/day
 
     const candidates: ICandidateSite[] = [];
     let candidateIndex = 1;
@@ -194,13 +194,13 @@ export class CandidateService {
         if (roundedLat < this.studyAreaBounds.minLat || roundedLat > this.studyAreaBounds.maxLat ||
             roundedLng < this.studyAreaBounds.minLng || roundedLng > this.studyAreaBounds.maxLng) {
           exclusionCode = 'OUTSIDE_STUDY_AREA';
-          exclusionReason = 'Coordinate is outside the Nashik study area extent (19.90°N - 20.10°N, 73.70°E - 73.95°E).';
+          exclusionReason = 'Coordinate is outside the Pune study area extent (18.43°N - 18.62°N, 73.75°E - 74.02°E).';
         } else if (terrain.slopePercent > 15.0) {
           exclusionCode = 'EXCESSIVE_SLOPE';
           exclusionReason = `Terrain slope (${terrain.slopePercent}%) exceeds project screening exclusion threshold of 15.0%. Excluded due to heavy vehicle maneuverability limits and excessive earthworks capex.`;
         } else if (isWithinRiparianBuffer(roundedLat, roundedLng)) {
           exclusionCode = 'RIVER_SETBACK_EXCLUSION';
-          exclusionReason = 'Candidate location is within the prohibited 30m Godavari River Blue Line flood margin buffer (MRTP Act 1966 & NMC DCPR 2017 Rule 11.2).';
+          exclusionReason = 'Candidate location is within the prohibited 30m Mula-Mutha River Blue Line flood margin buffer (MRTP Act 1966 & PMC DCPR Rule 11.2).';
         } else if (isInsideBuildingFootprint(roundedLat, roundedLng, buildingsData)) {
           exclusionCode = 'BUILDING_FOOTPRINT_OVERLAP';
           exclusionReason = 'Candidate location falls directly inside an existing OSM building structure footprint.';
@@ -210,7 +210,7 @@ export class CandidateService {
 
         // Factor Calculations
         // 1. Solar Photovoltaic Baseline Factor (25%)
-        const solarNormalized = Math.min(100, Math.round((annualGhi / SCORING_CONFIG.solarModel.projectThresholds.benchmarkGhiKwhM2Day) * 100)); // (5.02 / 6.0) * 100 = 84
+        const solarNormalized = Math.min(100, Math.round((annualGhi / SCORING_CONFIG.solarModel.projectThresholds.benchmarkGhiKwhM2Day) * 100));
         const solarWeight = SCORING_CONFIG.factors.solarPhotovoltaic.weightPercent;
         const solarContrib = Number(((solarNormalized * solarWeight) / 100).toFixed(2));
 
@@ -246,7 +246,7 @@ export class CandidateService {
           else status = 'LOW_SUITABILITY';
         }
 
-        const candidateCode = `NSK-CND-${String(candidateIndex).padStart(3, '0')}`;
+        const candidateCode = `PUN-CND-${String(candidateIndex).padStart(3, '0')}`;
         const candidateName = `Candidate Site ${candidateCode} (${roundedLat.toFixed(3)}, ${roundedLng.toFixed(3)})`;
 
         const landCoverCategory = detectLandCoverCategory(roundedLat, roundedLng, landuseData);
@@ -341,11 +341,11 @@ export class CandidateService {
             },
           },
           provenance: {
-            datasetName: 'Nashik Multi-Criteria Spatial Candidate Grid',
+            datasetName: 'Pune Multi-Criteria Spatial Candidate Grid',
             solarSource: 'NASA POWER 30-Year Solar Climatology (0.5° Grid)',
-            elevationSource: 'Copernicus DEM GLO-30 DSM (546-Cell Grid Extract)',
-            osmSource: 'OpenStreetMap Nashik Spatial Extracted Layers',
-            landCoverSource: 'OpenStreetMap Nashik Land Use Polygons (645 Features)',
+            elevationSource: 'Copernicus DEM GLO-30 DSM (Pune Grid Extract)',
+            osmSource: 'OpenStreetMap Pune Spatial Extracted Layers',
+            landCoverSource: 'OpenStreetMap Pune Land Use Polygons (500 Features)',
             generationMethod: `Regular spatial grid sampling at ${spacing}° (~${Math.round(spacing * 111000)}m spacing)`,
             candidateSpacing: `${spacing}°`,
           },
@@ -353,7 +353,7 @@ export class CandidateService {
             'NASA POWER solar irradiation is a 50km regional climatology mean and does not account for plot-level shading.',
             'EV infrastructure gap is a distance-based proxy for unserved coverage and does not measure actual EV traffic demand.',
             'Terrain slope is evaluated from Copernicus DEM GLO-30 Digital Surface Model (DSM) at 0.01° grid resolution.',
-            'Physical land cover is derived from OSM landuse polygons (DERIVED_LAND_COVER_PROXY). Does NOT constitute statutory legal zoning under MRTP Act 1966 or NMC DCPR 2017.',
+            'Physical land cover is derived from OSM landuse polygons (DERIVED_LAND_COVER_PROXY). Does NOT constitute statutory legal zoning under MRTP Act 1966 or PMC DCPR.',
             'Statutory legal zoning is currently UNVERIFIED and requires official municipal DP cadastral verification.',
           ],
         });
@@ -412,9 +412,9 @@ function countPointsWithinRadius(lat: number, lng: number, points: Array<[number
 }
 
 function isWithinRiparianBuffer(lat: number, lng: number): boolean {
-  // Conservative screening buffer along Godavari riverbed (approx 19.99°N to 20.01°N, 73.76°E to 73.82°E)
-  if (lat >= 19.992 && lat <= 20.005 && lng >= 73.765 && lng <= 73.815) {
-    const riverCenterLat = 19.998;
+  // Conservative screening buffer along Mula-Mutha riverbed corridor in Pune (approx 18.51°N to 18.56°N, 73.82°E to 73.95°E)
+  if (lat >= 18.510 && lat <= 18.560 && lng >= 73.820 && lng <= 73.950) {
+    const riverCenterLat = 18.532;
     const distanceToRiverCenter = calculateHaversineMeters(lat, lng, riverCenterLat, lng);
     return distanceToRiverCenter <= 30; // 30m Blue Line buffer
   }

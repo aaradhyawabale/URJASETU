@@ -138,16 +138,16 @@ export const SCORING_CONFIG: IScoringConfig = {
   riparianBufferModel: {
     sourceGuidance: {
       blueLineSetbackMeters: 30,
-      citation: 'Maharashtra Regional and Town Planning Act (MRTP Act 1966) & Nashik Municipal Corporation DCPR 2017 (Rule 11.2: Prohibited 30m Flood Margin / Blue Line along Godavari Riverbed).',
+      citation: 'Maharashtra Regional and Town Planning Act (MRTP Act 1966) & Pune Municipal Corporation DCPR 2017 (Rule 11.2: Prohibited 30m Flood Margin / Blue Line along Mula-Mutha Riverbed).',
       legalClassification: 'CONSERVATIVE_PROJECT_SCREENING_BUFFER',
     },
   },
   landCoverModel: {
     sourceGuidance: {
-      datasetName: 'OpenStreetMap Nashik Land Use Polygons (645 Features)',
+      datasetName: 'OpenStreetMap Pune Land Use Polygons (500 Features)',
       classification: 'DERIVED_LAND_COVER_PROXY',
       legalZoningStatus: 'UNVERIFIED_STATUTORY_ZONING',
-      limitations: 'Physical land cover derived from OpenStreetMap landuse polygons. Does NOT constitute statutory legal zoning under the Maharashtra Regional and Town Planning Act (MRTP Act 1966) or Nashik Municipal Corporation Development Control and Promotion Regulations (NMC DCPR 2017). Legal zoning requires municipal DP cadastral verification.',
+      limitations: 'Physical land cover derived from OpenStreetMap landuse polygons. Does NOT constitute statutory legal zoning under the Maharashtra Regional and Town Planning Act (MRTP Act 1966) or Pune Municipal Corporation Development Control and Promotion Regulations (PMC DCPR 2017). Legal zoning requires municipal DP cadastral verification.',
     },
     categoryScores: {
       industrial: 100,

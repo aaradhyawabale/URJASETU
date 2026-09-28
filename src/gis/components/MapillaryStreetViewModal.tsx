@@ -16,9 +16,9 @@ interface MapillaryStreetViewModalProps {
 export const MapillaryStreetViewModal: React.FC<MapillaryStreetViewModalProps> = ({
   isOpen,
   onClose,
-  lat = 19.9975,
-  lng = 73.7898,
-  title = 'Nashik Synchronous Street View & Aerial Inspection',
+  lat = 18.5252,
+  lng = 73.8850,
+  title = 'Pune Synchronous Street View & Aerial Inspection',
   placedComponents = [],
   plotGeometry,
 }) => {
@@ -253,7 +253,7 @@ export const MapillaryStreetViewModal: React.FC<MapillaryStreetViewModalProps> =
           <div className="absolute bottom-4 left-4 right-4 z-20 bg-slate-900/90 border border-slate-700 px-4 py-2 rounded-xl text-xs text-slate-300 font-mono backdrop-blur-md shadow-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-emerald-400 font-bold">SYNCHRONOUS_GIS_VIEWER:</span>
-              <span>Showing High-Resolution Street Aerial Footage centered on Nashik coordinates.</span>
+              <span>Showing High-Resolution Street Aerial Footage centered on Pune coordinates.</span>
             </div>
             <span className="text-[10px] bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-mono text-emerald-400">
               0.3m GROUND_RESOLUTION

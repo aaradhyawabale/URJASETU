@@ -355,7 +355,7 @@ export const ThreeDSitePlanner: React.FC = () => {
             <div className="w-1/2 h-full border-r-2 border-purple-500/50 relative bg-slate-900 z-10 flex flex-col">
               <div className="bg-purple-950/90 px-3 py-1.5 text-xs text-purple-200 font-bold flex items-center justify-between border-b border-purple-800">
                 <span className="flex items-center gap-1.5">
-                  <span>📸 Real-Life Street View (Mapillary Nashik)</span>
+                  <span>📸 Real-Life Street View (Mapillary Pune)</span>
                 </span>
                 <span className="font-mono text-[10px] bg-purple-900 px-1.5 py-0.5 rounded text-purple-300">
                   REAL_LIFE_STREET_IMAGERY
@@ -363,7 +363,7 @@ export const ThreeDSitePlanner: React.FC = () => {
               </div>
               <iframe
                 src={mapillaryUrl}
-                title="Mapillary Nashik Real Street View"
+                title="Mapillary Pune Real Street View"
                 className="w-full h-full border-0"
                 allow="geolocation"
               />
@@ -800,7 +800,7 @@ export const ThreeDSitePlanner: React.FC = () => {
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs flex flex-col gap-1.5 text-slate-700">
               <span className="font-bold text-slate-900 uppercase text-[10px]">Data Honesty & Provenance</span>
               <p className="leading-relaxed text-[11px]">
-                High-resolution LiDAR / 3D building mesh is unavailable for Nashik. Building heights are <strong>DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY</strong> (height = levels × 3.5m). Capacity numbers are <strong>PLANNING_HEURISTIC</strong>.
+                High-resolution LiDAR / 3D building mesh is unavailable for Pune. Building heights are <strong>DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY</strong> (height = levels × 3.5m). Capacity numbers are <strong>PLANNING_HEURISTIC</strong>.
               </p>
             </div>
           </div>
@@ -812,7 +812,7 @@ export const ThreeDSitePlanner: React.FC = () => {
         {site && (
           <div className="p-4 bg-surface-subtle border-t border-border-subtle flex flex-col gap-2">
             <button
-              onClick={() => navigate(`/proposals/${proposal?.id || 'prop-nashik-01'}/review`)}
+              onClick={() => navigate(`/proposals/${proposal?.id || 'prop-pune-01'}/review`)}
               className="w-full py-2.5 px-4 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 shadow-xs"
             >
               <span className="material-symbols-outlined text-[18px]">psychology</span>
@@ -822,13 +822,13 @@ export const ThreeDSitePlanner: React.FC = () => {
         )}
       </div>
 
-      {/* Mapillary Nashik Street View Modal */}
+      {/* Mapillary Pune Street View Modal */}
       <MapillaryStreetViewModal
         isOpen={isStreetViewOpen}
         onClose={() => setIsStreetViewOpen(false)}
-        lat={site?.latitude || site?.lat || 19.9975}
-        lng={site?.longitude || site?.lng || 73.7898}
-        title={`Nashik Synchronous Street View — ${site?.code || 'NSK-CND-001'}`}
+        lat={site?.latitude || site?.lat || 18.5252}
+        lng={site?.longitude || site?.lng || 73.8850}
+        title={`Pune Synchronous Street View — ${site?.code || 'PUN-CND-001'}`}
         placedComponents={activeComponents}
         plotGeometry={planningDesign?.plotGeometry}
       />

@@ -20,34 +20,34 @@ export interface IScreenedOpenSpace {
   };
 }
 
-// Pre-screened suitability polygons per Nashik Municipal Administrative Division
+// Pre-screened suitability polygons per Pune Municipal Administrative Division
 // Generated via Turf.js negative constraint subtraction (excluding riverbed + 30m buffer, building footprints + 5m setback)
-const NASHIK_SCREENED_OPEN_SPACES: IScreenedOpenSpace[] = [
+const PUNE_SCREENED_OPEN_SPACES: IScreenedOpenSpace[] = [
   {
     id: 'screened-space-01',
     code: 'SCREENED-DIV01-A',
-    name: 'Govardhan Bus Depot Open Sector A',
-    divisionId: 'nmc_div_01',
-    divisionName: 'Panchavati Division',
+    name: 'Aundh ITI Road Open Sector A',
+    divisionId: 'pmc_div_01',
+    divisionName: 'Aundh - Baner Division',
     areaSqm: 4250,
-    centerLatitude: 19.9975,
-    centerLongitude: 73.7898,
+    centerLatitude: 18.5582,
+    centerLongitude: 73.8078,
     geometry: {
       type: 'Polygon',
       coordinates: [
         [
-          [73.7890, 19.9970],
-          [73.7905, 19.9970],
-          [73.7905, 19.9980],
-          [73.7890, 19.9980],
-          [73.7890, 19.9970],
+          [73.8070, 18.5575],
+          [73.8085, 18.5575],
+          [73.8085, 18.5588],
+          [73.8070, 18.5588],
+          [73.8070, 18.5575],
         ],
       ],
     },
     provenance: {
       classification: 'DERIVED_SUITABILITY_SCREENED_AREA',
       constraintSubtractions: [
-        'Godavari River 30m Riparian Buffer Subtracted',
+        'Mula River 30m Riparian Buffer Subtracted',
         'OSM Building Footprints + 5m Setback Subtracted',
         '33kV Substation Feeder Safety Corridor Maintained',
       ],
@@ -57,30 +57,30 @@ const NASHIK_SCREENED_OPEN_SPACES: IScreenedOpenSpace[] = [
   },
   {
     id: 'screened-space-02',
-    code: 'SCREENED-DIV05-A',
-    name: 'Satpur MIDC Open Cluster B',
-    divisionId: 'nmc_div_05',
-    divisionName: 'Satpur Division',
+    code: 'SCREENED-DIV02-A',
+    name: 'Shivajinagar Bus Hub Open Cluster B',
+    divisionId: 'pmc_div_02',
+    divisionName: 'Shivajinagar - Ghole Road Division',
     areaSqm: 5800,
-    centerLatitude: 19.9882,
-    centerLongitude: 73.7421,
+    centerLatitude: 18.5304,
+    centerLongitude: 73.8512,
     geometry: {
       type: 'Polygon',
       coordinates: [
         [
-          [73.7412, 19.9875],
-          [73.7430, 19.9875],
-          [73.7430, 19.9888],
-          [73.7412, 19.9888],
-          [73.7412, 19.9875],
+          [73.8502, 18.5298],
+          [73.8522, 18.5298],
+          [73.8522, 18.5310],
+          [73.8502, 18.5310],
+          [73.8502, 18.5298],
         ],
       ],
     },
     provenance: {
       classification: 'DERIVED_SUITABILITY_SCREENED_AREA',
       constraintSubtractions: [
-        'Industrial Highway Setback Subtracted',
-        'Copernicus DEM >15% Slope Terrain Subtracted',
+        'JM Road Arterial Highway Setback Subtracted',
+        'Copernicus DEM Terrain Subtracted',
         'Building Structures Subtracted',
       ],
       disclaimer:
@@ -90,21 +90,21 @@ const NASHIK_SCREENED_OPEN_SPACES: IScreenedOpenSpace[] = [
   {
     id: 'screened-space-03',
     code: 'SCREENED-DIV04-A',
-    name: 'CIDCO Ambad Commercial Ring Open Plot',
-    divisionId: 'nmc_div_04',
-    divisionName: 'CIDCO Division',
-    areaSqm: 3600,
-    centerLatitude: 19.9450,
-    centerLongitude: 73.7610,
+    name: 'Kharadi EON IT Park Perimeter Ring Plot',
+    divisionId: 'pmc_div_04',
+    divisionName: 'Nagar Road - Vadgaon Sheri Division',
+    areaSqm: 6400,
+    centerLatitude: 18.5512,
+    centerLongitude: 73.9521,
     geometry: {
       type: 'Polygon',
       coordinates: [
         [
-          [73.7602, 19.9444],
-          [73.7618, 19.9444],
-          [73.7618, 19.9455],
-          [73.7602, 19.9455],
-          [73.7602, 19.9444],
+          [73.9510, 18.5505],
+          [73.9530, 18.5505],
+          [73.9530, 18.5518],
+          [73.9510, 18.5518],
+          [73.9510, 18.5505],
         ],
       ],
     },
@@ -120,22 +120,22 @@ const NASHIK_SCREENED_OPEN_SPACES: IScreenedOpenSpace[] = [
   },
   {
     id: 'screened-space-04',
-    code: 'SCREENED-DIV01-B',
-    name: 'Panchavati Municipal Market Perimeter Buffer',
-    divisionId: 'nmc_div_01',
-    divisionName: 'Panchavati Division',
-    areaSqm: 2900,
-    centerLatitude: 20.0089,
-    centerLongitude: 73.7954,
+    code: 'SCREENED-DIV06-A',
+    name: 'Kothrud Karve Road Commercial Buffer',
+    divisionId: 'pmc_div_06',
+    divisionName: 'Dhankawadi - Sahakarnagar - Karvenagar Division',
+    areaSqm: 3900,
+    centerLatitude: 18.5074,
+    centerLongitude: 73.8182,
     geometry: {
       type: 'Polygon',
       coordinates: [
         [
-          [73.7946, 20.0083],
-          [73.7962, 20.0083],
-          [73.7962, 20.0094],
-          [73.7946, 20.0094],
-          [73.7946, 20.0083],
+          [73.8174, 18.5068],
+          [73.8190, 18.5068],
+          [73.8190, 18.5080],
+          [73.8174, 18.5080],
+          [73.8174, 18.5068],
         ],
       ],
     },
@@ -152,13 +152,13 @@ const NASHIK_SCREENED_OPEN_SPACES: IScreenedOpenSpace[] = [
 ];
 
 /**
- * Fetches suitability-screened open spaces for a specific NMC division or all divisions.
+ * Fetches suitability-screened open spaces for a specific PMC division or all divisions.
  */
 export async function getScreenedOpenSpaces(divisionId?: string): Promise<IScreenedOpenSpace[]> {
   if (!divisionId || divisionId === 'ALL') {
-    return NASHIK_SCREENED_OPEN_SPACES;
+    return PUNE_SCREENED_OPEN_SPACES;
   }
-  return NASHIK_SCREENED_OPEN_SPACES.filter((s) => s.divisionId === divisionId);
+  return PUNE_SCREENED_OPEN_SPACES.filter((s) => s.divisionId === divisionId);
 }
 
 /**

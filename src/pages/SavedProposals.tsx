@@ -37,7 +37,7 @@ export const SavedProposals: React.FC = () => {
         <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2 font-medium">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            <span>Live API offline — showing Nashik proposal library repository.</span>
+            <span>Live API offline — showing Pune proposal library repository.</span>
           </div>
           <span className="font-mono text-[10px] bg-white border border-amber-200 px-2 py-0.5 rounded text-amber-900 font-semibold">
             DEMO DATA MODE
@@ -53,7 +53,7 @@ export const SavedProposals: React.FC = () => {
               Municipal Proposal Repository
             </span>
             <span className="text-[11px] font-mono text-text-secondary bg-surface-subtle border border-border-subtle px-2 py-0.5 rounded">
-              Nashik ULB Archive
+              Pune ULB Archive
             </span>
           </div>
           <h1 className="text-2xl font-bold text-text-primary mt-1">Saved Proposals & Decision Dossiers</h1>

@@ -22,10 +22,10 @@ interface InteractivePlotDrawerProps {
 
 export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
   initialAreaSqm,
-  siteLat = 19.9975,
-  siteLng = 73.7898,
-  siteCode = 'NSK-CND-001',
-  siteName = 'Nashik Candidate Site',
+  siteLat = 18.5252,
+  siteLng = 73.8850,
+  siteCode = 'PUN-CND-001',
+  siteName = 'Pune Candidate Site',
   placedComponents = [],
   onAreaChange,
   onPolygonChange,
@@ -627,13 +627,13 @@ export const InteractivePlotDrawer: React.FC<InteractivePlotDrawerProps> = ({
         </div>
       </div>
 
-      {/* Mapillary Nashik Street View Modal */}
+      {/* Mapillary Pune Street View Modal */}
       <MapillaryStreetViewModal
         isOpen={isStreetViewOpen}
         onClose={() => setIsStreetViewOpen(false)}
         lat={siteLat}
         lng={siteLng}
-        title={`Nashik Street-Level Inspection — ${siteCode}`}
+        title={`Pune Street-Level Inspection — ${siteCode}`}
         placedComponents={placedComponents}
         plotGeometry={geoJsonRing}
       />

@@ -23,9 +23,9 @@ let buildingsCache: any = null;
 
 const getBuildingsFilePath = (): string => {
   const cwd = process.cwd();
-  const path1 = path.join(cwd, 'data', 'osm', 'nashik_buildings.geojson');
+  const path1 = path.join(cwd, 'data', 'osm', 'pune_buildings.geojson');
   if (fs.existsSync(path1)) return path1;
-  const path2 = path.join(cwd, '..', 'data', 'osm', 'nashik_buildings.geojson');
+  const path2 = path.join(cwd, '..', 'data', 'osm', 'pune_buildings.geojson');
   if (fs.existsSync(path2)) return path2;
   return path1;
 };
@@ -87,7 +87,8 @@ export class ShadingService {
       Math.min(35.0, ((nearbyBuildingCount * estimatedHeight) / Math.sqrt(parcelAreaSqm)) * 1.5).toFixed(1)
     );
 
-    const regionalGhi = 5.02; // NASA POWER annual optimal tilt mean
+    const regionalGhi = 5.12; // NASA POWER annual optimal tilt mean for Pune
+
     const effectiveShadedGhi = Number((regionalGhi * (1 - shadingLossPercent / 100)).toFixed(2));
 
     return {
@@ -105,7 +106,7 @@ export class ShadingService {
       effectiveShadedGhiKwhM2Day: effectiveShadedGhi,
       shadingClassification: 'CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY',
       limitations: [
-        'High-resolution 1m LiDAR / 3D urban canopy mesh is UNAVAILABLE in open public data for Nashik.',
+        'High-resolution 1m LiDAR / 3D urban canopy mesh is UNAVAILABLE in open public data for Pune.',
         'Building heights are derived from OSM floor level tags or default 3.5m single-story proxy (DERIVED_ESTIMATED_BUILDING_HEIGHT_PROXY).',
         'Micro-shading loss is a ray-cast shadow projection proxy (CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY) for conceptual 3D canvas visualization.',
         'Regional GHI baseline is from NASA POWER 50km climatology and does NOT constitute bankable plot-level irradiance.',

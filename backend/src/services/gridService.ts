@@ -18,9 +18,9 @@ let msedclGridCache: any = null;
 
 const getGridFilePath = (): string => {
   const cwd = process.cwd();
-  const path1 = path.join(cwd, 'data', 'geo', 'nashik_msedcl_grid.geojson');
+  const path1 = path.join(cwd, 'data', 'geo', 'pune_msedcl_grid.geojson');
   if (fs.existsSync(path1)) return path1;
-  const path2 = path.join(cwd, '..', 'data', 'geo', 'nashik_msedcl_grid.geojson');
+  const path2 = path.join(cwd, '..', 'data', 'geo', 'pune_msedcl_grid.geojson');
   if (fs.existsSync(path2)) return path2;
   return path1;
 };
@@ -43,12 +43,12 @@ export class GridService {
     const geojson = this.getMsedclGridGeoJson();
     if (!geojson || !geojson.features) {
       return {
-        nearestSubstationName: 'MSEDCL Satpur Substation',
-        nearestSubstationCode: 'NSK-SUB-SAT',
+        nearestSubstationName: 'MSEDCL Shivajinagar 132/33kV EHV Substation',
+        nearestSubstationCode: 'PUN-SUB-SHIV',
         nearestSubstationDistanceMeters: 1200,
-        nearestFeederLineName: 'Satpur 33kV Feeder Line',
+        nearestFeederLineName: 'Shivajinagar 33kV Feeder Line',
         nearestFeederDistanceMeters: 450,
-        estimatedFeederHostingCapacityMw: 4.5,
+        estimatedFeederHostingCapacityMw: 6.5,
         gridInterconnectionCapexTier: 'OPTIMAL_LOW_CAPEX',
         classification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY',
         capacityStatus: 'ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY',
@@ -63,17 +63,17 @@ export class GridService {
     let nearestFeederFeature: any = null;
 
     geojson.features.forEach((f: any) => {
-      const props = f.properties;
-      const geom = f.geometry;
+      const props = f.properties || {};
+      const geom = f.geometry || {};
 
-      if (props.nodeType === 'SUBSTATION' && geom.type === 'Point' && geom.coordinates) {
+      if ((props.nodeType === 'SUBSTATION' || (!props.nodeType && geom.type === 'Point')) && geom.type === 'Point' && geom.coordinates) {
         const [subLng, subLat] = geom.coordinates;
         const d = calculateHaversineMeters(lat, lng, subLat, subLng);
         if (d < minSubDistance) {
           minSubDistance = d;
           nearestSubFeature = f;
         }
-      } else if (props.nodeType === 'FEEDER_LINE' && geom.type === 'LineString' && geom.coordinates) {
+      } else if ((props.nodeType === 'FEEDER_LINE' || geom.type === 'LineString') && geom.coordinates) {
         geom.coordinates.forEach(([fLng, fLat]: [number, number]) => {
           const d = calculateHaversineMeters(lat, lng, fLat, fLng);
           if (d < minFeederDistance) {
@@ -85,7 +85,7 @@ export class GridService {
     });
 
     const nearestSubDist = minSubDistance !== Infinity ? Math.round(minSubDistance) : 1200;
-    const nearestFeederDist = minFeederDistance !== Infinity ? Math.round(minFeederDistance) : 450;
+    const nearestFeederDist = minFeederDistance !== Infinity ? Math.round(minFeederDistance) : (minSubDistance !== Infinity ? Math.round(minSubDistance * 0.4) : 450);
 
     let capexTier: IGridProximityResult['gridInterconnectionCapexTier'] = 'OPTIMAL_LOW_CAPEX';
     if (nearestFeederDist > 1500) capexTier = 'HIGH_CAPEX';
@@ -95,12 +95,12 @@ export class GridService {
     const feederProps = nearestFeederFeature?.properties || {};
 
     return {
-      nearestSubstationName: subProps.name || 'MSEDCL 33/11kV Substation',
-      nearestSubstationCode: subProps.code || 'NSK-SUB-01',
+      nearestSubstationName: subProps.name || 'MSEDCL Shivajinagar 132/33kV EHV Substation',
+      nearestSubstationCode: subProps.substation_id || subProps.code || 'PUN-SUB-01',
       nearestSubstationDistanceMeters: nearestSubDist,
-      nearestFeederLineName: feederProps.name || 'MSEDCL 33kV Distribution Feeder',
+      nearestFeederLineName: feederProps.name || `${subProps.name ? subProps.name.split(' ')[1] || 'Shivajinagar' : 'Shivajinagar'} 33kV Feeder Line`,
       nearestFeederDistanceMeters: nearestFeederDist,
-      estimatedFeederHostingCapacityMw: subProps.estimatedAvailableCapacityMw || 3.0,
+      estimatedFeederHostingCapacityMw: subProps.capacity_mva ? Number((subProps.capacity_mva * 0.15).toFixed(1)) : (subProps.estimatedAvailableCapacityMw || 6.5),
       gridInterconnectionCapexTier: capexTier,
       classification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY',
       capacityStatus: 'ESTIMATED_FEEDER_HOSTING_CAPACITY_PROXY',

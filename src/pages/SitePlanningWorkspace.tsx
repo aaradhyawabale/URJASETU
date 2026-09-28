@@ -188,8 +188,8 @@ export const SitePlanningWorkspace: React.FC = () => {
           initialAreaSqm={plotAreaSqm}
           siteLat={effectiveLat}
           siteLng={effectiveLng}
-          siteCode={site?.code || 'NSK-CND-001'}
-          siteName={site?.name || 'Nashik Candidate Site'}
+          siteCode={site?.code || 'PUN-CND-001'}
+          siteName={site?.name || 'Pune Candidate Site'}
           placedComponents={placedComponents}
           onAreaChange={(newArea) => setPlotAreaSqm(newArea)}
           onPolygonChange={(ringCoordinates) => setPlotGeometry(ringCoordinates)}
@@ -213,7 +213,7 @@ export const SitePlanningWorkspace: React.FC = () => {
             <div>
               <span className="text-xs text-text-muted">Selected Parcel</span>
               <h3 className="text-sm font-bold text-text-primary">{site.name}</h3>
-              <p className="text-xs text-text-secondary mt-0.5">{site.ward || site.wardName || 'Nashik Municipal Corporation'}</p>
+              <p className="text-xs text-text-secondary mt-0.5">{site.ward || site.wardName || 'Pune Municipal Corporation'}</p>
             </div>
 
             {/* Stage 7: 2D Infrastructure Component Placement Palette */}

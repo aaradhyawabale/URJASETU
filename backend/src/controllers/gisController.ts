@@ -24,12 +24,12 @@ const getOsmDir = (): string => {
 const getGeoJsonFilePath = (layerName: string): string => {
   const osmDir = getOsmDir();
   const layerMap: Record<string, string> = {
-    roads: path.join(osmDir, 'nashik_roads.geojson'),
-    buildings: path.join(osmDir, 'nashik_buildings.geojson'),
-    pois: path.join(osmDir, 'nashik_pois.geojson'),
-    landuse: path.join(osmDir, 'nashik_landuse.geojson'),
-    parking: path.join(osmDir, 'nashik_parking.geojson'),
-    ev: path.join(osmDir, 'nashik_ev_pois.geojson'),
+    roads: path.join(osmDir, 'pune_roads.geojson'),
+    buildings: path.join(osmDir, 'pune_buildings.geojson'),
+    pois: path.join(osmDir, 'pune_pois.geojson'),
+    landuse: path.join(osmDir, 'pune_landuse.geojson'),
+    parking: path.join(osmDir, 'pune_parking.geojson'),
+    ev: path.join(osmDir, 'pune_ev_pois.geojson'),
   };
 
   return layerMap[layerName.toLowerCase()];
@@ -125,8 +125,8 @@ export const getSolarClimatology = async (_req: Request, res: Response) => {
 };
 
 export const getElevationAnalysis = (req: Request, res: Response) => {
-  const lat = parseFloat(req.query.lat as string) || 19.9975;
-  const lng = parseFloat(req.query.lng as string) || 73.7898;
+  const lat = parseFloat(req.query.lat as string) || 18.5252;
+  const lng = parseFloat(req.query.lng as string) || 73.8850;
 
   const data = ElevationService.evaluateTerrain(lat, lng);
   return res.status(200).json({
@@ -136,8 +136,8 @@ export const getElevationAnalysis = (req: Request, res: Response) => {
 };
 
 export const getHydrologicalAnalysis = (req: Request, res: Response) => {
-  const lat = parseFloat(req.query.lat as string) || 19.9975;
-  const lng = parseFloat(req.query.lng as string) || 73.7898;
+  const lat = parseFloat(req.query.lat as string) || 18.5252;
+  const lng = parseFloat(req.query.lng as string) || 73.8850;
 
   const data = RiskService.evaluateHydrologicalRisk(lat, lng);
   return res.status(200).json({

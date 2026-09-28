@@ -41,7 +41,7 @@ export const OverviewDashboard: React.FC = () => {
         <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2 font-medium">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            <span>Live API connection offline — displaying Nashik Municipal seed dataset.</span>
+            <span>Live API connection offline — displaying Pune Municipal seed dataset.</span>
           </div>
           <span className="font-mono text-[10px] bg-white border border-amber-200 px-2 py-0.5 rounded text-amber-900 font-semibold">
             DEMO DATA MODE
@@ -67,10 +67,10 @@ export const OverviewDashboard: React.FC = () => {
               </span>
             </div>
             <h1 className="text-2xl xl:text-3xl text-text-primary tracking-tight font-bold">
-              Nashik Urban Agglomeration <span className="text-text-secondary font-normal">— Solar-EV Infrastructure Siting Overview</span>
+              Pune Urban Agglomeration <span className="text-text-secondary font-normal">— Solar-EV Infrastructure Siting Overview</span>
             </h1>
             <p className="text-sm text-text-secondary max-w-3xl leading-relaxed">
-              Geospatial assessment combining solar irradiance, road connectivity, activity-based EV demand proxies, and flood/conflict screening for clean energy infrastructure deployment across the Godavari municipal basin.
+              Geospatial assessment combining solar irradiance, road connectivity, activity-based EV demand proxies, and flood/conflict screening for clean energy infrastructure deployment across the Mula-Mutha municipal basin.
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
@@ -200,15 +200,15 @@ export const OverviewDashboard: React.FC = () => {
                 <span className="material-symbols-outlined text-primary text-[20px]">layers</span>
                 <span className="text-sm font-semibold text-text-primary">Spatial Basin Topology</span>
                 <span className="text-[10px] text-text-secondary bg-white border border-border-subtle px-2 py-0.5 rounded">
-                  Nashik Ward Overlays
+                  Pune Ward Overlays
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] px-2 py-1 rounded bg-sky-50 text-sky-800 border border-sky-200 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-sky-500"></span>Godavari Riverway
+                  <span className="w-2 h-2 rounded-full bg-sky-500"></span>Mula-Mutha Riverway
                 </span>
                 <span className="text-[10px] px-2 py-1 rounded bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-slate-500"></span>Trimbak Corridor
+                  <span className="w-2 h-2 rounded-full bg-slate-500"></span>FC Road Corridor
                 </span>
                 <span className="text-[10px] px-2 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-amber-500"></span>33kV MSEDCL Feeder
@@ -332,7 +332,7 @@ export const OverviewDashboard: React.FC = () => {
       {/* Candidate Sites Matrix Table */}
       <div className="bg-white rounded-xl border border-border-subtle shadow-xs overflow-hidden">
         <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between">
-          <h3 className="text-base font-bold text-text-primary">Nashik Candidate Site Siting Matrix</h3>
+          <h3 className="text-base font-bold text-text-primary">Pune Candidate Site Siting Matrix</h3>
           <button onClick={() => navigate('/sites/ranked')} className="text-xs font-semibold text-primary hover:underline">
             View Full Ranked Shortlist →
           </button>

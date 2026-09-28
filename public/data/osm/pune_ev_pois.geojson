@@ -1,0 +1,125 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_ev_1",
+        "name": "Tata Power EV Charging Station - Aundh ITI Road",
+        "operator": "Tata Power EZ Charge",
+        "charger_type": "CCS2 / Type 2 Fast Charger",
+        "capacity_kw": 60,
+        "status": "OPERATIONAL",
+        "source": "OPEN_STREET_MAP_TRAFFIC",
+        "source_date": "2026-09-27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8078,
+          18.5582
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_ev_2",
+        "name": "MSEDCL EV Fast Charger - Shivajinagar",
+        "operator": "MSEDCL / Mahavitaran",
+        "charger_type": "CCS2 Dual Gun",
+        "capacity_kw": 120,
+        "status": "OPERATIONAL",
+        "source": "AUTHORITATIVE_MSEDCL",
+        "source_date": "2026-09-27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8512,
+          18.5304
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_ev_3",
+        "name": "Jio-bp pulse Charging Station - Viman Nagar",
+        "operator": "Jio-bp pulse",
+        "charger_type": "CCS2 Fast Charger",
+        "capacity_kw": 60,
+        "status": "OPERATIONAL",
+        "source": "OPEN_STREET_MAP_TRAFFIC",
+        "source_date": "2026-09-27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.9145,
+          18.5678
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_ev_4",
+        "name": "Ather Grid Fast Charger - Kothrud Karve Road",
+        "operator": "Ather Energy",
+        "charger_type": "Ather Grid LEV",
+        "capacity_kw": 15,
+        "status": "OPERATIONAL",
+        "source": "OPEN_STREET_MAP_TRAFFIC",
+        "source_date": "2026-09-27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8182,
+          18.5074
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_ev_5",
+        "name": "Statiq EV Hub - Swargate Bus Station",
+        "operator": "Statiq",
+        "charger_type": "CCS2 / AC Type 2",
+        "capacity_kw": 60,
+        "status": "OPERATIONAL",
+        "source": "OPEN_STREET_MAP_TRAFFIC",
+        "source_date": "2026-09-27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8589,
+          18.5018
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": "pune_ev_6",
+        "name": "Zeon Charging Hub - Kharadi EON IT Park",
+        "operator": "Zeon Charging",
+        "charger_type": "CCS2 150kW Ultra Fast",
+        "capacity_kw": 150,
+        "status": "OPERATIONAL",
+        "source": "OPEN_STREET_MAP_TRAFFIC",
+        "source_date": "2026-09-27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.9521,
+          18.5512
+        ]
+      }
+    }
+  ]
+}

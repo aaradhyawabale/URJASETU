@@ -52,11 +52,11 @@ export async function postAIReview(payload: IAIReviewPayload): Promise<{ review:
     return {
       review: {
         source: 'DETERMINISTIC_FALLBACK',
-        summary: 'Target site represents a high-viability candidate parcel for Solar-EV Charging Hub deployment in Nashik, Maharashtra based on preliminary ULB spatial criteria.',
+        summary: 'Target site represents a high-viability candidate parcel for Solar-EV Charging Hub deployment in Pune, Maharashtra based on preliminary ULB spatial criteria.',
         strengths: [
           'Optimal GHI solar yield with minimal shading proxy loss.',
           'High activity EV demand proxy along transit corridor.',
-          'Direct 33kV substation feeder adjacency.',
+          'Direct 132/33kV substation feeder adjacency.',
         ],
         risksAndConsiderations: [
           'Flood risk screening LOW. Hydrologic DEM model confirmed.',
@@ -64,11 +64,11 @@ export async function postAIReview(payload: IAIReviewPayload): Promise<{ review:
         ],
         verificationsRequired: [
           'MSEDCL grid interconnect capacity check',
-          'Physical cadastral survey & NMC land use clearance before tender issuance',
+          'Physical cadastral survey & PMC land use clearance before tender issuance',
         ],
         technicalCapacity: {
           solarCapacityKwp: 360,
-          annualGenerationMwh: 659.6,
+          annualGenerationMwh: 672.7,
           evChargerPorts: 4,
           bessCapacityKwh: 180,
           estimatedCapexInr: 22640000,
@@ -77,7 +77,7 @@ export async function postAIReview(payload: IAIReviewPayload): Promise<{ review:
           dataHonestyCompliance: '100% VERIFIED_HONEST',
           solarResourceClassification: 'OPEN (NASA POWER 50km Climatology)',
           elevationClassification: 'DERIVED (Copernicus DEM 30m GLO-30 DSM)',
-          administrativeDivisionClassification: 'DERIVED_NMC_ADMINISTRATIVE_ZONES',
+          administrativeDivisionClassification: 'DERIVED_PMC_ADMINISTRATIVE_ZONES',
           gridInfrastructureClassification: 'DERIVED_GRID_INFRASTRUCTURE_PROXY',
           microShadingClassification: 'CONCEPTUAL_3D_PLOT_SHADOW_SCREENING_PROXY',
           statutoryZoningStatus: 'UNVERIFIED_STATUTORY_ZONING (Requires DP Cadastral Verification)',

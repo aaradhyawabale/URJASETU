@@ -57,9 +57,9 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
-      // Center on Nashik extent: 19.9975, 73.7898
+      // Center on Pune extent: 18.5252, 73.8850
       const map = L.map(mapContainerRef.current, {
-        center: [19.9975, 73.7898],
+        center: [18.5252, 73.8850],
         zoom: 13,
         zoomControl: false,
         preferCanvas: true, // Use canvas renderer for high feature counts
@@ -465,8 +465,8 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     markersRef.current = {};
 
     sites.forEach((site) => {
-      const lat = site.latitude || site.lat || 19.9975;
-      const lng = site.longitude || site.lng || 73.7898;
+      const lat = site.latitude || site.lat || 18.5252;
+      const lng = site.longitude || site.lng || 73.8850;
       const isSelected = selectedSite?.id === site.id;
       const isExcluded = site.isRetained === false || site.status === 'EXCLUDED' || site.status === 'DISQUALIFIED';
 

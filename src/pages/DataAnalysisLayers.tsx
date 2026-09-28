@@ -17,7 +17,7 @@ export const DataAnalysisLayers: React.FC = () => {
           </div>
           <h1 className="text-2xl font-bold text-text-primary mt-1">Data & Analysis Layers Catalog</h1>
           <p className="text-xs text-text-secondary mt-1">
-            Authoritative spatial datasets powering the UrjaSetu Site Intelligence Engine for Nashik Municipal Corporation.
+            Authoritative spatial datasets powering the UrjaSetu Site Intelligence Engine for Pune Municipal Corporation.
           </p>
         </div>
       </div>

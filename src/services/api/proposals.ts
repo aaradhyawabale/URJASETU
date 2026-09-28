@@ -29,9 +29,9 @@ export async function createProposal(payload: Partial<Proposal>): Promise<{ prop
     const mockCreated: Proposal = {
       id: `prop-${Date.now()}`,
       title: payload.title || 'Untitled Proposal',
-      siteId: payload.siteId || 'nashik-site-01',
-      siteCode: payload.siteCode || 'NASHIK-SITE-01',
-      cityName: 'Nashik Municipal Corporation',
+      siteId: payload.siteId || 'pune-site-01',
+      siteCode: payload.siteCode || 'PUNE-SITE-01',
+      cityName: 'Pune Municipal Corporation',
       opportunityScore: payload.opportunityScore || 84,
       estimatedAreaSqm: payload.estimatedAreaSqm || 2450,
       infrastructureType: payload.infrastructureType || 'SOLAR_EV_CHARGING_HUB',
@@ -39,7 +39,7 @@ export async function createProposal(payload: Partial<Proposal>): Promise<{ prop
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
       aiSummary: payload.aiSummary || 'Generated proposal summary.',
-      author: 'NMC Planning Cell',
+      author: 'PMC Planning Cell',
     };
     return { proposal: mockCreated, isFallback: true };
   }

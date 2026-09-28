@@ -9,7 +9,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   const navItems = [
     {
       step: '1',
-      label: '1. Nashik Map & Search',
+      label: '1. Pune Map & Search',
       path: '/sites',
       icon: 'map',
       description: 'Clean Map & Open Spaces',
@@ -17,21 +17,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
     {
       step: '2',
       label: '2. 2D Parcel Designer',
-      path: '/planning/nashik-site-01',
+      path: '/planning/pune-site-01',
       icon: 'design_services',
       description: 'Auto-Plot & Shape Editor',
     },
     {
       step: '3',
       label: '3. 3D Connected View',
-      path: '/planning/nashik-site-01/3d',
+      path: '/planning/pune-site-01/3d',
       icon: 'view_in_ar',
       description: "Bird's-Eye & Real Streets",
     },
     {
       step: '4',
       label: '4. AI Rationale & Review',
-      path: '/proposals/prop-nashik-01/review',
+      path: '/proposals/prop-pune-01/review',
       icon: 'psychology',
       description: 'Why Here & AI Proposal',
     },

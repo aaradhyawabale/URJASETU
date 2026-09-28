@@ -17,7 +17,7 @@ export const AppRoutes: React.FC = () => {
     <BrowserRouter>
       <AppShell>
         <Routes>
-          {/* Simplified 11-Step Journey Default Route: Clean Nashik Map Screen */}
+          {/* Simplified 11-Step Journey Default Route: Clean Pune Map Screen */}
           <Route path="/" element={<Navigate to="/sites" replace />} />
           <Route path="/dashboard" element={<Navigate to="/sites" replace />} />
 

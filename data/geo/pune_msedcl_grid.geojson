@@ -1,0 +1,107 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "substation_id": "SUB_PUNE_01",
+        "name": "MSEDCL Shivajinagar 132/33kV EHV Substation",
+        "voltage_kv": "132/33",
+        "capacity_mva": 100,
+        "operator": "MSETCL / MSEDCL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8505,
+          18.532
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "substation_id": "SUB_PUNE_02",
+        "name": "MSEDCL Aundh 33/11kV Substation",
+        "voltage_kv": "33/11",
+        "capacity_mva": 25,
+        "operator": "MSEDCL Pune Circle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.805,
+          18.559
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "substation_id": "SUB_PUNE_03",
+        "name": "MSEDCL Kharadi 132/33kV EHV Substation",
+        "voltage_kv": "132/33",
+        "capacity_mva": 80,
+        "operator": "MSETCL / MSEDCL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.948,
+          18.549
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "substation_id": "SUB_PUNE_04",
+        "name": "MSEDCL Hadapsar 132/33kV EHV Substation",
+        "voltage_kv": "132/33",
+        "capacity_mva": 100,
+        "operator": "MSETCL / MSEDCL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.931,
+          18.502
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "substation_id": "SUB_PUNE_05",
+        "name": "MSEDCL Kothrud 33/11kV Substation",
+        "voltage_kv": "33/11",
+        "capacity_mva": 31.5,
+        "operator": "MSEDCL Pune Circle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.815,
+          18.508
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "substation_id": "SUB_PUNE_06",
+        "name": "MSEDCL Katraj 33/11kV Substation",
+        "voltage_kv": "33/11",
+        "capacity_mva": 25,
+        "operator": "MSEDCL Pune Circle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.855,
+          18.452
+        ]
+      }
+    }
+  ]
+}

@@ -84,10 +84,12 @@ export type LanduseFeature = Feature<Polygon, {
   type?: string;
 }>;
 
-export interface NashikSpatialDataset {
+export interface PuneSpatialDataset {
   candidateSites: FeatureCollection<Point>;
   riverways: FeatureCollection<LineString>;
   roads: FeatureCollection<LineString>;
   feeders: FeatureCollection<LineString>;
   floodZones: FeatureCollection<Polygon>;
 }
+
+export type NashikSpatialDataset = PuneSpatialDataset;

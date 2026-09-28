@@ -23,12 +23,12 @@ export async function fetchOsmLayer(layerKey: string): Promise<FeatureCollection
 
   // 2. Fall back to static asset URL
   const fileMap: Record<string, string> = {
-    roads: '/data/osm/nashik_roads.geojson',
-    buildings: '/data/osm/nashik_buildings.geojson',
-    pois: '/data/osm/nashik_pois.geojson',
-    landuse: '/data/osm/nashik_landuse.geojson',
-    parking: '/data/osm/nashik_parking.geojson',
-    ev: '/data/osm/nashik_ev_pois.geojson',
+    roads: '/data/osm/pune_roads.geojson',
+    buildings: '/data/osm/pune_buildings.geojson',
+    pois: '/data/osm/pune_pois.geojson',
+    landuse: '/data/osm/pune_landuse.geojson',
+    parking: '/data/osm/pune_parking.geojson',
+    ev: '/data/osm/pune_ev_pois.geojson',
   };
 
   const staticUrl = fileMap[layerKey];

@@ -1,8 +1,8 @@
-import { IProposal, NASHIK_SEED_PROPOSALS } from '../seed/seedData.js';
+import { IProposal, PUNE_SEED_PROPOSALS } from '../seed/seedData.js';
 import { isDbConnected } from '../config/db.js';
 import { ProposalModel } from '../models/Proposal.js';
 
-let inMemoryProposalsStore: IProposal[] = [...NASHIK_SEED_PROPOSALS];
+let inMemoryProposalsStore: IProposal[] = [...PUNE_SEED_PROPOSALS];
 
 export class ProposalService {
   public static async getAllProposals(): Promise<IProposal[]> {
@@ -66,17 +66,17 @@ export class ProposalService {
     const newProposal: IProposal & { plotGeometry?: any } = {
       id: `prop-${Date.now()}`,
       title: data.title || 'Untitled Solar-EV Proposal',
-      siteId: data.siteId || 'nashik-site-01',
-      siteCode: data.siteCode || 'NASHIK-SITE-01',
-      cityName: data.cityName || 'Nashik Municipal Corporation',
+      siteId: data.siteId || 'pune-site-01',
+      siteCode: data.siteCode || 'PUNE-SITE-01',
+      cityName: data.cityName || 'Pune Municipal Corporation',
       opportunityScore: data.opportunityScore || 80,
       estimatedAreaSqm: data.estimatedAreaSqm || 2450,
       infrastructureType: data.infrastructureType || 'SOLAR_EV_CHARGING_HUB',
       status: (data.status as IProposal['status']) || 'READY_FOR_REVIEW',
       createdAt: today,
       updatedAt: today,
-      aiSummary: data.aiSummary || 'Generated municipal siting proposal for Nashik.',
-      author: data.author || 'ULB Planning Cell',
+      aiSummary: data.aiSummary || 'Generated municipal siting proposal for Pune.',
+      author: data.author || 'PMC Planning Cell',
       ...(data.plotGeometry ? { plotGeometry: data.plotGeometry } : {}),
     };
 

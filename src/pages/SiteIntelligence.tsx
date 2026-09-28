@@ -167,7 +167,7 @@ export const SiteIntelligence: React.FC = () => {
                 <span className="material-symbols-outlined text-slate-500 text-[18px]">search</span>
                 <input
                   type="text"
-                  placeholder="Search Nashik locations, wards, roads, POIs..."
+                  placeholder="Search Pune locations, wards, roads, POIs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-transparent text-xs text-text-primary focus:outline-none w-full placeholder:text-text-muted"
@@ -402,7 +402,7 @@ export const SiteIntelligence: React.FC = () => {
         {isFallback && (
           <div className="absolute top-20 left-4 z-20 bg-amber-50/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-amber-200 text-[11px] text-amber-900 font-medium flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Live GIS API Offline — Displaying Nashik Spatial Seed</span>
+            <span>Live GIS API Offline — Displaying Pune Spatial Seed</span>
           </div>
         )}
 

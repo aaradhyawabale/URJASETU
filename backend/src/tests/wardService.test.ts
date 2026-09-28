@@ -7,26 +7,26 @@ async function runWardServiceTests() {
   // Test 1: Load GeoJSON dataset
   const geojson = WardService.getAdministrativeDivisionsGeoJson();
   if (!geojson || !geojson.features) {
-    throw new Error('FAILED Test 1: Failed to load nashik_administrative_wards.geojson');
+    throw new Error('FAILED Test 1: Failed to load pune_administrative_wards.geojson');
   }
   if (geojson.features.length !== 6) {
     throw new Error(`FAILED Test 1: Expected 6 administrative divisions, got ${geojson.features.length}`);
   }
-  console.log(`✅ Test 1 PASSED: Loaded GeoJSON with ${geojson.features.length} NMC Administrative Divisions.`);
+  console.log(`✅ Test 1 PASSED: Loaded GeoJSON with ${geojson.features.length} PMC Administrative Divisions.`);
 
   // Test 2: Point-in-Polygon spatial lookup
-  // Test Panchavati coordinate (20.02°N, 73.82°E)
-  const panchavatiDivision = WardService.getDivisionForCoordinate(20.02, 73.82);
-  if (!panchavatiDivision || panchavatiDivision.divisionId !== 'nmc_div_01') {
-    throw new Error(`FAILED Test 2: Expected Panchavati Division (nmc_div_01), got ${panchavatiDivision?.divisionName}`);
+  // Test Shivajinagar coordinate (18.5285°N, 73.8520°E)
+  const shivajiDivision = WardService.getDivisionForCoordinate(18.5285, 73.8520);
+  if (!shivajiDivision || !shivajiDivision.divisionName.includes('Shivajinagar')) {
+    throw new Error(`FAILED Test 2: Expected Shivajinagar-Ghole Road Zone, got ${shivajiDivision?.divisionName}`);
   }
-  if (panchavatiDivision.classification !== 'DERIVED_NMC_ADMINISTRATIVE_ZONES') {
-    throw new Error(`FAILED Test 2: Classification must be DERIVED_NMC_ADMINISTRATIVE_ZONES, got ${panchavatiDivision?.classification}`);
+  if (shivajiDivision.classification !== 'DERIVED_PMC_ADMINISTRATIVE_ZONES') {
+    throw new Error(`FAILED Test 2: Classification must be DERIVED_PMC_ADMINISTRATIVE_ZONES, got ${shivajiDivision?.classification}`);
   }
-  if (panchavatiDivision.population2021 !== 'UNKNOWN') {
-    throw new Error(`FAILED Test 2: Population 2021 must be UNKNOWN, got ${panchavatiDivision?.population2021}`);
+  if (shivajiDivision.population2021 === undefined || shivajiDivision.population2021 === null) {
+    throw new Error(`FAILED Test 2: Population 2021 missing, got ${shivajiDivision?.population2021}`);
   }
-  console.log(`✅ Test 2 PASSED: Point-in-polygon lookup correctly identified Panchavati Division with provenance classification DERIVED_NMC_ADMINISTRATIVE_ZONES.`);
+  console.log(`✅ Test 2 PASSED: Point-in-polygon lookup correctly identified Shivajinagar-Ghole Road Zone with provenance classification DERIVED_PMC_ADMINISTRATIVE_ZONES.`);
 
   // Test 3: Division Aggregation metrics
   const candidates = await CandidateService.generateCandidates({ includeExcluded: true });
@@ -36,16 +36,16 @@ async function runWardServiceTests() {
     throw new Error(`FAILED Test 3: Expected aggregation for 6 divisions, got ${aggregations.length}`);
   }
 
-  const panchavatiAgg = aggregations.find((a) => a.divisionId === 'nmc_div_01');
-  if (!panchavatiAgg) {
-    throw new Error('FAILED Test 3: Panchavati aggregation summary missing');
+  const shivajiAgg = aggregations.find((a) => a.divisionName.includes('Shivajinagar'));
+  if (!shivajiAgg) {
+    throw new Error('FAILED Test 3: Shivajinagar aggregation summary missing');
   }
 
-  if (panchavatiAgg.metricClassification !== 'AGGREGATE_MODEL_OUTPUT') {
-    throw new Error(`FAILED Test 3: Metric classification must be AGGREGATE_MODEL_OUTPUT, got ${panchavatiAgg.metricClassification}`);
+  if (shivajiAgg.metricClassification !== 'AGGREGATE_MODEL_OUTPUT') {
+    throw new Error(`FAILED Test 3: Metric classification must be AGGREGATE_MODEL_OUTPUT, got ${shivajiAgg.metricClassification}`);
   }
-  if (panchavatiAgg.revenueStatus !== 'NOT_MODELED') {
-    throw new Error(`FAILED Test 3: Revenue status must be NOT_MODELED, got ${panchavatiAgg.revenueStatus}`);
+  if (shivajiAgg.revenueStatus !== 'NOT_MODELED') {
+    throw new Error(`FAILED Test 3: Revenue status must be NOT_MODELED, got ${shivajiAgg.revenueStatus}`);
   }
 
   console.log('✅ Test 3 PASSED: Spatial model aggregation correctly produced AGGREGATE_MODEL_OUTPUT summaries for 6 divisions:');

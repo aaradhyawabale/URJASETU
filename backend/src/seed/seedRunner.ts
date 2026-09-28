@@ -2,7 +2,7 @@ import { isDbConnected } from '../config/db.js';
 import { TownModel } from '../models/Town.js';
 import { SiteModel } from '../models/Site.js';
 import { ProposalModel } from '../models/Proposal.js';
-import { NASHIK_SEED_SITES, NASHIK_SEED_PROPOSALS } from './seedData.js';
+import { PUNE_SEED_SITES, PUNE_SEED_PROPOSALS } from './seedData.js';
 
 export const seedDatabase = async (): Promise<void> => {
   if (!isDbConnected()) {
@@ -11,24 +11,24 @@ export const seedDatabase = async (): Promise<void> => {
   }
 
   try {
-    // 1. Seed Town (Nashik)
+    // 1. Seed Town (Pune)
     await TownModel.findOneAndUpdate(
-      { name: 'Nashik', state: 'Maharashtra' },
+      { name: 'Pune', state: 'Maharashtra' },
       {
-        name: 'Nashik',
+        name: 'Pune',
         state: 'Maharashtra',
         country: 'India',
-        centerLat: 19.9975,
-        centerLon: 73.7898,
+        centerLat: 18.5252,
+        centerLon: 73.8850,
         bounds: {
           type: 'Polygon',
           coordinates: [
             [
-              [73.70, 19.90],
-              [73.85, 19.90],
-              [73.85, 20.05],
-              [73.70, 20.05],
-              [73.70, 19.90],
+              [73.74985, 18.42950],
+              [74.02021, 18.42950],
+              [74.02021, 18.62087],
+              [73.74985, 18.62087],
+              [73.74985, 18.42950],
             ],
           ],
         },
@@ -37,7 +37,7 @@ export const seedDatabase = async (): Promise<void> => {
     );
 
     // 2. Seed Candidate Sites
-    for (const site of NASHIK_SEED_SITES) {
+    for (const site of PUNE_SEED_SITES) {
       await SiteModel.findOneAndUpdate(
         { id: site.id },
         site,
@@ -46,7 +46,7 @@ export const seedDatabase = async (): Promise<void> => {
     }
 
     // 3. Seed Proposals
-    for (const proposal of NASHIK_SEED_PROPOSALS) {
+    for (const proposal of PUNE_SEED_PROPOSALS) {
       await ProposalModel.findOneAndUpdate(
         { id: proposal.id },
         proposal,
@@ -54,7 +54,7 @@ export const seedDatabase = async (): Promise<void> => {
       );
     }
 
-    console.log('[Seed] Database populated/synchronized with Nashik master datasets successfully.');
+    console.log('[Seed] Database populated/synchronized with Pune master datasets successfully.');
   } catch (error) {
     console.error('[Seed] Error seeding database:', (error as Error).message);
   }
