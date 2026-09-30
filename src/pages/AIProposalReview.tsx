@@ -460,7 +460,7 @@ ${aiReview.verificationsRequired.map((v) => `- [ ] ${v}`).join('\n')}
                 </div>
                 <div className="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-500 font-mono">
                   <span>Weight: 10%</span>
-                  <span>Source: Hydrology Buffer Screening (DEMO)</span>
+                  <span>Source: Hydrology buffer — PROXY, source not verified</span>
                 </div>
               </div>
             </div>

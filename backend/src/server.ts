@@ -9,6 +9,7 @@ import { sitesRouter } from './routes/sitesRouter.js';
 import { proposalsRouter } from './routes/proposalsRouter.js';
 import { aiRouter } from './routes/aiRouter.js';
 import { gisRouter } from './routes/gisRouter.js';
+import { STUDY_AREA } from './config/studyArea.js';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/v1', gisRouter);
 app.use(errorHandler);
 
 app.listen(env.PORT, () => {
+  console.log(`[UrjaSetu Backend] Active Town: ${STUDY_AREA.cityName} (${STUDY_AREA.authority})`);
   console.log(`[UrjaSetu Backend] Listening on port ${env.PORT} in ${env.NODE_ENV} mode.`);
 });
 

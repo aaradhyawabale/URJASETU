@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as turf from '@turf/turf';
 import { fetchOsmLayer } from '../services/osmService';
-import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
+import { PUNE_GEOJSON_DATASET } from '../data/geojsonDemo';
 import { calculatePolygonAreaSqm } from '../utils/turfUtils';
 
 import { IPlacedComponent } from '../../types/site';

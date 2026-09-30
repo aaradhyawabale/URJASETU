@@ -105,13 +105,10 @@ const loadGeoJsonLayer = (layerName: string): any | null => {
   }
 };
 
+import { STUDY_AREA } from '../config/studyArea.js';
+
 export class CandidateService {
-  private static studyAreaBounds = {
-    minLat: 18.4295,
-    maxLat: 18.6209,
-    minLng: 73.7498,
-    maxLng: 74.0202,
-  };
+  private static studyAreaBounds = STUDY_AREA.bounds;
 
   public static async generateCandidates(params?: ICandidateGenerationParams): Promise<ICandidateSite[]> {
     const spacing = params?.spacingDegree || 0.0075; // ~830m grid spacing
@@ -167,7 +164,7 @@ export class CandidateService {
     }
 
     // Load Solar Climatology
-    const solarClimatology = await ClimateService.getNashikSolarClimatology();
+    const solarClimatology = await ClimateService.getPuneSolarClimatology();
     const annualGhi = solarClimatology.metrics.annualGhiOptimalTilt; // 5.12 kWh/m²/day
 
     const candidates: ICandidateSite[] = [];

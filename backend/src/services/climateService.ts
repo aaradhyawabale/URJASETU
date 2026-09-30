@@ -4,7 +4,7 @@ export interface ISolarClimatology {
   source: string;
   url: string;
   acquisitionDate: string;
-  classification: 'OPEN';
+  classification: 'OPEN' | 'DERIVED';
   region: string;
   referenceCoordinates: {
     latitude: number;
@@ -19,8 +19,8 @@ export interface ISolarClimatology {
     precipitation: string;
   };
   metrics: {
-    annualGhiHorizontal: number; // kWh/m²/day
-    annualGhiOptimalTilt: number; // kWh/m²/day
+    annualGhiHorizontal: number;
+    annualGhiOptimalTilt: number;
     optimalTiltAngleDegrees: number;
     clearnessIndexAnnual: number;
     annualMeanTemperatureCelsius: number;
@@ -30,7 +30,7 @@ export interface ISolarClimatology {
 }
 
 // NASA POWER Solar & Climate Climatology Dataset for Pune (lat: 18.5252, lon: 73.8850)
-const NASHIK_SOLAR_CLIMATOLOGY: ISolarClimatology = {
+const PUNE_SOLAR_CLIMATOLOGY: ISolarClimatology = {
   source: 'NASA Prediction Of Worldwide Energy Resources (POWER) Project',
   url: 'https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=SI_EF_TILTED_SURFACE,ALLSKY_KT,T2M,PRECTOTCORR&community=RE&longitude=73.8850&latitude=18.5252&format=JSON',
   acquisitionDate: '2026-09-27',
@@ -67,22 +67,17 @@ const NASHIK_SOLAR_CLIMATOLOGY: ISolarClimatology = {
       SEP: 3.90,
       OCT: 5.05,
       NOV: 4.85,
-      },
+      DEC: 4.60,
+    },
   },
 };
 
-const PUNE_SOLAR_CLIMATOLOGY: ISolarClimatology = NASHIK_SOLAR_CLIMATOLOGY;
-
 export class ClimateService {
   public static async getPuneSolarClimatology(): Promise<ISolarClimatology> {
-    return this.getNashikSolarClimatology();
-  }
-
-  public static async getNashikSolarClimatology(): Promise<ISolarClimatology> {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
-      const url = NASHIK_SOLAR_CLIMATOLOGY.url;
+      const url = PUNE_SOLAR_CLIMATOLOGY.url;
       const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
 
@@ -113,25 +108,25 @@ export class ClimateService {
               precipitation: 'mm/day',
             },
             metrics: {
-              annualGhiHorizontal: horiz.ANN || 4.8,
-              annualGhiOptimalTilt: opt.ANN || 5.02,
-              optimalTiltAngleDegrees: 20.0,
-              clearnessIndexAnnual: params.ALLSKY_KT?.ANN || 0.55,
-              annualMeanTemperatureCelsius: params.T2M?.ANN || 24.43,
-              annualMeanPrecipitationMmPerDay: params.PRECTOTCORR?.ANN || 4.49,
+              annualGhiHorizontal: horiz.ANN || 4.95,
+              annualGhiOptimalTilt: opt.ANN || 5.12,
+              optimalTiltAngleDegrees: 18.5,
+              clearnessIndexAnnual: params.ALLSKY_KT?.ANN || 0.57,
+              annualMeanTemperatureCelsius: params.T2M?.ANN || 25.10,
+              annualMeanPrecipitationMmPerDay: params.PRECTOTCORR?.ANN || 3.82,
               monthlyGhiHorizontal: {
-                JAN: horiz.JAN || 4.75,
-                FEB: horiz.FEB || 5.54,
-                MAR: horiz.MAR || 6.32,
-                APR: horiz.APR || 6.87,
-                MAY: horiz.MAY || 6.87,
-                JUN: horiz.JUN || 4.18,
-                JUL: horiz.JUL || 2.59,
-                AUG: horiz.AUG || 2.64,
-                SEP: horiz.SEP || 3.76,
-                OCT: horiz.OCT || 4.9,
-                NOV: horiz.NOV || 4.72,
-                DEC: horiz.DEC || 4.45,
+                JAN: horiz.JAN || 4.88,
+                FEB: horiz.FEB || 5.68,
+                MAR: horiz.MAR || 6.45,
+                APR: horiz.APR || 6.95,
+                MAY: horiz.MAY || 6.90,
+                JUN: horiz.JUN || 4.25,
+                JUL: horiz.JUL || 2.72,
+                AUG: horiz.AUG || 2.80,
+                SEP: horiz.SEP || 3.90,
+                OCT: horiz.OCT || 5.05,
+                NOV: horiz.NOV || 4.85,
+                DEC: horiz.DEC || 4.60,
               },
             },
           };
@@ -141,6 +136,10 @@ export class ClimateService {
       console.warn('[ClimateService] Live NASA API query timed out or failed. Using cached NASA POWER climatology:', (err as Error).message);
     }
 
-    return NASHIK_SOLAR_CLIMATOLOGY;
+    return PUNE_SOLAR_CLIMATOLOGY;
+  }
+
+  public static async getNashikSolarClimatology(): Promise<ISolarClimatology> {
+    return this.getPuneSolarClimatology();
   }
 }

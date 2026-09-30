@@ -74,7 +74,7 @@ export const RankedSites: React.FC = () => {
               </span>
             </div>
             <h2 className="text-xl font-bold text-text-primary mt-1">
-              Divisional Requirement & Infrastructure Priority Matrix (DEMO — Not Verified for PMC)
+              Divisional Requirement & Infrastructure Priority Matrix — DEMO
             </h2>
           </div>
           <span className="text-xs text-text-muted">6 Administrative Divisions</span>

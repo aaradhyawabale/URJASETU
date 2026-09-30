@@ -58,7 +58,7 @@ async function runEndToEndIntegrationTests() {
   if (aggregations.length !== 6) {
     throw new Error(`FAILED Test 5: Expected 6 administrative divisions, got ${aggregations.length}`);
   }
-  console.log(`✅ Test 5 PASSED: Ward aggregation summarized candidate density across 6 NMC administrative divisions.`);
+  console.log(`✅ Test 5 PASSED: Ward aggregation summarized candidate density across 6 PMC administrative divisions.`);
 
   // 6. MCDA Sensitivity & Recalculation Test
   const sensitivity = SensitivityService.generateSensitivityMatrix(candidates);

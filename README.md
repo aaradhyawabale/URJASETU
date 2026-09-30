@@ -7,7 +7,7 @@
 ## 1. What is UrjaSetu?
 **UrjaSetu** is an AI-assisted Geospatial Intelligence and Decision-Support Platform built for Indian Municipal Bodies (Urban Local Bodies - ULBs). It converts fragmented spatial, climate, grid, and demand proxy data into ranked, risk-screened candidate sites for Solar-EV Charging Hubs, then guides urban planners through plot measurement, 3D conceptual planning, AI-assisted proposal review, and final proposal packaging.
 
-- **Primary Demo City:** Nashik, Maharashtra, India
+- **Primary Study City:** Pune, Maharashtra, India (Historical reference: Nashik)
 - **Primary Infrastructure Model:** 500kW Solar-EV Charging Hub
 
 ---
@@ -87,7 +87,7 @@ Verify Health API at `http://localhost:5000/api/health`:
 {
   "status": "ok",
   "service": "urjasetu-api",
-  "demoCity": "Nashik, Maharashtra, India"
+  "demoCity": "Pune, Maharashtra, India"
 }
 ```
 
@@ -102,7 +102,7 @@ stitch_urjasetu_geospatial_planning_platform/
 │   │   ├── controllers/      # Site, Proposal, AI, Health controllers
 │   │   ├── middleware/       # Error handling & CORS middleware
 │   │   ├── routes/           # REST endpoints (/api/v1/sites, /api/v1/proposals, /api/v1/ai)
-│   │   ├── seed/             # Nashik seed datasets
+│   │   ├── seed/             # Pune seed datasets
 │   │   ├── services/         # Scoring engine, Risk screening, Proposal CRUD, AI wrapper
 │   │   └── server.ts         # Express server entry point
 │   ├── package.json

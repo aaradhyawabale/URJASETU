@@ -21,7 +21,7 @@ export interface GISLayerMetadata {
   category: GISLayerCategory;
   source: string;
   type: 'Vector Point' | 'Vector Polyline' | 'Vector Polygon' | 'Raster Heatmap';
-  status: 'Active Demo' | 'Precomputed' | 'Estimated Proxy' | 'Authoritative OSM';
+  status: string;
   description: string;
   coverage: string;
   limitations: string;
@@ -91,5 +91,3 @@ export interface PuneSpatialDataset {
   feeders: FeatureCollection<LineString>;
   floodZones: FeatureCollection<Polygon>;
 }
-
-export type NashikSpatialDataset = PuneSpatialDataset;

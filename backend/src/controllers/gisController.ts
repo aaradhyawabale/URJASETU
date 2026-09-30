@@ -117,7 +117,7 @@ export const getOsmMetadata = (_req: Request, res: Response) => {
 };
 
 export const getSolarClimatology = async (_req: Request, res: Response) => {
-  const data = await ClimateService.getNashikSolarClimatology();
+  const data = await ClimateService.getPuneSolarClimatology();
   return res.status(200).json({
     success: true,
     data,

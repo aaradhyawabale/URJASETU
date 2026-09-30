@@ -3,32 +3,39 @@ import { TownModel } from '../models/Town.js';
 import { SiteModel } from '../models/Site.js';
 import { ProposalModel } from '../models/Proposal.js';
 import { PUNE_SEED_SITES, PUNE_SEED_PROPOSALS } from './seedData.js';
+import { STUDY_AREA } from '../config/studyArea.js';
 
 export const seedDatabase = async (): Promise<void> => {
   if (!isDbConnected()) {
-    console.log('[Seed] Database not connected. Active fallback will serve in-memory seed data.');
+    console.log(`[Seed] Database not connected. Active fallback will serve in-memory seed data for ${STUDY_AREA.cityName}.`);
     return;
   }
 
   try {
-    // 1. Seed Town (Pune)
+    // Audit for any non-Pune Town documents in DB
+    const nonPuneTowns = await TownModel.find({ name: { $ne: STUDY_AREA.cityName } }).lean();
+    if (nonPuneTowns && nonPuneTowns.length > 0) {
+      console.warn(`[Seed Warning] Found ${nonPuneTowns.length} non-${STUDY_AREA.cityName} town record(s) in DB (${nonPuneTowns.map((t) => t.name).join(', ')}). Run scripts/report-stale-towns.ts to inspect.`);
+    }
+
+    // 1. Explicitly Seed/Update Town by name 'Pune'
     await TownModel.findOneAndUpdate(
-      { name: 'Pune', state: 'Maharashtra' },
+      { name: STUDY_AREA.cityName, state: STUDY_AREA.stateName },
       {
-        name: 'Pune',
-        state: 'Maharashtra',
-        country: 'India',
-        centerLat: 18.5252,
-        centerLon: 73.8850,
+        name: STUDY_AREA.cityName,
+        state: STUDY_AREA.stateName,
+        country: STUDY_AREA.countryName,
+        centerLat: STUDY_AREA.centerLat,
+        centerLon: STUDY_AREA.centerLon,
         bounds: {
           type: 'Polygon',
           coordinates: [
             [
-              [73.74985, 18.42950],
-              [74.02021, 18.42950],
-              [74.02021, 18.62087],
-              [73.74985, 18.62087],
-              [73.74985, 18.42950],
+              [STUDY_AREA.bounds.minLng, STUDY_AREA.bounds.minLat],
+              [STUDY_AREA.bounds.maxLng, STUDY_AREA.bounds.minLat],
+              [STUDY_AREA.bounds.maxLng, STUDY_AREA.bounds.maxLat],
+              [STUDY_AREA.bounds.minLng, STUDY_AREA.bounds.maxLat],
+              [STUDY_AREA.bounds.minLng, STUDY_AREA.bounds.minLat],
             ],
           ],
         },
@@ -54,7 +61,7 @@ export const seedDatabase = async (): Promise<void> => {
       );
     }
 
-    console.log('[Seed] Database populated/synchronized with Pune master datasets successfully.');
+    console.log(`[Seed] Database synchronized with ${STUDY_AREA.cityName} master datasets successfully.`);
   } catch (error) {
     console.error('[Seed] Error seeding database:', (error as Error).message);
   }

@@ -160,5 +160,3 @@ export const PUNE_GEOJSON_DATASET: PuneSpatialDataset = {
     ],
   },
 };
-
-export const NASHIK_GEOJSON_DATASET = PUNE_GEOJSON_DATASET;

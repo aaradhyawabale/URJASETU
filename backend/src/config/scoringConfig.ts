@@ -53,7 +53,7 @@ export interface IScoringConfig {
   };
   riparianBufferModel: {
     sourceGuidance: {
-      blueLineSetbackMeters: number; // 30m MRTP Act 1966 & NMC DCPR 2017 blue line setback
+      blueLineSetbackMeters: number; // 30m MRTP Act 1966 & PMC DCPR 2017 blue line setback
       citation: string;
       legalClassification: 'CONSERVATIVE_PROJECT_SCREENING_BUFFER';
     };

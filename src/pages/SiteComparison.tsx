@@ -192,7 +192,7 @@ export const SiteComparison: React.FC = () => {
               <tr>
                 <td className="p-4 font-bold text-text-primary bg-slate-50/50">
                   Riparian Blue Line Setback (DEMO)
-                  <span className="block text-[10px] text-text-muted font-normal">MRTP Act 1966 & Planning Guidelines (DEMO — Not Verified for PMC)</span>
+                  <span className="block text-[10px] text-text-muted font-normal">Applicable Building Regulations — Not Verified</span>
                 </td>
                 {comparedSites.map((s) => (
                   <td key={s.id} className="p-4 text-emerald-600 font-bold">

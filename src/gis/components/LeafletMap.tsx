@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { CandidateSite } from '../../types/site';
-import { NASHIK_GEOJSON_DATASET } from '../data/geojsonDemo';
+import { STUDY_AREA } from '../../config/studyArea';
+import { PUNE_GEOJSON_DATASET } from '../data/geojsonDemo';
 import { fetchOsmLayer } from '../services/osmService';
 
 import { getScreenedOpenSpaces } from '../services/screenedSpaceService';
@@ -57,10 +58,10 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
-      // Center on Pune extent: 18.5252, 73.8850
+      // Center on Pune extent: STUDY_AREA
       const map = L.map(mapContainerRef.current, {
-        center: [18.5252, 73.8850],
-        zoom: 13,
+        center: STUDY_AREA.center,
+        zoom: STUDY_AREA.defaultZoom,
         zoomControl: false,
         preferCanvas: true, // Use canvas renderer for high feature counts
       });
@@ -188,10 +189,10 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
 
       // 2. Render Demo Floodways & Feeders if toggled
       if (layers.floodways) {
-        const riverLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.riverways as any, {
+        const riverLayer = L.geoJSON(PUNE_GEOJSON_DATASET.riverways as any, {
           style: { color: '#0284c7', weight: 10, opacity: 0.5 },
         });
-        const floodZoneLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.floodZones as any, {
+        const floodZoneLayer = L.geoJSON(PUNE_GEOJSON_DATASET.floodZones as any, {
           style: { color: '#dc2626', fillColor: '#fef2f2', fillOpacity: 0.35, weight: 2, dashArray: '4 4' },
         });
         groupMap.floodways.addLayer(riverLayer);
@@ -199,7 +200,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       }
 
       if (layers.substationFeeders) {
-        const feederLayer = L.geoJSON(NASHIK_GEOJSON_DATASET.feeders as any, {
+        const feederLayer = L.geoJSON(PUNE_GEOJSON_DATASET.feeders as any, {
           style: { color: '#f59e0b', weight: 3, dashArray: '6 6', opacity: 0.9 },
         });
         groupMap.substationFeeders.addLayer(feederLayer);
